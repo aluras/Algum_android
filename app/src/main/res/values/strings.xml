@@ -1,0 +1,18 @@
+<resources>
+    <string name="app_name">Algum</string>
+    <string name="title_text">Algum</string>
+
+    <!-- Sign-in status messages -->
+    <string name="signed_in_fmt">Entrou como: %s</string>
+    <string name="signed_in">Entrou</string>
+    <string name="signing_in">Entrando…</string>
+    <string name="signed_out">Saiu</string>
+
+    <!-- Button labels -->
+    <string name="sign_out">Sair</string>
+    <string name="disconnect">Desconectar</string>
+
+    <!-- Content Description for images -->
+    <string name="desc_google_icon">Google Logo</string>
+
+</resources>
