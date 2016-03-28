@@ -5,6 +5,8 @@ import android.support.v7.app.AppCompatActivity;
 
 public class LancamentoContasActivity extends AppCompatActivity {
 
+    private final String LOG_TAG = LancamentoContasActivity.class.getSimpleName();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
