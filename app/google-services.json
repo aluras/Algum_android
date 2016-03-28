@@ -86,6 +86,51 @@
           "status": 1
         }
       }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:428110110118:android:5523ef93add55e92",
+        "client_id": "android:br.com.algum.algum_android",
+        "client_type": 1,
+        "android_client_info": {
+          "package_name": "br.com.algum.algum_android",
+          "certificate_hash": []
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "428110110118-tr046ljd6nb79j1f17idqfhr2jbrkcnu.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "br.com.algum.algum_android",
+            "certificate_hash": "F1188086E3930888C61BD1C7C70119B34C923FD9"
+          }
+        },
+        {
+          "client_id": "428110110118-aorl760dnq9g1095fk3gvji391h8f89n.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "cloud_messaging_service": {
+          "status": 1,
+          "apns_config": []
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "google_signin_service": {
+          "status": 2
+        },
+        "ads_service": {
+          "status": 1
+        }
+      }
     }
   ],
   "client_info": [],
