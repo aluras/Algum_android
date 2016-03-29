@@ -1,0 +1,6 @@
+<resources>
+    <declare-styleable name="GraficoBarraView">
+        <attr name="mClosedColor" format="integer" />
+        <attr name="mSizePercent" format="integer" />
+    </declare-styleable>
+</resources>

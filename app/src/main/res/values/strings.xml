@@ -2,6 +2,29 @@
     <string name="app_name">Algum</string>
     <string name="title_text">Algum</string>
 
+    <string name="despesa">Despesa</string>
+    <string name="receita">Receita</string>
+    <string name="transferencia">Transferência</string>
+    <string name="contas">Contas</string>
+    <string name="despesasmes">Despesas no mês</string>
+    <string name="planejadomes">Planejado</string>
+
+    <string name="navigation_drawer_open">Abrir menu de navegação</string>
+    <string name="navigation_drawer_close">Fechar menu de navegação</string>
+
+    <string name="action_settings">Settings</string>
+    <string name="title_activity_main">Lançamento</string>
+    <string name="title_activity_contas">Contas</string>
+    <string name="title_activity_grupos">Grupos</string>
+    <string name="title_activity_edit_grupo">Novo Grupo</string>
+    <string name="title_activity_edit_conta">Nova Conta</string>
+    <string name="title_activity_lancamento_grupos">Lançamento - Grupos</string>
+    <string name="title_activity_base">BaseActivity</string>
+    <string name="title_activity_lancamento_valor">Lançamento - Valor</string>
+    <string name="title_activity_planejamento">Planejamento</string>
+    <string name="title_activity_extrato">Extrato</string>
+    <string name="title_activity_situacao">Situação</string>
+
     <!-- Sign-in status messages -->
     <string name="signed_in_fmt">Entrou como: %s</string>
     <string name="signed_in">Entrou</string>

@@ -17,15 +17,27 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/ThemeOverlay.MyNoTitleActivity">
-        <activity android:name="br.com.algum.algum_android.MainActivity">
+        <activity android:name="br.com.algum.algum_android.MainActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="br.com.algum.algum_android.LancamentoContasActivity"></activity>
+        <activity
+            android:name=".LancamentoContasActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:label="@string/title_activity_main"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar">
+        </activity>
 
+        <provider
+            android:authorities="@string/content_authority"
+            android:name=".data.AlgumContentProvider"
+            android:exported="false"
+            android:syncable="true" />
 
         <service
             android:name=".sync.AlgumSyncService"

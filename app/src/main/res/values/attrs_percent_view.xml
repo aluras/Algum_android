@@ -1,0 +1,9 @@
+<resources>
+    <declare-styleable name="PercentView">
+        <attr name="value" format="float" />
+        <attr name="startColor" format="color" />
+        <attr name="endColor" format="color" />
+        <attr name="ballColor" format="color" />
+        <attr name="ballColorExceed" format="color" />
+    </declare-styleable>
+</resources>

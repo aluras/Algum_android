@@ -4,6 +4,33 @@
     <color name="colorPrimaryDark">#42AF42</color>
     <color name="colorAccent">#249624</color>
 
+    <color name="despesa">#DB5353</color>
+    <color name="receita">#42AF42</color>
+    <color name="transferencia">#DBC453</color>
+
+    <color name="texto_tipo">#FFFFFF</color>
+
+    <!-- TILES -->
+    <color name="tile1">#DB5353</color>
+    <color name="tile2">#DB9153</color>
+    <color name="tile3">#328383</color>
+
+    <!-- Barra de porcentagem -->
+    <color name="ball">#272E27</color>
+    <color name="ballExcced">#DB5353</color>
+
+    <color name="despesaDisable">#50DB5353</color>
+    <color name="receitaDisable">#5042AF42</color>
+    <color name="transferenciaDisable">#50DBC453</color>
+
+    <!-- Grafico de situação -->
+    <color name="situacao1">#1B7070</color>
+    <color name="situacao2">#BB2D2D</color>
+    <color name="situacao3">#BB6D2D</color>
+    <color name="situacao4">#249624</color>
+    <color name="situacao5">#3F2A81</color>
+    <color name="situacao6">#BBA32D</color>
+
     <color name="verde_algum">#69CC69</color>
 
     <color name="blue_grey_500">#607D8B</color>
