@@ -1,5 +1,7 @@
 package br.com.algum.algum_android;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
@@ -49,6 +51,13 @@ public class LancamentoContasActivity extends BaseActivity
         TextView txtTransferencia = (TextView)findViewById(R.id.textTransferencia);
         txtTransferencia.setTextColor(getResources().getColor(R.color.texto_tipo));
 
+
+        SharedPreferences sharedPref = getSharedPreferences(getString(R.string.userInfo), Context.MODE_PRIVATE);
+        int idUsuario = sharedPref.getInt(getString(R.string.idUsuario), 0);
+
+
+        TextView txtView = (TextView) findViewById(R.id.textView2);
+        txtView.setText(String.valueOf(idUsuario));
 
 
 

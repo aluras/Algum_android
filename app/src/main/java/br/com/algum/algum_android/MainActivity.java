@@ -1,6 +1,9 @@
 package br.com.algum.algum_android;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -17,6 +20,7 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.OptionalPendingResult;
 
 import java.io.BufferedReader;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -31,6 +35,10 @@ public class MainActivity extends AppCompatActivity implements
     private static final String TAG = "MainActivuty";
     private static final int RC_SIGN_IN = 9001;
     private static final int RC_GET_TOKEN = 9002;
+
+    private Context mContext;
+
+    private String retorno;
 
     private GoogleApiClient mGoogleApiClient;
 
@@ -55,6 +63,8 @@ public class MainActivity extends AppCompatActivity implements
         SignInButton signInButton = (SignInButton) findViewById(R.id.sign_in_button);
         signInButton.setSize(SignInButton.SIZE_STANDARD);
         signInButton.setScopes(gso.getScopeArray());
+
+        mContext = this;
 
     }
 
@@ -90,62 +100,16 @@ public class MainActivity extends AppCompatActivity implements
             String id_token = acct.getIdToken();
             String email = acct.getEmail();
 
-            HttpURLConnection urlConnection = null;
-            BufferedReader reader = null;
+            SharedPreferences sharedPref = getSharedPreferences(getString(R.string.userInfo), Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor = sharedPref.edit();
+            editor.putString(getString(R.string.emailUsuario), email);
+            editor.putString(getString(R.string.tokenUsuario), id_token);
+            editor.commit();
+
+            ValidaUsuarioTask validaUsuarioTask = new ValidaUsuarioTask();
+            validaUsuarioTask.execute(email, id_token);
 
 
-            try{
-
-                URL url = new URL("http://localhost:81/Algum_php/usuarios");
-                urlConnection = (HttpURLConnection) url.openConnection();
-                urlConnection.setRequestMethod("GET");
-                urlConnection.connect();
-
-                // Read the input stream into a String
-                InputStream inputStream = urlConnection.getInputStream();
-                StringBuffer buffer = new StringBuffer();
-                if (inputStream == null) {
-                    // Nothing to do.
-                    return;
-                }
-
-                reader = new BufferedReader(new InputStreamReader(inputStream));
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    // Since it's JSON, adding a newline isn't necessary (it won't affect parsing)
-                    // But it does make debugging a *lot* easier if you print out the completed
-                    // buffer for debugging.
-                    buffer.append(line + "\n");
-                }
-
-                if (buffer.length() == 0) {
-                    // Stream was empty.  No point in parsing.
-                    return;
-                }
-
-            } catch (IOException e) {
-                Log.e(TAG, "Error ", e);
-                // If the code didn't successfully get the weather data, there's no point in attempting
-                // to parse it.
-                return;
-            } finally {
-                if (urlConnection != null) {
-                    urlConnection.disconnect();
-                }
-                if (reader != null) {
-                    try {
-                        reader.close();
-                    } catch (final IOException e) {
-                        Log.e(TAG, "Error closing stream", e);
-                    }
-                }
-            }
-
-
-
-
-            Intent intent = new Intent(this,LancamentoContasActivity.class);
-            startActivity(intent);
         }else{
             Toast.makeText(MainActivity.this, result.toString(), Toast.LENGTH_LONG).show();
 
@@ -175,4 +139,103 @@ public class MainActivity extends AppCompatActivity implements
         }
     }
 
+
+    public class ValidaUsuarioTask extends AsyncTask<String, Void, Integer> {
+        private final String LOG_TAG = ValidaUsuarioTask.class.getSimpleName();
+
+        @Override
+        protected Integer doInBackground(String... params) {
+
+            if (params.length == 0) {
+                return 0;
+            }
+
+            HttpURLConnection urlConnection = null;
+            BufferedReader reader = null;
+            String strRetorno;
+
+
+            try{
+
+                //URL url = new URL("http://localhost:81/Algum_php/usuarios");
+                URL url = new URL("http://10.190.236.51:81/Algum_php/usuarios");
+                urlConnection = (HttpURLConnection) url.openConnection();
+                urlConnection.setRequestMethod("POST");
+                urlConnection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+                String postParams = getString(R.string.emailUsuario)+"="+params[0];
+                urlConnection.setRequestProperty("Content-length", Integer.toString(postParams.length()));
+
+                //urlConnection.setDoOutput(true);
+                //urlConnection.setDoInput(true);
+                DataOutputStream wr = new DataOutputStream(urlConnection.getOutputStream());
+                wr.write(postParams.getBytes());
+
+                urlConnection.connect();
+
+                // Read the input stream into a String
+                InputStream inputStream = urlConnection.getInputStream();
+                StringBuffer buffer = new StringBuffer();
+                if (inputStream == null) {
+                    // Nothing to do.
+                    return 0;
+                }
+
+                reader = new BufferedReader(new InputStreamReader(inputStream));
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    // Since it's JSON, adding a newline isn't necessary (it won't affect parsing)
+                    // But it does make debugging a *lot* easier if you print out the completed
+                    // buffer for debugging.
+                    buffer.append(line + "\n");
+                }
+
+                strRetorno = buffer.toString();
+
+                if (buffer.length() == 0) {
+                    // Stream was empty.  No point in parsing.
+                    return 0;
+                }
+
+                return 1;
+            } catch (IOException e) {
+                Log.e(LOG_TAG, "Error ", e);
+                // If the code didn't successfully get the weather data, there's no point in attempting
+                // to parse it.
+                return 0;
+            } catch (Exception e){
+                Log.e(LOG_TAG, "Error ", e);
+                // If the code didn't successfully get the weather data, there's no point in attempting
+                // to parse it.
+                return 0;
+            }finally {
+                if (urlConnection != null) {
+                    urlConnection.disconnect();
+                }
+                if (reader != null) {
+                    try {
+                        reader.close();
+                    } catch (final IOException e) {
+                        Log.e(LOG_TAG, "Error closing stream", e);
+                    }
+                }
+            }
+        }
+
+        @Override
+        protected void onPostExecute(Integer s) {
+            if(s == 0){
+                Toast.makeText(mContext, "Erro ao validar usuário! Tente novamente mais tarde.", Toast.LENGTH_LONG).show();
+            }else{
+                SharedPreferences sharedPref = getSharedPreferences(getString(R.string.userInfo), Context.MODE_PRIVATE);
+                SharedPreferences.Editor editor = sharedPref.edit();
+                editor.putInt(getString(R.string.idUsuario), s);
+                editor.commit();
+
+                Intent intent = new Intent(mContext,LancamentoContasActivity.class);
+                intent.putExtra("teste","executado");
+                startActivity(intent);
+            }
+
+        }
+    }
 }

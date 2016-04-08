@@ -1,6 +1,10 @@
 <resources>
     <string name="app_name">Algum</string>
     <string name="title_text">Algum</string>
+    <string name="idUsuario">idUsuario</string>
+    <string name="emailUsuario">email</string>
+    <string name="tokenUsuario">tokenUsuario</string>
+    <string name="userInfo">userInfo</string>
 
     <string name="despesa">Despesa</string>
     <string name="receita">Receita</string>
