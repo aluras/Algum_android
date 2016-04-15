@@ -20,7 +20,6 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.OptionalPendingResult;
 
 import java.io.BufferedReader;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -78,6 +77,11 @@ public class MainActivity extends AppCompatActivity implements
             // and the GoogleSignInResult will be available instantly.
             GoogleSignInResult result = opr.get();
             handleSignInResult(result);
+        }else{
+            View btnLogin = (View) findViewById(R.id.sign_in_button);
+            btnLogin.setVisibility(View.VISIBLE);
+            View loading = (View) findViewById(R.id.loadingPanel);
+            loading.setVisibility(View.GONE);
         }
     }
 
@@ -113,11 +117,20 @@ public class MainActivity extends AppCompatActivity implements
         }else{
             Toast.makeText(MainActivity.this, result.toString(), Toast.LENGTH_LONG).show();
 
+            View btnLogin = (View) findViewById(R.id.sign_in_button);
+            btnLogin.setVisibility(View.VISIBLE);
+            View loading = (View) findViewById(R.id.loadingPanel);
+            loading.setVisibility(View.GONE);
+
         }
     }
 
 
     private void signIn() {
+        View btnLogin = (View) findViewById(R.id.sign_in_button);
+        btnLogin.setVisibility(View.GONE);
+        View loading = (View) findViewById(R.id.loadingPanel);
+        loading.setVisibility(View.VISIBLE);
         Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
         startActivityForResult(signInIntent, RC_SIGN_IN);
     }
@@ -158,17 +171,18 @@ public class MainActivity extends AppCompatActivity implements
             try{
 
                 //URL url = new URL("http://localhost:81/Algum_php/usuarios");
-                URL url = new URL("http://10.190.236.51:81/Algum_php/usuarios");
+                URL url = new URL("http://10.190.236.51:81/Algum_php/usuario");
                 urlConnection = (HttpURLConnection) url.openConnection();
-                urlConnection.setRequestMethod("POST");
+                urlConnection.setRequestMethod("GET");
                 urlConnection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
-                String postParams = getString(R.string.emailUsuario)+"="+params[0];
-                urlConnection.setRequestProperty("Content-length", Integer.toString(postParams.length()));
+                //String postParams = getString(R.string.emailUsuario)+"="+params[0];
+                urlConnection.setRequestProperty("Application-Authorization", params[1]);
+                //urlConnection.setRequestProperty("Content-length", Integer.toString(postParams.length()));
 
                 //urlConnection.setDoOutput(true);
                 //urlConnection.setDoInput(true);
-                DataOutputStream wr = new DataOutputStream(urlConnection.getOutputStream());
-                wr.write(postParams.getBytes());
+                //DataOutputStream wr = new DataOutputStream(urlConnection.getOutputStream());
+                //wr.write(postParams.getBytes());
 
                 urlConnection.connect();
 
@@ -225,6 +239,10 @@ public class MainActivity extends AppCompatActivity implements
         protected void onPostExecute(Integer s) {
             if(s == 0){
                 Toast.makeText(mContext, "Erro ao validar usuário! Tente novamente mais tarde.", Toast.LENGTH_LONG).show();
+                View btnLogin = (View) findViewById(R.id.sign_in_button);
+                btnLogin.setVisibility(View.VISIBLE);
+                View loading = (View) findViewById(R.id.loadingPanel);
+                loading.setVisibility(View.GONE);
             }else{
                 SharedPreferences sharedPref = getSharedPreferences(getString(R.string.userInfo), Context.MODE_PRIVATE);
                 SharedPreferences.Editor editor = sharedPref.edit();

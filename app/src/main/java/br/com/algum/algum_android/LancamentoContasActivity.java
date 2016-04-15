@@ -54,6 +54,7 @@ public class LancamentoContasActivity extends BaseActivity
 
         SharedPreferences sharedPref = getSharedPreferences(getString(R.string.userInfo), Context.MODE_PRIVATE);
         int idUsuario = sharedPref.getInt(getString(R.string.idUsuario), 0);
+        String tok = sharedPref.getString(getString(R.string.tokenUsuario),"");
 
 
         TextView txtView = (TextView) findViewById(R.id.textView2);
