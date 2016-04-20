@@ -24,7 +24,7 @@ public class AlgumDbHelper extends SQLiteOpenHelper {
         final String SQL_CREATE_CONTA_TABLE = "CREATE TABLE " + AlgumDBContract.ContasEntry.TABLE_NAME + " (" +
                 AlgumDBContract.ContasEntry.COLUMN_CONTA_ID + " INTEGER PRIMARY KEY," +
                 AlgumDBContract.ContasEntry.COLUMN_USUARIO_ID + " INTEGER NOT NULL, " +
-                AlgumDBContract.ContasEntry.COLUMN_NOME + "TEXT NOT NULL)";
+                AlgumDBContract.ContasEntry.COLUMN_NOME + " TEXT NOT NULL)";
 
         db.execSQL(SQL_CREATE_CONTA_TABLE);
     }

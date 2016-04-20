@@ -155,6 +155,7 @@ public class MainActivity extends AppCompatActivity implements
 
     public class ValidaUsuarioTask extends AsyncTask<String, Void, Integer> {
         private final String LOG_TAG = ValidaUsuarioTask.class.getSimpleName();
+        private Exception e=null;
 
         @Override
         protected Integer doInBackground(String... params) {
@@ -171,7 +172,7 @@ public class MainActivity extends AppCompatActivity implements
             try{
 
                 //URL url = new URL("http://localhost:81/Algum_php/usuarios");
-                URL url = new URL("http://10.190.236.51:81/Algum_php/usuario");
+                URL url = new URL(getString(R.string.WSurl)+"usuarios");
                 urlConnection = (HttpURLConnection) url.openConnection();
                 urlConnection.setRequestMethod("GET");
                 urlConnection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
@@ -185,29 +186,54 @@ public class MainActivity extends AppCompatActivity implements
                 //wr.write(postParams.getBytes());
 
                 urlConnection.connect();
-
-                // Read the input stream into a String
-                InputStream inputStream = urlConnection.getInputStream();
                 StringBuffer buffer = new StringBuffer();
-                if (inputStream == null) {
-                    // Nothing to do.
-                    return 0;
-                }
 
-                reader = new BufferedReader(new InputStreamReader(inputStream));
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    // Since it's JSON, adding a newline isn't necessary (it won't affect parsing)
-                    // But it does make debugging a *lot* easier if you print out the completed
-                    // buffer for debugging.
-                    buffer.append(line + "\n");
-                }
+                if(urlConnection.getResponseCode() == 200){
+                    // Read the input stream into a String
+                    InputStream inputStream = urlConnection.getInputStream();
+                    if (inputStream == null) {
+                        // Nothing to do.
+                        throw new Exception("Usuário não encontrado.");
+                    }
 
-                strRetorno = buffer.toString();
+                    reader = new BufferedReader(new InputStreamReader(inputStream));
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        // Since it's JSON, adding a newline isn't necessary (it won't affect parsing)
+                        // But it does make debugging a *lot* easier if you print out the completed
+                        // buffer for debugging.
+                        buffer.append(line + "\n");
+                    }
 
-                if (buffer.length() == 0) {
-                    // Stream was empty.  No point in parsing.
-                    return 0;
+                    strRetorno = buffer.toString();
+
+                    if (buffer.length() == 0) {
+                        // Stream was empty.  No point in parsing.
+                        throw new Exception("Usuário não encontrado.");
+                    }
+
+                }else{
+                    InputStream inputStream = urlConnection.getErrorStream();
+                    if (inputStream == null) {
+                        // Nothing to do.
+                        throw new Exception("Mensagem de erro em branco.");
+                    }
+
+                    reader = new BufferedReader(new InputStreamReader(inputStream));
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        // Since it's JSON, adding a newline isn't necessary (it won't affect parsing)
+                        // But it does make debugging a *lot* easier if you print out the completed
+                        // buffer for debugging.
+                        buffer.append(line + "\n");
+                    }
+
+                    strRetorno = buffer.toString();
+
+                    throw new Exception(strRetorno.toString());
+
+                    //return 0;
+
                 }
 
                 return 1;
@@ -215,12 +241,12 @@ public class MainActivity extends AppCompatActivity implements
                 Log.e(LOG_TAG, "Error ", e);
                 // If the code didn't successfully get the weather data, there's no point in attempting
                 // to parse it.
-                return 0;
+                this.e = e;
             } catch (Exception e){
                 Log.e(LOG_TAG, "Error ", e);
                 // If the code didn't successfully get the weather data, there's no point in attempting
                 // to parse it.
-                return 0;
+                this.e = e;
             }finally {
                 if (urlConnection != null) {
                     urlConnection.disconnect();
@@ -230,15 +256,17 @@ public class MainActivity extends AppCompatActivity implements
                         reader.close();
                     } catch (final IOException e) {
                         Log.e(LOG_TAG, "Error closing stream", e);
+                        this.e = e;
                     }
                 }
             }
+            return 1;
         }
 
         @Override
         protected void onPostExecute(Integer s) {
-            if(s == 0){
-                Toast.makeText(mContext, "Erro ao validar usuário! Tente novamente mais tarde.", Toast.LENGTH_LONG).show();
+            if(this.e != null){
+                Toast.makeText(mContext, "Erro ao validar usuário! Tente novamente mais tarde.\n" + this.e.getMessage() , Toast.LENGTH_LONG).show();
                 View btnLogin = (View) findViewById(R.id.sign_in_button);
                 btnLogin.setVisibility(View.VISIBLE);
                 View loading = (View) findViewById(R.id.loadingPanel);

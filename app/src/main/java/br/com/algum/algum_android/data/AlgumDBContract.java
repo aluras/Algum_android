@@ -1,5 +1,6 @@
 package br.com.algum.algum_android.data;
 
+import android.content.ContentUris;
 import android.net.Uri;
 import android.provider.BaseColumns;
 
@@ -12,7 +13,7 @@ import java.util.Date;
  */
 public class AlgumDBContract {
 
-    public static final String CONTENT_AUTHORITY = "br.com.algum.algum_android";
+    public static final String CONTENT_AUTHORITY = "br.com.algum.algum_android.provider";
 
     public static final Uri BASE_CONTENT_URI = Uri.parse("content://" + CONTENT_AUTHORITY);
 
@@ -55,10 +56,10 @@ public class AlgumDBContract {
 
         public static final String COLUMN_CONTA_ID = "conta_id";
         public static final String COLUMN_USUARIO_ID = "usuario_id";
-        public static final String COLUMN_NOME = "nomne";
+        public static final String COLUMN_NOME = "nome";
 
-        public static Uri buildContaUsuarioUri(String usuarioId) {
-            return CONTENT_URI.buildUpon().appendPath(usuarioId).build();
+        public static Uri buildContaUsuarioUri(long id) {
+            return ContentUris.withAppendedId(CONTENT_URI, id);
         }
 
     }

@@ -58,6 +58,17 @@ public class AlgumContentProvider extends ContentProvider {
                 );
                 break;
             }
+            case CONTAS: {
+                retCursor = mDbHelper.getReadableDatabase().query(
+                        AlgumDBContract.ContasEntry.TABLE_NAME,
+                        projection,
+                        selection,
+                        selectionArgs,
+                        null,
+                        null,sortOrder
+                );
+                break;
+            }
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
@@ -74,7 +85,21 @@ public class AlgumContentProvider extends ContentProvider {
     @Nullable
     @Override
     public Uri insert(Uri uri, ContentValues values) {
-        return null;
+        Uri returnUri;
+
+        switch (sUriMatcher.match(uri)){
+            case CONTAS:{
+                long _id = mDbHelper.getWritableDatabase().insert(AlgumDBContract.ContasEntry.TABLE_NAME, null, values);
+                if ( _id > 0 )
+                    returnUri = AlgumDBContract.ContasEntry.buildContaUsuarioUri(_id);
+                else
+                    throw new android.database.SQLException("Failed to insert row into " + uri);
+                break;
+            }
+            default:
+                throw new UnsupportedOperationException("Unknown uri: " + uri);
+        }
+        return returnUri;
     }
 
     @Override
