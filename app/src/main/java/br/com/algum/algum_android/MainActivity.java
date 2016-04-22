@@ -116,7 +116,7 @@ public class MainActivity extends AppCompatActivity implements
 
         }else{
             Toast.makeText(MainActivity.this, result.toString(), Toast.LENGTH_LONG).show();
-
+            Log.e(TAG, result.getStatus().toString());
             View btnLogin = (View) findViewById(R.id.sign_in_button);
             btnLogin.setVisibility(View.VISIBLE);
             View loading = (View) findViewById(R.id.loadingPanel);
@@ -171,7 +171,6 @@ public class MainActivity extends AppCompatActivity implements
 
             try{
 
-                //URL url = new URL("http://localhost:81/Algum_php/usuarios");
                 URL url = new URL(getString(R.string.WSurl)+"usuarios");
                 urlConnection = (HttpURLConnection) url.openConnection();
                 urlConnection.setRequestMethod("GET");
