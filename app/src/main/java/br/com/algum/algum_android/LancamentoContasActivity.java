@@ -7,19 +7,20 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.drawable.GradientDrawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.LoaderManager.LoaderCallbacks;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.widget.GridView;
 import android.widget.TextView;
 
-import java.util.ArrayList;
-
 import br.com.algum.algum_android.customAdapters.ContaAdapter;
 import br.com.algum.algum_android.data.AlgumDBContract;
-import br.com.algum.algum_android.entities.Conta;
 
 public class LancamentoContasActivity extends BaseActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+        implements NavigationView.OnNavigationItemSelectedListener, LoaderCallbacks<Cursor> {
 
     private final String LOG_TAG = LancamentoContasActivity.class.getSimpleName();
 
@@ -30,6 +31,7 @@ public class LancamentoContasActivity extends BaseActivity
     public static final String ACCOUNT = "dummyaccount";
     // Instance fields
     Account mAccount;
+    private ContaAdapter mCcontasAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,7 +70,11 @@ public class LancamentoContasActivity extends BaseActivity
         txtTransferencia.setTextColor(getResources().getColor(R.color.texto_tipo));
 
         Cursor cursor = getContentResolver().query(AlgumDBContract.ContasEntry.CONTENT_URI, null, null, null, null);
+        cursor.setNotificationUri(getContentResolver(),AlgumDBContract.ContasEntry.CONTENT_URI);
 
+        mCcontasAdapter = new ContaAdapter(this,cursor, 0);
+
+        /*
         ArrayList<Conta> contasArray = new ArrayList<Conta>();
 
         cursor.moveToFirst();
@@ -82,11 +88,14 @@ public class LancamentoContasActivity extends BaseActivity
         contas = contasArray.toArray(contas);
         ContaAdapter contasAdapter = new ContaAdapter(this,R.layout.tiles, contas);
 
-        gridContas.setAdapter(contasAdapter);
+*/
+        gridContas.setAdapter(mCcontasAdapter);
 
-
+        getSupportLoaderManager().initLoader(0, null, this);
 
     }
+
+
 
     public static Account CreateSyncAccount(Context context) {
         // Create the account type and default account
@@ -122,5 +131,28 @@ public class LancamentoContasActivity extends BaseActivity
             //onAccountCreated(newAccount, context);
         }
         return newAccount;
+    }
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        Uri contasUri = AlgumDBContract.ContasEntry.CONTENT_URI;
+        return new CursorLoader(
+                this,
+                contasUri,
+                null,
+                null,
+                null,
+                null
+        );
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        mCcontasAdapter.swapCursor(data);
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+        mCcontasAdapter.swapCursor(null);
     }
 }

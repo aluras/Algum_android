@@ -110,6 +110,7 @@ public class AlgumSyncAdapter extends AbstractThreadedSyncAdapter {
                 if(cursor.getCount() < 1){
 
                     ContentValues contasValues = new ContentValues();
+                    contasValues.put(AlgumDBContract.ContasEntry.COLUMN_ID, contaUsuario.getInt("id"));
                     contasValues.put(AlgumDBContract.ContasEntry.COLUMN_NOME, conta.getString("nome"));
                     contasValues.put(AlgumDBContract.ContasEntry.COLUMN_CONTA_ID, conta.getInt("id"));
                     contasValues.put(AlgumDBContract.ContasEntry.COLUMN_USUARIO_ID, contaUsuario.getInt("usuario_id"));
@@ -117,6 +118,8 @@ public class AlgumSyncAdapter extends AbstractThreadedSyncAdapter {
                     getContext().getContentResolver().insert(AlgumDBContract.ContasEntry.CONTENT_URI, contasValues);
                 }
             }
+
+            getContext().getContentResolver().notifyChange(builtUri, null, false);
 
 
 

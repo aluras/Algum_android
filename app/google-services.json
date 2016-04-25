@@ -54,6 +54,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "48636432617-ljv6vr3jjoc7ighch4mjg2t56qvi00ep.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "br.com.algum.algum_android",
+            "certificate_hash": "F1188086E3930888C61BD1C7C70119B34C923FD9"
+          }
+        },
+        {
           "client_id": "48636432617-2nl1d6j2ffupbl3a4mmouqvrjf3ohj5c.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
