@@ -1,10 +1,12 @@
 package br.com.algum.algum_android;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -265,7 +267,26 @@ public class MainActivity extends AppCompatActivity implements
         @Override
         protected void onPostExecute(Integer s) {
             if(this.e != null){
-                Toast.makeText(mContext, "Erro ao validar usuário! Tente novamente mais tarde.\n" + this.e.getMessage() , Toast.LENGTH_LONG).show();
+                //Toast.makeText(mContext, "Erro ao validar usuário! Tente novamente mais tarde.\n" + this.e.getMessage() , Toast.LENGTH_LONG).show();
+            try{
+                AlertDialog.Builder builder1  = new AlertDialog.Builder(MainActivity.this);
+                builder1.setTitle("Ops.");
+                builder1.setMessage("Erro ao validar usuário! Tente novamente mais tarde.\n" + this.e.getMessage());
+                builder1.setCancelable(true);
+                builder1.setNeutralButton(android.R.string.ok,
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                dialog.cancel();
+                            }
+                        });
+
+                AlertDialog alert11 = builder1.create();
+                alert11.show();
+            }catch (Exception e){
+                Log.e(LOG_TAG, "Error closing stream", e);
+            }
+
+
                 View btnLogin = (View) findViewById(R.id.sign_in_button);
                 btnLogin.setVisibility(View.VISIBLE);
                 View loading = (View) findViewById(R.id.loadingPanel);

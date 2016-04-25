@@ -42,7 +42,7 @@
     <!-- Content Description for images -->
     <string name="desc_google_icon">Aluras Logo</string>
 
-    <string name="algum_server_client_id">428110110118-aorl760dnq9g1095fk3gvji391h8f89n.apps.googleusercontent.com</string>
+    <string name="algum_server_client_id">48636432617-l6duqf4jpe3irph355fas92mqfcimfmr.apps.googleusercontent.com</string>
 
     <string name="base_url_contas">localhost:81/Algum_php/contas</string>
 
@@ -50,6 +50,7 @@
     <!-- SyncAdapter related -->
     <string name="sync_account_type">algum.com.br</string>
     <string name="content_authority">br.com.algum.algum_android.provider</string>
-    <string name="WSurl">http://10.190.236.51:81/Algum_php/</string>
+    <!--<string name="WSurl">http://10.190.236.51:81/Algum_php/</string>-->
+    <string name="WSurl">http://192.168.0.6:81/Algum_php/</string>
 
 </resources>
