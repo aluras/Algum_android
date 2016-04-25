@@ -119,7 +119,7 @@ public class AlgumSyncAdapter extends AbstractThreadedSyncAdapter {
                 }
             }
 
-            getContext().getContentResolver().notifyChange(builtUri, null, false);
+            getContext().getContentResolver().notifyChange(builtUri, null, true);
 
 
 

@@ -12,19 +12,19 @@ import android.widget.TextView;
 
 import br.com.algum.algum_android.LancamentoGrupoActivity;
 import br.com.algum.algum_android.R;
-import br.com.algum.algum_android.entities.Conta;
 
 /**
  * Created by sn1007071 on 09/03/2016.
  */
 public class ContaAdapter extends CursorAdapter {
 
-    Context mContext;
-    int layoutResourceId;
-    Conta data[] = null;
+    private Cursor mCursor;
+    private Context mContext;
+    private LayoutInflater mInflater;
 
     public ContaAdapter(Context context, Cursor c, int flags) {
         super(context, c, flags);
+        mInflater = LayoutInflater.from(context);
         mContext = context;
     }
 
@@ -76,13 +76,15 @@ public class ContaAdapter extends CursorAdapter {
 */
     @Override
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
-        View view = LayoutInflater.from(context).inflate(R.layout.tiles, parent, false);
+        View view = mInflater.inflate(R.layout.tiles, parent, false);
+        final ContaHolder holder = new ContaHolder(view);
+        view.setTag(holder);
         return view;
     }
 
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
-        ContaHolder holder = new ContaHolder(view);
+        final ContaHolder holder = (ContaHolder) view.getTag();
         holder.txtNome.setText(cursor.getString(3));
 
         GradientDrawable gd = (GradientDrawable) holder.txtNome.getBackground();

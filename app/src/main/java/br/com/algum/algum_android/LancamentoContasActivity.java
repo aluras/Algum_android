@@ -69,10 +69,10 @@ public class LancamentoContasActivity extends BaseActivity
         TextView txtTransferencia = (TextView)findViewById(R.id.textTransferencia);
         txtTransferencia.setTextColor(getResources().getColor(R.color.texto_tipo));
 
-        Cursor cursor = getContentResolver().query(AlgumDBContract.ContasEntry.CONTENT_URI, null, null, null, null);
-        cursor.setNotificationUri(getContentResolver(),AlgumDBContract.ContasEntry.CONTENT_URI);
+        //Cursor cursor = getContentResolver().query(AlgumDBContract.ContasEntry.CONTENT_URI, null, null, null, null);
+        //cursor.setNotificationUri(getContentResolver(),AlgumDBContract.ContasEntry.CONTENT_URI);
 
-        mCcontasAdapter = new ContaAdapter(this,cursor, 0);
+        mCcontasAdapter = new ContaAdapter(this,null, 0);
 
         /*
         ArrayList<Conta> contasArray = new ArrayList<Conta>();
@@ -89,9 +89,9 @@ public class LancamentoContasActivity extends BaseActivity
         ContaAdapter contasAdapter = new ContaAdapter(this,R.layout.tiles, contas);
 
 */
-        gridContas.setAdapter(mCcontasAdapter);
-
         getSupportLoaderManager().initLoader(0, null, this);
+
+        gridContas.setAdapter(mCcontasAdapter);
 
     }
 
@@ -149,6 +149,7 @@ public class LancamentoContasActivity extends BaseActivity
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         mCcontasAdapter.swapCursor(data);
+        mCcontasAdapter.notifyDataSetChanged();
     }
 
     @Override

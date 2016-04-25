@@ -72,7 +72,7 @@ public class AlgumContentProvider extends ContentProvider {
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
-
+        retCursor.setNotificationUri(getContext().getContentResolver(),uri);
         return retCursor;
     }
 
@@ -99,6 +99,7 @@ public class AlgumContentProvider extends ContentProvider {
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
+        getContext().getContentResolver().notifyChange(uri,null);
         return returnUri;
     }
 
