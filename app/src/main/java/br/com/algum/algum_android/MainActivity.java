@@ -1,9 +1,11 @@
 package br.com.algum.algum_android;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
@@ -20,6 +22,9 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.OptionalPendingResult;
+import com.google.android.gms.common.api.ResultCallback;
+
+import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -27,6 +32,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+
+import br.com.algum.algum_android.data.AlgumDBContract;
 
 
 public class MainActivity extends AppCompatActivity implements
@@ -72,19 +79,32 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void onStart() {
         super.onStart();
+        SharedPreferences sharedPref = getSharedPreferences(getString(R.string.userInfo), Context.MODE_PRIVATE);
+        if(sharedPref.contains(getString(R.string.tokenUsuario))){
+            OptionalPendingResult<GoogleSignInResult> opr = Auth.GoogleSignInApi.silentSignIn(mGoogleApiClient);
 
-        OptionalPendingResult<GoogleSignInResult> opr = Auth.GoogleSignInApi.silentSignIn(mGoogleApiClient);
-        if (opr.isDone()) {
-            // If the user's cached credentials are valid, the OptionalPendingResult will be "done"
-            // and the GoogleSignInResult will be available instantly.
-            GoogleSignInResult result = opr.get();
-            handleSignInResult(result);
+            if (opr.isDone()) {
+                // If the user's cached credentials are valid, the OptionalPendingResult will be "done"
+                // and the GoogleSignInResult will be available instantly.
+                GoogleSignInResult result = opr.get();
+                handleSignInResult(result);
+            }else{
+                opr.setResultCallback(new ResultCallback<GoogleSignInResult>() {
+                    @Override
+                    public void onResult(GoogleSignInResult googleSignInResult) {
+                        handleSignInResult(googleSignInResult);
+                    }
+                });
+            }
         }else{
+
             View btnLogin = (View) findViewById(R.id.sign_in_button);
             btnLogin.setVisibility(View.VISIBLE);
             View loading = (View) findViewById(R.id.loadingPanel);
             loading.setVisibility(View.GONE);
+
         }
+
     }
 
     @Override
@@ -105,6 +125,7 @@ public class MainActivity extends AppCompatActivity implements
             GoogleSignInAccount acct = result.getSignInAccount();
             String id_token = acct.getIdToken();
             String email = acct.getEmail();
+            //String refreshToken = acct.
 
             SharedPreferences sharedPref = getSharedPreferences(getString(R.string.userInfo), Context.MODE_PRIVATE);
             SharedPreferences.Editor editor = sharedPref.edit();
@@ -154,6 +175,14 @@ public class MainActivity extends AppCompatActivity implements
         }
     }
 
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        Intent intent = new Intent(Intent.ACTION_MAIN);
+        intent.addCategory(Intent.CATEGORY_HOME);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
+    }
 
     public class ValidaUsuarioTask extends AsyncTask<String, Void, Integer> {
         private final String LOG_TAG = ValidaUsuarioTask.class.getSimpleName();
@@ -162,129 +191,127 @@ public class MainActivity extends AppCompatActivity implements
         @Override
         protected Integer doInBackground(String... params) {
 
+            int usuarioId = 0;
+
             if (params.length == 0) {
                 return 0;
             }
 
-            HttpURLConnection urlConnection = null;
-            BufferedReader reader = null;
-            String strRetorno;
+            String mSelectionClause = AlgumDBContract.UsuariosEntry.COLUMN_EMAIL + " = ? ";
+            String[] mSelectionArgs = {params[0]};
+            Cursor cursor = getContentResolver().query(AlgumDBContract.UsuariosEntry.CONTENT_URI, null, mSelectionClause, mSelectionArgs, null);
 
+            if(cursor.getCount()==0){
 
-            try{
+                HttpURLConnection urlConnection = null;
+                BufferedReader reader = null;
+                String strRetorno;
 
-                URL url = new URL(getString(R.string.WSurl)+"usuarios");
-                urlConnection = (HttpURLConnection) url.openConnection();
-                urlConnection.setRequestMethod("GET");
-                urlConnection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
-                //String postParams = getString(R.string.emailUsuario)+"="+params[0];
-                urlConnection.setRequestProperty("Application-Authorization", params[1]);
-                //urlConnection.setRequestProperty("Content-length", Integer.toString(postParams.length()));
+                try{
 
-                //urlConnection.setDoOutput(true);
-                //urlConnection.setDoInput(true);
-                //DataOutputStream wr = new DataOutputStream(urlConnection.getOutputStream());
-                //wr.write(postParams.getBytes());
+                    URL url = new URL(getString(R.string.WSurl)+"usuarios");
+                    urlConnection = (HttpURLConnection) url.openConnection();
+                    urlConnection.setRequestMethod("GET");
+                    urlConnection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+                    urlConnection.setRequestProperty("Application-Authorization", params[1]);
 
-                urlConnection.connect();
-                StringBuffer buffer = new StringBuffer();
+                    urlConnection.connect();
+                    StringBuffer buffer = new StringBuffer();
 
-                if(urlConnection.getResponseCode() == 200){
-                    // Read the input stream into a String
-                    InputStream inputStream = urlConnection.getInputStream();
-                    if (inputStream == null) {
-                        // Nothing to do.
-                        throw new Exception("Usuário não encontrado.");
+                    if(urlConnection.getResponseCode() == 200){
+                        InputStream inputStream = urlConnection.getInputStream();
+                        if (inputStream == null) {
+                            throw new Exception("Usuário não encontrado.");
+                        }
+
+                        reader = new BufferedReader(new InputStreamReader(inputStream));
+                        String line;
+                        while ((line = reader.readLine()) != null) {
+                            buffer.append(line + "\n");
+                        }
+
+                        strRetorno = buffer.toString();
+
+                        if (buffer.length() == 0) {
+                            throw new Exception("Usuário não encontrado.");
+                        }
+
+                        JSONObject usuarioJson = new JSONObject(strRetorno);
+                        ContentValues usuarioValues = new ContentValues();
+                        usuarioValues.put(AlgumDBContract.UsuariosEntry.COLUMN_ID, usuarioJson.getJSONObject("Usuario").getInt("id"));
+                        usuarioValues.put(AlgumDBContract.UsuariosEntry.COLUMN_EMAIL, usuarioJson.getJSONObject("Usuario").getString("email"));
+
+                        getContentResolver().insert(AlgumDBContract.UsuariosEntry.CONTENT_URI, usuarioValues);
+
+                        usuarioId = usuarioJson.getJSONObject("Usuario").getInt("id");
+
+                    }else{
+                        InputStream inputStream = urlConnection.getErrorStream();
+                        if (inputStream == null) {
+                            throw new Exception("Mensagem de erro em branco.");
+                        }
+
+                        reader = new BufferedReader(new InputStreamReader(inputStream));
+                        String line;
+                        while ((line = reader.readLine()) != null) {
+                            buffer.append(line + "\n");
+                        }
+
+                        strRetorno = buffer.toString();
+
+                        throw new Exception(strRetorno.toString());
+
                     }
 
-                    reader = new BufferedReader(new InputStreamReader(inputStream));
-                    String line;
-                    while ((line = reader.readLine()) != null) {
-                        // Since it's JSON, adding a newline isn't necessary (it won't affect parsing)
-                        // But it does make debugging a *lot* easier if you print out the completed
-                        // buffer for debugging.
-                        buffer.append(line + "\n");
+                    return usuarioId;
+                } catch (IOException e) {
+                    Log.e(LOG_TAG, "Error ", e);
+                    this.e = e;
+                } catch (Exception e){
+                    Log.e(LOG_TAG, "Error ", e);
+                    this.e = e;
+                }finally {
+                    if (urlConnection != null) {
+                        urlConnection.disconnect();
                     }
-
-                    strRetorno = buffer.toString();
-
-                    if (buffer.length() == 0) {
-                        // Stream was empty.  No point in parsing.
-                        throw new Exception("Usuário não encontrado.");
-                    }
-
-                }else{
-                    InputStream inputStream = urlConnection.getErrorStream();
-                    if (inputStream == null) {
-                        // Nothing to do.
-                        throw new Exception("Mensagem de erro em branco.");
-                    }
-
-                    reader = new BufferedReader(new InputStreamReader(inputStream));
-                    String line;
-                    while ((line = reader.readLine()) != null) {
-                        // Since it's JSON, adding a newline isn't necessary (it won't affect parsing)
-                        // But it does make debugging a *lot* easier if you print out the completed
-                        // buffer for debugging.
-                        buffer.append(line + "\n");
-                    }
-
-                    strRetorno = buffer.toString();
-
-                    throw new Exception(strRetorno.toString());
-
-                    //return 0;
-
-                }
-
-                return 1;
-            } catch (IOException e) {
-                Log.e(LOG_TAG, "Error ", e);
-                // If the code didn't successfully get the weather data, there's no point in attempting
-                // to parse it.
-                this.e = e;
-            } catch (Exception e){
-                Log.e(LOG_TAG, "Error ", e);
-                // If the code didn't successfully get the weather data, there's no point in attempting
-                // to parse it.
-                this.e = e;
-            }finally {
-                if (urlConnection != null) {
-                    urlConnection.disconnect();
-                }
-                if (reader != null) {
-                    try {
-                        reader.close();
-                    } catch (final IOException e) {
-                        Log.e(LOG_TAG, "Error closing stream", e);
-                        this.e = e;
+                    if (reader != null) {
+                        try {
+                            reader.close();
+                        } catch (final IOException e) {
+                            Log.e(LOG_TAG, "Error closing stream", e);
+                            this.e = e;
+                        }
                     }
                 }
+            }else{
+                cursor.moveToFirst();
+                usuarioId = cursor.getInt(cursor.getColumnIndex("_id"));
             }
-            return 1;
+
+
+            return usuarioId;
         }
 
         @Override
         protected void onPostExecute(Integer s) {
             if(this.e != null){
-                //Toast.makeText(mContext, "Erro ao validar usuário! Tente novamente mais tarde.\n" + this.e.getMessage() , Toast.LENGTH_LONG).show();
-            try{
-                AlertDialog.Builder builder1  = new AlertDialog.Builder(MainActivity.this);
-                builder1.setTitle("Ops.");
-                builder1.setMessage("Erro ao validar usuário! Tente novamente mais tarde.\n" + this.e.getMessage());
-                builder1.setCancelable(true);
-                builder1.setNeutralButton(android.R.string.ok,
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
-                                dialog.cancel();
-                            }
-                        });
+                try{
+                    AlertDialog.Builder builder1  = new AlertDialog.Builder(MainActivity.this);
+                    builder1.setTitle("Ops.");
+                    builder1.setMessage("Erro ao validar usuário! Tente novamente mais tarde.\n" + this.e.getMessage());
+                    builder1.setCancelable(true);
+                    builder1.setNeutralButton(android.R.string.ok,
+                            new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int id) {
+                                    dialog.cancel();
+                                }
+                            });
 
-                AlertDialog alert11 = builder1.create();
-                alert11.show();
-            }catch (Exception e){
-                Log.e(LOG_TAG, "Error closing stream", e);
-            }
+                    AlertDialog alert11 = builder1.create();
+                    alert11.show();
+                }catch (Exception e){
+                    Log.e(LOG_TAG, "Error closing stream", e);
+                }
 
 
                 View btnLogin = (View) findViewById(R.id.sign_in_button);
@@ -298,7 +325,6 @@ public class MainActivity extends AppCompatActivity implements
                 editor.commit();
 
                 Intent intent = new Intent(mContext,LancamentoContasActivity.class);
-                intent.putExtra("teste","executado");
                 startActivity(intent);
             }
 

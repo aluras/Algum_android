@@ -1,18 +1,53 @@
 package br.com.algum.algum_android;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
-public abstract class BaseActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
 
+public abstract class BaseActivity extends AppCompatActivity
+        implements NavigationView.OnNavigationItemSelectedListener,GoogleApiClient.OnConnectionFailedListener {
+
+    private static final String TAG = "BaseActivity";
+
+    protected String id_token;
+    protected String email;
+    protected int id_usuario;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        SharedPreferences sharedPref = getSharedPreferences(getString(R.string.userInfo), Context.MODE_PRIVATE);
+
+        if (sharedPref.contains(getString(R.string.tokenUsuario))){
+            id_token = sharedPref.getString(getString(R.string.tokenUsuario),"");
+            email = sharedPref.getString(getString(R.string.emailUsuario),"");
+            id_usuario = sharedPref.getInt(getString(R.string.idUsuario), 0);
+
+
+        }else{
+            Intent intent = new Intent();
+            intent = new Intent(this, MainActivity.class);
+            startActivity(intent);
+        }
+    }
 
     protected void onCreateDrawer() {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -70,8 +105,21 @@ public abstract class BaseActivity extends AppCompatActivity
 
         if (id == R.id.nav_lancamento) {
             intent = new Intent(this, LancamentoContasActivity.class);
-//        }else if (id == R.id.nav_contas) {
-//            intent = new Intent(this, Contas.class);
+        }else if (id == R.id.nav_exit) {
+            getSharedPreferences(getString(R.string.userInfo), Context.MODE_PRIVATE).edit().clear().commit();
+/*
+            GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                    .requestIdToken(getString(R.string.algum_server_client_id))
+                    .requestEmail()
+                    .build();
+
+            GoogleApiClient googleApiClient = new GoogleApiClient.Builder(this)
+                    .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
+                    .build();
+
+            Auth.GoogleSignInApi.signOut(googleApiClient);
+*/
+            intent = new Intent(this, MainActivity.class);
 //        }else if (id == R.id.nav_grupos) {
 //            intent = new Intent(this, Grupos.class);
 //        }else if (id == R.id.nav_planejamento) {
@@ -87,5 +135,12 @@ public abstract class BaseActivity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    @Override
+    public void onConnectionFailed(ConnectionResult connectionResult) {
+        // An unresolvable error has occurred and Google APIs (including Sign-In) will not
+        // be available.
+        Log.d(TAG, "onConnectionFailed:" + connectionResult);
     }
 }

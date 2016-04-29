@@ -18,6 +18,7 @@ public class AlgumContentProvider extends ContentProvider {
 
     private static final int CONTAS = 100;
     private static final int CONTAS_POR_USUARIO = 101;
+    private static final int USUARIOS = 200;
 
     private static UriMatcher buildUriMatcher() {
         // I know what you're thinking.  Why create a UriMatcher when you can use regular
@@ -32,6 +33,8 @@ public class AlgumContentProvider extends ContentProvider {
         // For each type of URI you want to add, create a corresponding code.
         matcher.addURI(authority, AlgumDBContract.PATH_CONTAS, CONTAS);
         matcher.addURI(authority, AlgumDBContract.PATH_CONTAS + "/*", CONTAS_POR_USUARIO);
+
+        matcher.addURI(authority, AlgumDBContract.PATH_USUARIOS, USUARIOS);
 
         return matcher;
     }
@@ -69,7 +72,17 @@ public class AlgumContentProvider extends ContentProvider {
                 );
                 break;
             }
-            default:
+            case USUARIOS: {
+                retCursor = mDbHelper.getReadableDatabase().query(
+                        AlgumDBContract.UsuariosEntry.TABLE_NAME,
+                        projection,
+                        selection,
+                        selectionArgs,
+                        null,
+                        null,sortOrder
+                );
+                break;
+            }            default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
         retCursor.setNotificationUri(getContext().getContentResolver(),uri);
@@ -90,6 +103,14 @@ public class AlgumContentProvider extends ContentProvider {
         switch (sUriMatcher.match(uri)){
             case CONTAS:{
                 long _id = mDbHelper.getWritableDatabase().insert(AlgumDBContract.ContasEntry.TABLE_NAME, null, values);
+                if ( _id > 0 )
+                    returnUri = AlgumDBContract.ContasEntry.buildContaUsuarioUri(_id);
+                else
+                    throw new android.database.SQLException("Failed to insert row into " + uri);
+                break;
+            }
+            case USUARIOS:{
+                long _id = mDbHelper.getWritableDatabase().insert(AlgumDBContract.UsuariosEntry.TABLE_NAME, null, values);
                 if ( _id > 0 )
                     returnUri = AlgumDBContract.ContasEntry.buildContaUsuarioUri(_id);
                 else

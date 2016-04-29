@@ -18,6 +18,7 @@ public class AlgumDBContract {
     public static final Uri BASE_CONTENT_URI = Uri.parse("content://" + CONTENT_AUTHORITY);
 
     public static final String PATH_CONTAS = "contas";
+    public static final String PATH_USUARIOS = "usuarios";
 
     public static final String DATE_FORMAT = "yyyyMMdd";
 
@@ -63,6 +64,25 @@ public class AlgumDBContract {
             return ContentUris.withAppendedId(CONTENT_URI, id);
         }
 
+    }
+
+    public static final class UsuariosEntry implements BaseColumns {
+        public static final Uri CONTENT_URI =
+                BASE_CONTENT_URI.buildUpon().appendPath(PATH_USUARIOS).build();
+
+        public static final String CONTENT_TYPE =
+                "vnd.android.cursor.dir/" + CONTENT_AUTHORITY + "/" + PATH_USUARIOS;
+        public static final String CONTENT_ITEM_TYPE =
+                "vnd.android.cursor.item/" + CONTENT_AUTHORITY + "/" + PATH_USUARIOS;
+
+        public static final String TABLE_NAME = "usuarios";
+
+        public static final String COLUMN_ID = "_id";
+        public static final String COLUMN_EMAIL = "email";
+
+        public static Uri buildUsuarioUri(long id) {
+            return ContentUris.withAppendedId(CONTENT_URI, id);
+        }
     }
 
 }

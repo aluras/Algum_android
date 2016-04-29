@@ -4,7 +4,6 @@ import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.content.ContentResolver;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
@@ -38,10 +37,6 @@ public class LancamentoContasActivity extends BaseActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_lancamento_contas);
         super.onCreateDrawer();
-
-        SharedPreferences sharedPref = getSharedPreferences(getString(R.string.userInfo), Context.MODE_PRIVATE);
-        int idUsuario = sharedPref.getInt(getString(R.string.idUsuario), 0);
-        String tok = sharedPref.getString(getString(R.string.tokenUsuario),"");
 
         mAccount = CreateSyncAccount(this);
         Bundle b = new Bundle();
