@@ -34,12 +34,21 @@ public class AlgumDbHelper extends SQLiteOpenHelper {
                 AlgumDBContract.UsuariosEntry.COLUMN_EMAIL + " TEXT NOT NULL)";
 
         db.execSQL(SQL_CREATE_USUARIO_TABLE);
+
+        final String SQL_CREATE_GRUPO_TABLE = "CREATE TABLE " + AlgumDBContract.GruposEntry.TABLE_NAME + " (" +
+                AlgumDBContract.GruposEntry.COLUMN_ID + " INTEGER PRIMARY KEY," +
+                AlgumDBContract.GruposEntry.COLUMN_TIPO_ID + " INTEGER NOT NULL," +
+                AlgumDBContract.GruposEntry.COLUMN_NOME + " TEXT NOT NULL)";
+
+        db.execSQL(SQL_CREATE_CONTA_TABLE);
+
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         db.execSQL("DROP TABLE IF EXISTS " + AlgumDBContract.ContasEntry.TABLE_NAME);
         db.execSQL("DROP TABLE IF EXISTS " + AlgumDBContract.UsuariosEntry.TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + AlgumDBContract.GruposEntry.TABLE_NAME);
         onCreate(db);
 
     }

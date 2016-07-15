@@ -56,6 +56,7 @@ public class AlgumSyncAdapter extends AbstractThreadedSyncAdapter {
 
         // Will contain the raw JSON response as a string.
         String ContasJsonStr = null;
+        String GruposJsonStr = null;
 
         String format = "json";
 
@@ -144,6 +145,89 @@ public class AlgumSyncAdapter extends AbstractThreadedSyncAdapter {
             }
         }
 
+
+        try {
+            final String GRUPO_BASE_URL = getContext().getString(R.string.WSurl) + "grupos";
+
+            Uri builtUri = Uri.parse(GRUPO_BASE_URL).buildUpon().build();
+
+            URL url = new URL(builtUri.toString());
+
+            urlConnection = (HttpURLConnection) url.openConnection();
+            urlConnection.setRequestMethod("GET");
+            urlConnection.setRequestProperty("Application-Authorization", tok);
+            urlConnection.connect();
+
+            // Read the input stream into a String
+            InputStream inputStream = urlConnection.getInputStream();
+            StringBuffer buffer = new StringBuffer();
+            if (inputStream == null) {
+                // Nothing to do.
+                return;
+            }
+
+            reader = new BufferedReader(new InputStreamReader(inputStream));
+            String line;
+            while ((line = reader.readLine()) != null) {
+                // Since it's JSON, adding a newline isn't necessary (it won't affect parsing)
+                // But it does make debugging a *lot* easier if you print out the completed
+                // buffer for debugging.
+                buffer.append(line + "\n");
+            }
+
+            if (buffer.length() == 0) {
+                // Stream was empty.  No point in parsing.
+                return;
+            }
+            GruposJsonStr = buffer.toString();
+
+            JSONArray gruposArray = new JSONArray(GruposJsonStr);
+
+            for(int i = 0; i < gruposArray.length(); i++){
+
+                JSONObject grupoJson = gruposArray.getJSONObject(i);
+                JSONObject grupo = grupoJson.getJSONObject("Grupo");
+
+                String mSelectionClause = AlgumDBContract.GruposEntry.COLUMN_GRUPO_ID + " = ? ";
+                String[] mSelectionArgs = {grupo.getString("id")};
+                Cursor cursor = getContext().getContentResolver().query(AlgumDBContract.GruposEntry.CONTENT_URI, null, mSelectionClause, mSelectionArgs, null);
+
+                if(cursor.getCount() < 1){
+
+                    ContentValues gruposValues = new ContentValues();
+                    gruposValues.put(AlgumDBContract.GruposEntry.COLUMN_ID, grupo.getInt("id"));
+                    gruposValues.put(AlgumDBContract.GruposEntry.COLUMN_NOME, grupo.getString("nome"));
+                    gruposValues.put(AlgumDBContract.GruposEntry.COLUMN_GRUPO_ID, grupo.getInt("id"));
+                    gruposValues.put(AlgumDBContract.GruposEntry.COLUMN_TIPO_ID, grupo.getInt("tipo_id"));
+
+                    getContext().getContentResolver().insert(AlgumDBContract.ContasEntry.CONTENT_URI, gruposValues);
+                }
+            }
+
+            getContext().getContentResolver().notifyChange(builtUri, null, true);
+
+
+
+
+        } catch (IOException e) {
+            Log.e(LOG_TAG, "Error ", e);
+            // If the code didn't successfully get the weather data, there's no point in attempting
+            // to parse it.
+            return;
+        } catch (JSONException e) {
+            e.printStackTrace();
+        } finally {
+            if (urlConnection != null) {
+                urlConnection.disconnect();
+            }
+            if (reader != null) {
+                try {
+                    reader.close();
+                } catch (final IOException e) {
+                    Log.e(LOG_TAG, "Error closing stream", e);
+                }
+            }
+        }
 
 
     }

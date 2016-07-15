@@ -14,6 +14,8 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.google.android.gms.auth.api.Auth;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 
@@ -107,7 +109,7 @@ public abstract class BaseActivity extends AppCompatActivity
             intent = new Intent(this, LancamentoContasActivity.class);
         }else if (id == R.id.nav_exit) {
             getSharedPreferences(getString(R.string.userInfo), Context.MODE_PRIVATE).edit().clear().commit();
-/*
+
             GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                     .requestIdToken(getString(R.string.algum_server_client_id))
                     .requestEmail()
@@ -117,8 +119,9 @@ public abstract class BaseActivity extends AppCompatActivity
                     .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
                     .build();
 
-            Auth.GoogleSignInApi.signOut(googleApiClient);
-*/
+            if(googleApiClient.isConnected()) {
+                Auth.GoogleSignInApi.revokeAccess(googleApiClient);
+            }
             intent = new Intent(this, MainActivity.class);
 //        }else if (id == R.id.nav_grupos) {
 //            intent = new Intent(this, Grupos.class);
