@@ -10,7 +10,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class AlgumDbHelper extends SQLiteOpenHelper {
 
     // If you change the database schema, you must increment the database version.
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 5;
 
     public static final String DATABASE_NAME = "algum.db";
 
@@ -24,10 +24,23 @@ public class AlgumDbHelper extends SQLiteOpenHelper {
         final String SQL_CREATE_CONTA_TABLE = "CREATE TABLE " + AlgumDBContract.ContasEntry.TABLE_NAME + " (" +
                 AlgumDBContract.ContasEntry.COLUMN_ID + " INTEGER PRIMARY KEY," +
                 AlgumDBContract.ContasEntry.COLUMN_CONTA_ID + " INTEGER NOT NULL," +
+                AlgumDBContract.ContasEntry.COLUMN_TIPO_CONTA_ID + " INTEGER NOT NULL," +
                 AlgumDBContract.ContasEntry.COLUMN_USUARIO_ID + " INTEGER NOT NULL, " +
                 AlgumDBContract.ContasEntry.COLUMN_NOME + " TEXT NOT NULL)";
 
         db.execSQL(SQL_CREATE_CONTA_TABLE);
+
+        //TODO: Remove after the sync adapter is ready
+        String SQL_INSERT_CONTA = "INSERT INTO contas VALUES(1,1,1,2,'Conta Corrente')";
+        db.execSQL(SQL_INSERT_CONTA);
+        SQL_INSERT_CONTA = "INSERT INTO contas VALUES(2,2,2,2,'Investimento')";
+        db.execSQL(SQL_INSERT_CONTA);
+        SQL_INSERT_CONTA = "INSERT INTO contas VALUES(3,3,3,2,'Cartão de Crédito')";
+        db.execSQL(SQL_INSERT_CONTA);
+        SQL_INSERT_CONTA = "INSERT INTO contas VALUES(4,4,4,2,'Espécie')";
+        db.execSQL(SQL_INSERT_CONTA);
+        SQL_INSERT_CONTA = "INSERT INTO contas VALUES(5,5,5,2,'VR')";
+        db.execSQL(SQL_INSERT_CONTA);
 
         final String SQL_CREATE_USUARIO_TABLE = "CREATE TABLE " + AlgumDBContract.UsuariosEntry.TABLE_NAME + " (" +
                 AlgumDBContract.UsuariosEntry.COLUMN_ID + " INTEGER PRIMARY KEY," +
@@ -40,7 +53,13 @@ public class AlgumDbHelper extends SQLiteOpenHelper {
                 AlgumDBContract.GruposEntry.COLUMN_TIPO_ID + " INTEGER NOT NULL," +
                 AlgumDBContract.GruposEntry.COLUMN_NOME + " TEXT NOT NULL)";
 
-        db.execSQL(SQL_CREATE_CONTA_TABLE);
+        db.execSQL(SQL_CREATE_GRUPO_TABLE);
+
+        //TODO: Remove after the sync adapter is ready
+        String SQL_INSERT_GRUPO = "INSERT INTO grupos VALUES(1,1,'Alimentação')";
+        db.execSQL(SQL_INSERT_GRUPO);
+        SQL_INSERT_GRUPO = "INSERT INTO grupos VALUES(2,2,'Educação')";
+        db.execSQL(SQL_INSERT_GRUPO);
 
     }
 

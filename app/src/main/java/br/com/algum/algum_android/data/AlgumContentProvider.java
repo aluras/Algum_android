@@ -19,6 +19,7 @@ public class AlgumContentProvider extends ContentProvider {
     private static final int CONTAS = 100;
     private static final int CONTAS_POR_USUARIO = 101;
     private static final int USUARIOS = 200;
+    private static final int GRUPOS = 300;
 
     private static UriMatcher buildUriMatcher() {
         // I know what you're thinking.  Why create a UriMatcher when you can use regular
@@ -35,6 +36,8 @@ public class AlgumContentProvider extends ContentProvider {
         matcher.addURI(authority, AlgumDBContract.PATH_CONTAS + "/*", CONTAS_POR_USUARIO);
 
         matcher.addURI(authority, AlgumDBContract.PATH_USUARIOS, USUARIOS);
+
+        matcher.addURI(authority, AlgumDBContract.PATH_GRUPOS, GRUPOS);
 
         return matcher;
     }
@@ -82,7 +85,19 @@ public class AlgumContentProvider extends ContentProvider {
                         null,sortOrder
                 );
                 break;
-            }            default:
+            }
+            case GRUPOS: {
+                retCursor = mDbHelper.getReadableDatabase().query(
+                        AlgumDBContract.GruposEntry.TABLE_NAME,
+                        projection,
+                        selection,
+                        selectionArgs,
+                        null,
+                        null,sortOrder
+                );
+                break;
+            }
+            default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
         retCursor.setNotificationUri(getContext().getContentResolver(),uri);
@@ -113,6 +128,14 @@ public class AlgumContentProvider extends ContentProvider {
                 long _id = mDbHelper.getWritableDatabase().insert(AlgumDBContract.UsuariosEntry.TABLE_NAME, null, values);
                 if ( _id > 0 )
                     returnUri = AlgumDBContract.ContasEntry.buildContaUsuarioUri(_id);
+                else
+                    throw new android.database.SQLException("Failed to insert row into " + uri);
+                break;
+            }
+            case GRUPOS:{
+                long _id = mDbHelper.getWritableDatabase().insert(AlgumDBContract.GruposEntry.TABLE_NAME, null, values);
+                if ( _id > 0 )
+                    returnUri = AlgumDBContract.GruposEntry.buildGrupoUri(_id);
                 else
                     throw new android.database.SQLException("Failed to insert row into " + uri);
                 break;

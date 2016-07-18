@@ -31,6 +31,11 @@
             android:label="@string/title_activity_main"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar"></activity>
+        <activity android:name=".LancamentoGrupoActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:label="@string/title_activity_main"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
 
         <provider
             android:name=".data.AlgumContentProvider"
@@ -60,7 +65,6 @@
                 android:resource="@xml/syncadapter" />
         </service>
 
-        <activity android:name=".LancamentoGrupoActivity"></activity>
     </application>
 
 </manifest>

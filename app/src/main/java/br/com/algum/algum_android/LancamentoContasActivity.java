@@ -12,6 +12,7 @@ import android.support.design.widget.NavigationView;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.view.View;
 import android.widget.GridView;
 import android.widget.TextView;
 
@@ -32,6 +33,12 @@ public class LancamentoContasActivity extends BaseActivity
     Account mAccount;
     private ContaAdapter mCcontasAdapter;
 
+    public int getTipoLancamento() {
+        return tipoLancamento;
+    }
+
+    private int tipoLancamento = 1;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -44,7 +51,7 @@ public class LancamentoContasActivity extends BaseActivity
                 ContentResolver.SYNC_EXTRAS_MANUAL, true);
         b.putBoolean(
                 ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
-        ContentResolver.requestSync(mAccount, this.getString(R.string.content_authority), b);
+        //ContentResolver.requestSync(mAccount, this.getString(R.string.content_authority), b);
 
         GridView gridContas = (GridView) findViewById(R.id.gridViewContas);
 
@@ -53,43 +60,76 @@ public class LancamentoContasActivity extends BaseActivity
         gdDespesa.setColor(getResources().getColor(R.color.despesa));
         TextView txtDespesa = (TextView)findViewById(R.id.textDespesa);
         txtDespesa.setTextColor(getResources().getColor(R.color.texto_tipo));
+        txtDespesa.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mudaTipo(v);
+            }
+        });
 
         GradientDrawable gdReceita = (GradientDrawable) findViewById(R.id.textReceita).getBackground();
         gdReceita.setColor(getResources().getColor(R.color.receitaDisable));
         TextView txtReceita = (TextView)findViewById(R.id.textReceita);
         txtReceita.setTextColor(getResources().getColor(R.color.texto_tipo));
+        txtReceita.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mudaTipo(v);
+            }
+        });
 
         GradientDrawable gdTransferencia = (GradientDrawable) findViewById(R.id.textTransferencia).getBackground();
         gdTransferencia.setColor(getResources().getColor(R.color.transferenciaDisable));
         TextView txtTransferencia = (TextView)findViewById(R.id.textTransferencia);
         txtTransferencia.setTextColor(getResources().getColor(R.color.texto_tipo));
+        txtTransferencia.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mudaTipo(v);
+            }
+        });
 
         //Cursor cursor = getContentResolver().query(AlgumDBContract.ContasEntry.CONTENT_URI, null, null, null, null);
         //cursor.setNotificationUri(getContentResolver(),AlgumDBContract.ContasEntry.CONTENT_URI);
 
         mCcontasAdapter = new ContaAdapter(this,null, 0);
 
-        /*
-        ArrayList<Conta> contasArray = new ArrayList<Conta>();
-
-        cursor.moveToFirst();
-        while (cursor.isAfterLast() == false) {
-            Conta conta = new Conta(cursor.getString(cursor.getColumnIndex(AlgumDBContract.ContasEntry.COLUMN_NOME)),R.color.tile1);
-            contasArray.add(conta);
-            cursor.moveToNext();
-        }
-
-        Conta[] contas = new Conta[contasArray.size()];
-        contas = contasArray.toArray(contas);
-        ContaAdapter contasAdapter = new ContaAdapter(this,R.layout.tiles, contas);
-
-*/
         getSupportLoaderManager().initLoader(0, null, this);
 
         gridContas.setAdapter(mCcontasAdapter);
 
     }
 
+    private void mudaTipo(View v) {
+
+        GradientDrawable gdDespesa = (GradientDrawable) findViewById(R.id.textDespesa).getBackground();
+        gdDespesa.setColor(getResources().getColor(R.color.despesaDisable));
+
+        GradientDrawable gdReceita = (GradientDrawable) findViewById(R.id.textReceita).getBackground();
+        gdReceita.setColor(getResources().getColor(R.color.receitaDisable));
+
+        GradientDrawable gdTransferencia = (GradientDrawable) findViewById(R.id.textTransferencia).getBackground();
+        gdTransferencia.setColor(getResources().getColor(R.color.transferenciaDisable));
+
+        switch (v.getId()){
+            case R.id.textDespesa:
+                gdDespesa.setColor(getResources().getColor(R.color.despesa));
+                tipoLancamento = 1;
+                break;
+            case R.id.textReceita:
+                gdReceita.setColor(getResources().getColor(R.color.receita));
+                tipoLancamento = 2;
+                break;
+            case R.id.textTransferencia:
+                gdTransferencia.setColor(getResources().getColor(R.color.transferencia));
+                tipoLancamento = 3;
+                break;
+
+        }
+        getSupportLoaderManager().restartLoader(0, null, this);
+        //mCcontasAdapter.notifyDataSetChanged();
+
+    }
 
 
     public static Account CreateSyncAccount(Context context) {
@@ -131,11 +171,22 @@ public class LancamentoContasActivity extends BaseActivity
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         Uri contasUri = AlgumDBContract.ContasEntry.CONTENT_URI;
+        String selection = "";
+
+        switch (tipoLancamento){
+            case 1:
+                selection =  AlgumDBContract.ContasEntry.COLUMN_TIPO_CONTA_ID + " IN (1,3,4,5) ";
+                break;
+            case 2:
+                selection =  AlgumDBContract.ContasEntry.COLUMN_TIPO_CONTA_ID + " IN (1,2,4,5) ";
+                break;
+        }
+
         return new CursorLoader(
                 this,
                 contasUri,
                 null,
-                null,
+                selection,
                 null,
                 null
         );

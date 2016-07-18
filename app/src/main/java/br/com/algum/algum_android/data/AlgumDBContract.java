@@ -58,6 +58,7 @@ public class AlgumDBContract {
 
         public static final String COLUMN_ID = "_id";
         public static final String COLUMN_CONTA_ID = "conta_id";
+        public static final String COLUMN_TIPO_CONTA_ID = "tipo_conta_id";
         public static final String COLUMN_USUARIO_ID = "usuario_id";
         public static final String COLUMN_NOME = "nome";
 

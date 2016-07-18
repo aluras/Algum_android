@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import br.com.algum.algum_android.LancamentoContasActivity;
 import br.com.algum.algum_android.LancamentoGrupoActivity;
 import br.com.algum.algum_android.R;
 
@@ -21,6 +22,7 @@ public class ContaAdapter extends CursorAdapter {
     private Cursor mCursor;
     private Context mContext;
     private LayoutInflater mInflater;
+    private int idTipoLancamento;
 
     public ContaAdapter(Context context, Cursor c, int flags) {
         super(context, c, flags);
@@ -84,8 +86,13 @@ public class ContaAdapter extends CursorAdapter {
 
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
+        idTipoLancamento = ((LancamentoContasActivity) context).getTipoLancamento();
+
         final ContaHolder holder = (ContaHolder) view.getTag();
-        holder.txtNome.setText(cursor.getString(3));
+        final String nomeConta = cursor.getString(4);
+        final int idConta = cursor.getInt(1);
+
+        holder.txtNome.setText(nomeConta);
 
         GradientDrawable gd = (GradientDrawable) holder.txtNome.getBackground();
         gd.setColor(context.getResources().getColor(R.color.tile1));
@@ -96,6 +103,9 @@ public class ContaAdapter extends CursorAdapter {
             @Override
             public void onClick(View view) {
                 Intent lancamentoGruposIntent = new Intent(view.getContext(), LancamentoGrupoActivity.class);
+                lancamentoGruposIntent.putExtra("tipoLancamento",idTipoLancamento);
+                lancamentoGruposIntent.putExtra("nomeConta",nomeConta);
+                lancamentoGruposIntent.putExtra("idConta",idConta);
                 view.getContext().startActivity(lancamentoGruposIntent);
 
             }
