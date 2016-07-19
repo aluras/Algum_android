@@ -17,10 +17,25 @@ import br.com.algum.algum_android.data.AlgumDBContract;
 public class LancamentoGrupoActivity extends BaseActivity
         implements NavigationView.OnNavigationItemSelectedListener, LoaderManager.LoaderCallbacks<Cursor> {
 
-    private final String LOG_TAG = LancamentoContasActivity.class.getSimpleName();
+    private final String LOG_TAG = LancamentoGrupoActivity.class.getSimpleName();
 
     private GrupoAdapter mGruposAdapter;
 
+    private int idTipoLancamento = 1;
+    private String nomeConta = "";
+    private int idCOnta = 0;
+
+    public int getTipoLancamento() {
+        return idTipoLancamento;
+    }
+
+    public String getNomeConta() {
+        return nomeConta;
+    }
+
+    public int getIdCOnta() {
+        return idCOnta;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,8 +45,12 @@ public class LancamentoGrupoActivity extends BaseActivity
 
         Intent intent = getIntent();
 
+        idTipoLancamento = intent.getIntExtra("tipoLancamento", 1);
+        nomeConta = intent.getStringExtra("nomeConta");
+        idCOnta = intent.getIntExtra("idConta",0);
+
         String tipoLancamento = "";
-        switch (intent.getIntExtra("tipoLancamento",1)){
+        switch (idTipoLancamento){
             case 1:
                 tipoLancamento = getString(R.string.despesa);
                 break;
@@ -47,7 +66,7 @@ public class LancamentoGrupoActivity extends BaseActivity
         txtTipoLancamento.setText("Nova " + tipoLancamento);
 
         TextView txtConta = (TextView) findViewById(R.id.txtConta);
-        txtConta.setText("Conta: "+intent.getStringExtra("nomeConta"));
+        txtConta.setText("Conta: "+nomeConta);
 
         GridView gridContas = (GridView) findViewById(R.id.gridViewGrupos);
 
