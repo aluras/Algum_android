@@ -48,12 +48,6 @@ public class AlgumSyncAdapter extends AbstractThreadedSyncAdapter {
     public void onPerformSync(Account account, Bundle extras, String authority, ContentProviderClient provider, SyncResult syncResult) {
         Log.d(LOG_TAG, "Starting sync");
 
-        SharedPreferences sharedPref = getContext().getSharedPreferences(getContext().getString(R.string.userInfo), Context.MODE_PRIVATE);
-        String tok = sharedPref.getString(getContext().getString(R.string.tokenUsuario), "");
-
-        HttpURLConnection urlConnection = null;
-        BufferedReader reader = null;
-
         // Will contain the raw JSON response as a string.
         String ContasJsonStr = null;
         String GruposJsonStr = null;
@@ -62,38 +56,11 @@ public class AlgumSyncAdapter extends AbstractThreadedSyncAdapter {
 
         try {
             final String CONTA_BASE_URL = getContext().getString(R.string.WSurl) + "contas";
+            ContasJsonStr = callService(CONTA_BASE_URL);
 
-            Uri builtUri = Uri.parse(CONTA_BASE_URL).buildUpon().build();
+            final String GRUPO_BASE_URL = getContext().getString(R.string.WSurl) + "grupos";
+            GruposJsonStr = callService(GRUPO_BASE_URL);
 
-            URL url = new URL(builtUri.toString());
-
-            urlConnection = (HttpURLConnection) url.openConnection();
-            urlConnection.setRequestMethod("GET");
-            urlConnection.setRequestProperty("Application-Authorization", tok);
-            urlConnection.connect();
-
-            // Read the input stream into a String
-            InputStream inputStream = urlConnection.getInputStream();
-            StringBuffer buffer = new StringBuffer();
-            if (inputStream == null) {
-                // Nothing to do.
-                return;
-            }
-
-            reader = new BufferedReader(new InputStreamReader(inputStream));
-            String line;
-            while ((line = reader.readLine()) != null) {
-                // Since it's JSON, adding a newline isn't necessary (it won't affect parsing)
-                // But it does make debugging a *lot* easier if you print out the completed
-                // buffer for debugging.
-                buffer.append(line + "\n");
-            }
-
-            if (buffer.length() == 0) {
-                // Stream was empty.  No point in parsing.
-                return;
-            }
-            ContasJsonStr = buffer.toString();
 
             JSONArray contasArray = new JSONArray(ContasJsonStr);
 
@@ -114,72 +81,14 @@ public class AlgumSyncAdapter extends AbstractThreadedSyncAdapter {
                     contasValues.put(AlgumDBContract.ContasEntry.COLUMN_ID, contaUsuario.getInt("id"));
                     contasValues.put(AlgumDBContract.ContasEntry.COLUMN_NOME, conta.getString("nome"));
                     contasValues.put(AlgumDBContract.ContasEntry.COLUMN_CONTA_ID, conta.getInt("id"));
+                    contasValues.put(AlgumDBContract.ContasEntry.COLUMN_TIPO_CONTA_ID, conta.getInt("tipo_conta_id"));
                     contasValues.put(AlgumDBContract.ContasEntry.COLUMN_USUARIO_ID, contaUsuario.getInt("usuario_id"));
 
                     getContext().getContentResolver().insert(AlgumDBContract.ContasEntry.CONTENT_URI, contasValues);
                 }
             }
 
-            getContext().getContentResolver().notifyChange(builtUri, null, true);
-
-
-
-
-        } catch (IOException e) {
-            Log.e(LOG_TAG, "Error ", e);
-            // If the code didn't successfully get the weather data, there's no point in attempting
-            // to parse it.
-            return;
-        } catch (JSONException e) {
-            e.printStackTrace();
-        } finally {
-            if (urlConnection != null) {
-                urlConnection.disconnect();
-            }
-            if (reader != null) {
-                try {
-                    reader.close();
-                } catch (final IOException e) {
-                    Log.e(LOG_TAG, "Error closing stream", e);
-                }
-            }
-        }
-
-
-        try {
-            final String GRUPO_BASE_URL = getContext().getString(R.string.WSurl) + "grupos";
-
-            Uri builtUri = Uri.parse(GRUPO_BASE_URL).buildUpon().build();
-
-            URL url = new URL(builtUri.toString());
-
-            urlConnection = (HttpURLConnection) url.openConnection();
-            urlConnection.setRequestMethod("GET");
-            urlConnection.setRequestProperty("Application-Authorization", tok);
-            urlConnection.connect();
-
-            // Read the input stream into a String
-            InputStream inputStream = urlConnection.getInputStream();
-            StringBuffer buffer = new StringBuffer();
-            if (inputStream == null) {
-                // Nothing to do.
-                return;
-            }
-
-            reader = new BufferedReader(new InputStreamReader(inputStream));
-            String line;
-            while ((line = reader.readLine()) != null) {
-                // Since it's JSON, adding a newline isn't necessary (it won't affect parsing)
-                // But it does make debugging a *lot* easier if you print out the completed
-                // buffer for debugging.
-                buffer.append(line + "\n");
-            }
-
-            if (buffer.length() == 0) {
-                // Stream was empty.  No point in parsing.
-                return;
-            }
-            GruposJsonStr = buffer.toString();
+            //getContext().getContentResolver().notifyChange(builtUri, null, true);
 
             JSONArray gruposArray = new JSONArray(GruposJsonStr);
 
@@ -204,19 +113,63 @@ public class AlgumSyncAdapter extends AbstractThreadedSyncAdapter {
                 }
             }
 
-            getContext().getContentResolver().notifyChange(builtUri, null, true);
+            //getContext().getContentResolver().notifyChange(builtUri, null, true);
 
 
 
 
-        } catch (IOException e) {
+        }catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    private String callService(String pUrl){
+
+        SharedPreferences sharedPref = getContext().getSharedPreferences(getContext().getString(R.string.userInfo), Context.MODE_PRIVATE);
+        String tok = sharedPref.getString(getContext().getString(R.string.tokenUsuario), "");
+
+        HttpURLConnection urlConnection = null;
+        BufferedReader reader = null;
+
+        try{
+            Uri builtUri = Uri.parse(pUrl).buildUpon().build();
+
+            URL url = new URL(builtUri.toString());
+
+            urlConnection = (HttpURLConnection) url.openConnection();
+            urlConnection.setRequestMethod("GET");
+            urlConnection.setRequestProperty("Application-Authorization", tok);
+            urlConnection.connect();
+
+            // Read the input stream into a String
+            InputStream inputStream = urlConnection.getInputStream();
+            StringBuffer buffer = new StringBuffer();
+            if (inputStream == null) {
+                // Nothing to do.
+                return "";
+            }
+
+            reader = new BufferedReader(new InputStreamReader(inputStream));
+            String line;
+            while ((line = reader.readLine()) != null) {
+                // Since it's JSON, adding a newline isn't necessary (it won't affect parsing)
+                // But it does make debugging a *lot* easier if you print out the completed
+                // buffer for debugging.
+                buffer.append(line + "\n");
+            }
+
+            if (buffer.length() == 0) {
+                // Stream was empty.  No point in parsing.
+                return "";
+            }
+            return buffer.toString();
+        }catch (IOException e) {
             Log.e(LOG_TAG, "Error ", e);
             // If the code didn't successfully get the weather data, there's no point in attempting
             // to parse it.
-            return;
-        } catch (JSONException e) {
-            e.printStackTrace();
-        } finally {
+            return "";
+        }finally {
             if (urlConnection != null) {
                 urlConnection.disconnect();
             }
@@ -228,8 +181,6 @@ public class AlgumSyncAdapter extends AbstractThreadedSyncAdapter {
                 }
             }
         }
-
-
     }
 
     public static Account CreateSyncAccount(Context context) {

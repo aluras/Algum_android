@@ -51,7 +51,7 @@ public class LancamentoContasActivity extends BaseActivity
                 ContentResolver.SYNC_EXTRAS_MANUAL, true);
         b.putBoolean(
                 ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
-        //ContentResolver.requestSync(mAccount, this.getString(R.string.content_authority), b);
+        ContentResolver.requestSync(mAccount, this.getString(R.string.content_authority), b);
 
         GridView gridContas = (GridView) findViewById(R.id.gridViewContas);
 
