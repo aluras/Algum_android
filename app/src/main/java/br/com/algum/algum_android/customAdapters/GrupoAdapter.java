@@ -45,7 +45,8 @@ public class GrupoAdapter extends CursorAdapter {
         idTipoLancamento = ((LancamentoGrupoActivity) context).getTipoLancamento();
         nomeConta = ((LancamentoGrupoActivity) context).getNomeConta();
         idConta = ((LancamentoGrupoActivity) context).getIdCOnta();
-        final String nomeGrupo = cursor.getString(2);
+        final String nomeGrupo = cursor.getString(3);
+        final int idGrupo = cursor.getInt(0);
 
         final GrupoHolder holder = (GrupoHolder) view.getTag();
         holder.txtNome.setText(nomeGrupo);
@@ -63,6 +64,7 @@ public class GrupoAdapter extends CursorAdapter {
                 lancamentoValorIntent.putExtra("nomeConta",nomeConta);
                 lancamentoValorIntent.putExtra("idConta",idConta);
                 lancamentoValorIntent.putExtra("nomeGrupo",nomeGrupo);
+                lancamentoValorIntent.putExtra("idGrupo",idGrupo);
                 view.getContext().startActivity(lancamentoValorIntent);
 
             }

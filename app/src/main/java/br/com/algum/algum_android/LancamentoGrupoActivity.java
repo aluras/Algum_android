@@ -81,12 +81,14 @@ public class LancamentoGrupoActivity extends BaseActivity
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         Uri gruposUri = AlgumDBContract.GruposEntry.CONTENT_URI;
+        String selection = AlgumDBContract.GruposEntry.COLUMN_TIPO_ID + " = ?";
+        String[] selectionArgs = {String.valueOf(idTipoLancamento)};
         return new CursorLoader(
                 this,
                 gruposUri,
                 null,
-                null,
-                null,
+                selection,
+                selectionArgs,
                 null
         );
     }
