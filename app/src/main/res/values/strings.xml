@@ -10,6 +10,8 @@
     <string name="receita">Receita</string>
     <string name="transferencia">Transferência</string>
     <string name="contas">Contas</string>
+    <string name="contaOrigem">Conta de origem</string>
+    <string name="contaDestino">Conta de destino</string>
     <string name="grupos">Grupos</string>
     <string name="despesasmes">Despesas no mês</string>
     <string name="planejadomes">Planejado</string>

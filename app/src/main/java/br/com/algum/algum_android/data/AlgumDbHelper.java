@@ -55,6 +55,19 @@ public class AlgumDbHelper extends SQLiteOpenHelper {
                 AlgumDBContract.GruposEntry.COLUMN_NOME + " TEXT NOT NULL)";
 
         db.execSQL(SQL_CREATE_GRUPO_TABLE);
+
+        final String SQL_CREATE_LANCAMENTO_TABLE = "CREATE TABLE " + AlgumDBContract.LancamentoEntry.TABLE_NAME + " (" +
+                AlgumDBContract.LancamentoEntry.COLUMN_ID + " INTEGER PRIMARY KEY," +
+                AlgumDBContract.LancamentoEntry.COLUMN_LANCAMENTO_ID + " INTEGER NOT NULL," +
+                AlgumDBContract.LancamentoEntry.COLUMN_DATA + " DATE NOT NULL," +
+                AlgumDBContract.LancamentoEntry.COLUMN_VALOR + " DECIMAL NOT NULL," +
+                AlgumDBContract.LancamentoEntry.COLUMN_OBSERVACAO + " TEXT NOT NULL," +
+                AlgumDBContract.LancamentoEntry.COLUMN_TIPO_ID + " INTEGER NOT NULL," +
+                AlgumDBContract.LancamentoEntry.COLUMN_GRUPO_ID + " INTEGER NOT NULL," +
+                AlgumDBContract.LancamentoEntry.COLUMN_CONTA_ORIGEM_ID + " INTEGER NOT NULL," +
+                AlgumDBContract.LancamentoEntry.COLUMN_CONTA_DESTINO_ID + " INTEGER NOT NULL)";
+
+        db.execSQL(SQL_CREATE_LANCAMENTO_TABLE);
 /*
         //TODO: Remove after the sync adapter is ready
         String SQL_INSERT_GRUPO = "INSERT INTO grupos VALUES(1,1,'Alimentação')";
@@ -69,6 +82,7 @@ public class AlgumDbHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + AlgumDBContract.ContasEntry.TABLE_NAME);
         db.execSQL("DROP TABLE IF EXISTS " + AlgumDBContract.UsuariosEntry.TABLE_NAME);
         db.execSQL("DROP TABLE IF EXISTS " + AlgumDBContract.GruposEntry.TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + AlgumDBContract.LancamentoEntry.TABLE_NAME);
         onCreate(db);
 
     }

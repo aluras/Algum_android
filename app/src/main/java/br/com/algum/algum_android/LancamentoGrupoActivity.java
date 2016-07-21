@@ -8,10 +8,11 @@ import android.support.design.widget.NavigationView;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.view.View;
 import android.widget.GridView;
 import android.widget.TextView;
 
-import br.com.algum.algum_android.customAdapters.GrupoAdapter;
+import br.com.algum.algum_android.customAdapters.ContaAdapter;
 import br.com.algum.algum_android.data.AlgumDBContract;
 
 public class LancamentoGrupoActivity extends BaseActivity
@@ -19,22 +20,27 @@ public class LancamentoGrupoActivity extends BaseActivity
 
     private final String LOG_TAG = LancamentoGrupoActivity.class.getSimpleName();
 
-    private GrupoAdapter mGruposAdapter;
+    private ContaAdapter mContasAdapter;
+    private ContaAdapter mContasAdapterDestino;
 
     private int idTipoLancamento = 1;
-    private String nomeConta = "";
-    private int idCOnta = 0;
+    private String nomeGrupo = "";
+    private int idGrupo = 0;
+    private int idContaOrigem = 0;
+    private int idContaDestino = 0;
+    private String nomeContaOrigem = "";
+    private String nomeContaDestino = "";
 
     public int getTipoLancamento() {
         return idTipoLancamento;
     }
 
-    public String getNomeConta() {
-        return nomeConta;
+    public String getNomeGrupo() {
+        return nomeGrupo;
     }
 
-    public int getIdCOnta() {
-        return idCOnta;
+    public int getIdGrupo() {
+        return idGrupo;
     }
 
     @Override
@@ -46,8 +52,17 @@ public class LancamentoGrupoActivity extends BaseActivity
         Intent intent = getIntent();
 
         idTipoLancamento = intent.getIntExtra("tipoLancamento", 1);
-        nomeConta = intent.getStringExtra("nomeConta");
-        idCOnta = intent.getIntExtra("idConta",0);
+        nomeGrupo = intent.getStringExtra("nomeGrupo");
+        idGrupo = intent.getIntExtra("idGrupo",0);
+
+        TextView txtContaOrigem = (TextView) findViewById(R.id.txtContaOrigem);
+        TextView txtContaDestino = (TextView) findViewById(R.id.txtContaDestino);
+        GridView gridContas = (GridView) findViewById(R.id.gridViewGrupos);
+        GridView gridViewContaDestino = (GridView) findViewById(R.id.gridViewContaDestino);
+
+        txtContaOrigem.setText(R.string.contas);
+        txtContaDestino.setVisibility(View.GONE);
+        gridViewContaDestino.setVisibility(View.GONE);
 
         String tipoLancamento = "";
         switch (idTipoLancamento){
@@ -59,48 +74,84 @@ public class LancamentoGrupoActivity extends BaseActivity
                 break;
             case 3:
                 tipoLancamento = getString(R.string.transferencia);
+                txtContaOrigem.setText(R.string.contaOrigem);
+                txtContaDestino.setVisibility(View.VISIBLE);
+                gridViewContaDestino.setVisibility(View.VISIBLE);
                 break;
         }
 
         TextView txtTipoLancamento = (TextView) findViewById(R.id.txtTipoLancamento);
-        txtTipoLancamento.setText("Nova " + tipoLancamento);
+        txtTipoLancamento.setText("Nova " + tipoLancamento + " - " + nomeGrupo);
 
-        TextView txtConta = (TextView) findViewById(R.id.txtConta);
-        txtConta.setText("Conta: "+nomeConta);
-
-        GridView gridContas = (GridView) findViewById(R.id.gridViewGrupos);
-
-        mGruposAdapter = new GrupoAdapter(this,null, 0);
+        mContasAdapter = new ContaAdapter(this,null, 0, false);
+        mContasAdapterDestino = new ContaAdapter(this,null, 0, true);
 
         getSupportLoaderManager().initLoader(0, null, this);
 
-        gridContas.setAdapter(mGruposAdapter);
+        gridContas.setAdapter(mContasAdapter);
+        gridViewContaDestino.setAdapter(mContasAdapterDestino);
 
     }
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        Uri gruposUri = AlgumDBContract.GruposEntry.CONTENT_URI;
-        String selection = AlgumDBContract.GruposEntry.COLUMN_TIPO_ID + " = ?";
-        String[] selectionArgs = {String.valueOf(idTipoLancamento)};
+
+        Uri contasUri = AlgumDBContract.ContasEntry.CONTENT_URI;
+        String selection = "";
+
+        switch (idTipoLancamento){
+            case 1:
+                selection =  AlgumDBContract.ContasEntry.COLUMN_TIPO_CONTA_ID + " IN (1,3,4,5) ";
+                break;
+            case 2:
+                selection =  AlgumDBContract.ContasEntry.COLUMN_TIPO_CONTA_ID + " IN (1,2,4,5) ";
+                break;
+        }
+
         return new CursorLoader(
                 this,
-                gruposUri,
+                contasUri,
                 null,
                 selection,
-                selectionArgs,
+                null,
                 null
         );
     }
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        mGruposAdapter.swapCursor(data);
-        mGruposAdapter.notifyDataSetChanged();
+        mContasAdapter.swapCursor(data);
+        mContasAdapter.notifyDataSetChanged();
+        mContasAdapterDestino.swapCursor(data);
+        mContasAdapterDestino.notifyDataSetChanged();
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
-        mGruposAdapter.swapCursor(null);
+        mContasAdapter.swapCursor(null);
+        mContasAdapterDestino.swapCursor(null);
+    }
+
+    public void recebeConta(boolean destino, int idConta, String nomeConta, int idGrupo, String nomeGrupo, int tipoLancamento){
+
+        if (destino){
+            idContaDestino = idConta;
+            nomeContaDestino = nomeConta;
+        }else{
+            idContaOrigem = idConta;
+            nomeContaOrigem = nomeConta;
+        }
+
+        if ((idContaDestino != 0 && idContaOrigem != 0) || tipoLancamento != 3){
+            Intent lancamentoValorIntent = new Intent(this, LancamentoValorActivity.class);
+            lancamentoValorIntent.putExtra("tipoLancamento",tipoLancamento);
+            lancamentoValorIntent.putExtra("nomeGrupo",nomeGrupo);
+            lancamentoValorIntent.putExtra("idGrupo",idGrupo);
+            lancamentoValorIntent.putExtra("nomeContaOrigem",nomeContaOrigem);
+            lancamentoValorIntent.putExtra("nomeContaDestino",nomeContaDestino);
+            lancamentoValorIntent.putExtra("idContaOrigem",idContaOrigem);
+            lancamentoValorIntent.putExtra("idContaDestino",idContaDestino);
+            this.startActivity(lancamentoValorIntent);
+        }
     }
 }

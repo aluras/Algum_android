@@ -20,6 +20,7 @@ public class AlgumDBContract {
     public static final String PATH_CONTAS = "contas";
     public static final String PATH_USUARIOS = "usuarios";
     public static final String PATH_GRUPOS = "grupos";
+    public static final String PATH_LANCAMENTOS = "lancamentos";
 
     public static final String DATE_FORMAT = "yyyyMMdd";
 
@@ -102,6 +103,32 @@ public class AlgumDBContract {
         public static final String COLUMN_GRUPO_ID = "grupo_id";
         public static final String COLUMN_NOME = "nome";
         public static final String COLUMN_TIPO_ID = "tipo_id";
+
+        public static Uri buildGrupoUri(long id) {
+            return ContentUris.withAppendedId(CONTENT_URI, id);
+        }
+    }
+
+    public static final class LancamentoEntry implements  BaseColumns{
+        public static final Uri CONTENT_URI =
+                BASE_CONTENT_URI.buildUpon().appendPath(PATH_LANCAMENTOS).build();
+
+        public static final String CONTENT_TYPE =
+                "vnd.android.cursor.dir/" + CONTENT_AUTHORITY + "/" + PATH_LANCAMENTOS;
+        public static final String CONTENT_ITEM_TYPE =
+                "vnd.android.cursor.item/" + CONTENT_AUTHORITY + "/" + PATH_LANCAMENTOS;
+
+        public static final String TABLE_NAME = "lancamentos";
+
+        public static final String COLUMN_ID = "_id";
+        public static final String COLUMN_LANCAMENTO_ID = "grupo_id";
+        public static final String COLUMN_DATA = "data";
+        public static final String COLUMN_VALOR = "valor";
+        public static final String COLUMN_OBSERVACAO = "observacao";
+        public static final String COLUMN_TIPO_ID = "tipo_id";
+        public static final String COLUMN_GRUPO_ID = "grupo_id";
+        public static final String COLUMN_CONTA_ORIGEM_ID = "conta_origem_id";
+        public static final String COLUMN_CONTA_DESTINO_ID = "conta_destino_id";
 
         public static Uri buildGrupoUri(long id) {
             return ContentUris.withAppendedId(CONTENT_URI, id);

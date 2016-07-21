@@ -16,7 +16,7 @@ import android.view.View;
 import android.widget.GridView;
 import android.widget.TextView;
 
-import br.com.algum.algum_android.customAdapters.ContaAdapter;
+import br.com.algum.algum_android.customAdapters.GrupoAdapter;
 import br.com.algum.algum_android.data.AlgumDBContract;
 
 public class LancamentoContasActivity extends BaseActivity
@@ -31,13 +31,12 @@ public class LancamentoContasActivity extends BaseActivity
     public static final String ACCOUNT = "dummyaccount";
     // Instance fields
     Account mAccount;
-    private ContaAdapter mCcontasAdapter;
+    private GrupoAdapter mGruposAdapter;
+    private int tipoLancamento = 1;
 
     public int getTipoLancamento() {
         return tipoLancamento;
     }
-
-    private int tipoLancamento = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,14 +88,11 @@ public class LancamentoContasActivity extends BaseActivity
             }
         });
 
-        //Cursor cursor = getContentResolver().query(AlgumDBContract.ContasEntry.CONTENT_URI, null, null, null, null);
-        //cursor.setNotificationUri(getContentResolver(),AlgumDBContract.ContasEntry.CONTENT_URI);
-
-        mCcontasAdapter = new ContaAdapter(this,null, 0);
+        mGruposAdapter = new GrupoAdapter(this,null, 0);
 
         getSupportLoaderManager().initLoader(0, null, this);
 
-        gridContas.setAdapter(mCcontasAdapter);
+        gridContas.setAdapter(mGruposAdapter);
 
     }
 
@@ -127,7 +123,6 @@ public class LancamentoContasActivity extends BaseActivity
 
         }
         getSupportLoaderManager().restartLoader(0, null, this);
-        //mCcontasAdapter.notifyDataSetChanged();
 
     }
 
@@ -170,36 +165,28 @@ public class LancamentoContasActivity extends BaseActivity
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        Uri contasUri = AlgumDBContract.ContasEntry.CONTENT_URI;
-        String selection = "";
-
-        switch (tipoLancamento){
-            case 1:
-                selection =  AlgumDBContract.ContasEntry.COLUMN_TIPO_CONTA_ID + " IN (1,3,4,5) ";
-                break;
-            case 2:
-                selection =  AlgumDBContract.ContasEntry.COLUMN_TIPO_CONTA_ID + " IN (1,2,4,5) ";
-                break;
-        }
-
+        Uri gruposUri = AlgumDBContract.GruposEntry.CONTENT_URI;
+        String selection = AlgumDBContract.GruposEntry.COLUMN_TIPO_ID + " = ?";
+        String[] selectionArgs = {String.valueOf(tipoLancamento)};
         return new CursorLoader(
                 this,
-                contasUri,
+                gruposUri,
                 null,
                 selection,
-                null,
+                selectionArgs,
                 null
         );
+
     }
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        mCcontasAdapter.swapCursor(data);
-        mCcontasAdapter.notifyDataSetChanged();
+        mGruposAdapter.swapCursor(data);
+        mGruposAdapter.notifyDataSetChanged();
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
-        mCcontasAdapter.swapCursor(null);
+        mGruposAdapter.swapCursor(null);
     }
 }

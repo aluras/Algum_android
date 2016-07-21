@@ -2,6 +2,7 @@ package br.com.algum.algum_android;
 
 import android.app.DatePickerDialog;
 import android.app.Dialog;
+import android.content.ContentValues;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
@@ -18,11 +19,18 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
+import br.com.algum.algum_android.data.AlgumDBContract;
+
 public class LancamentoValorActivity extends BaseActivity
         implements NavigationView.OnNavigationItemSelectedListener,View.OnClickListener {
 
     private final String LOG_TAG = LancamentoValorActivity.class.getSimpleName();
     static final int DATE_DIALOG_ID = 0;
+
+    private int idTipoLancamento = 1;
+    private int idGrupo = 0;
+    private int idContaOrigem = 0;
+    private int idContaDestino = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,8 +40,13 @@ public class LancamentoValorActivity extends BaseActivity
 
         Intent intent = getIntent();
 
+        idTipoLancamento = intent.getIntExtra("tipoLancamento",1);
+        idGrupo = intent.getIntExtra("idGrupo",0);
+        idContaOrigem = intent.getIntExtra("idContaOrigem",0);
+        idContaDestino = intent.getIntExtra("idContaDestino",0);
+
         String tipoLancamento = "";
-        switch (intent.getIntExtra("tipoLancamento",1)){
+        switch (idTipoLancamento){
             case 1:
                 tipoLancamento = getString(R.string.despesa);
                 break;
@@ -46,13 +59,15 @@ public class LancamentoValorActivity extends BaseActivity
         }
 
         TextView txtTipoLancamento = (TextView) findViewById(R.id.txtTipoLancamento);
-        txtTipoLancamento.setText("Nova " + tipoLancamento);
+        txtTipoLancamento.setText("Nova " + tipoLancamento + " - " + intent.getStringExtra("nomeGrupo"));
 
         TextView txtConta = (TextView) findViewById(R.id.txtConta);
-        txtConta.setText("Conta: " + intent.getStringExtra("nomeConta"));
+        if(idTipoLancamento == 3){
+            txtConta.setText("Conta: " + intent.getStringExtra("nomeContaOrigem") + " -> " + intent.getStringExtra("nomeContaDestino"));
+        }else{
+            txtConta.setText("Conta: " + intent.getStringExtra("nomeContaOrigem"));
+        }
 
-        TextView txtGrupo = (TextView) findViewById(R.id.txtGrupo);
-        txtGrupo.setText("Grupo: " + intent.getStringExtra("nomeGrupo"));
 
         TextView txtData = (TextView) findViewById(R.id.txtData);
         TextView txtValor = (TextView) findViewById(R.id.txtValor);
@@ -90,9 +105,24 @@ public class LancamentoValorActivity extends BaseActivity
 
     protected void gravar(){
         TextView valor = (TextView) findViewById(R.id.txtValor);
+        TextView data = (TextView) findViewById(R.id.txtData);
+        TextView observacao = (TextView) findViewById(R.id.txtDetalhe);
+
         if (valor.getText().toString().trim().equals("")){
             valor.setError("Digite o valor!");
         }else{
+            ContentValues lancamentoValues = new ContentValues();
+            //lancamentoValues.put(AlgumDBContract.LancamentoEntry.COLUMN_ID, grupo.getInt("id"));
+            lancamentoValues.put(AlgumDBContract.LancamentoEntry.COLUMN_VALOR, valor.getText().toString());
+            lancamentoValues.put(AlgumDBContract.LancamentoEntry.COLUMN_DATA, data.getText().toString());
+            lancamentoValues.put(AlgumDBContract.LancamentoEntry.COLUMN_OBSERVACAO, observacao.getText().toString());
+            lancamentoValues.put(AlgumDBContract.LancamentoEntry.COLUMN_TIPO_ID, idTipoLancamento);
+            lancamentoValues.put(AlgumDBContract.LancamentoEntry.COLUMN_GRUPO_ID, idGrupo);
+            lancamentoValues.put(AlgumDBContract.LancamentoEntry.COLUMN_CONTA_ORIGEM_ID, idContaOrigem);
+            lancamentoValues.put(AlgumDBContract.LancamentoEntry.COLUMN_CONTA_DESTINO_ID, idContaDestino);
+
+            getContentResolver().insert(AlgumDBContract.LancamentoEntry.CONTENT_URI, lancamentoValues);
+
             Toast.makeText(this, "Lançamento registrado.", Toast.LENGTH_LONG).show();
             Intent intent = new Intent(this,LancamentoContasActivity.class);
             startActivity(intent);

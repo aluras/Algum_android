@@ -14,6 +14,7 @@
     <color name="tile1">#DB5353</color>
     <color name="tile2">#DB9153</color>
     <color name="tile3">#328383</color>
+    <color name="tile4">#999999</color>
 
     <!-- Barra de porcentagem -->
     <color name="ball">#272E27</color>

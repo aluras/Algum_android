@@ -1,7 +1,6 @@
 package br.com.algum.algum_android.customAdapters;
 
 import android.content.Context;
-import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.drawable.GradientDrawable;
 import android.support.v4.widget.CursorAdapter;
@@ -10,7 +9,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import br.com.algum.algum_android.LancamentoContasActivity;
 import br.com.algum.algum_android.LancamentoGrupoActivity;
 import br.com.algum.algum_android.R;
 
@@ -19,15 +17,19 @@ import br.com.algum.algum_android.R;
  */
 public class ContaAdapter extends CursorAdapter {
 
-    private Cursor mCursor;
-    private Context mContext;
+    //private Cursor mCursor;
+    //private Context mContext;
     private LayoutInflater mInflater;
     private int idTipoLancamento;
+    private String nomeGrupo;
+    private int idGrupo;
+    private boolean mDestino;
 
-    public ContaAdapter(Context context, Cursor c, int flags) {
+    public ContaAdapter(Context context, Cursor c, int flags, boolean destino) {
         super(context, c, flags);
         mInflater = LayoutInflater.from(context);
-        mContext = context;
+        mDestino = destino;
+        //mContext = context;
     }
 
 /*    public ContaAdapter(Context context, int resource, Conta[] data) {
@@ -86,28 +88,28 @@ public class ContaAdapter extends CursorAdapter {
 
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
-        idTipoLancamento = ((LancamentoContasActivity) context).getTipoLancamento();
+        idTipoLancamento = ((LancamentoGrupoActivity) context).getTipoLancamento();
+        nomeGrupo = ((LancamentoGrupoActivity) context).getNomeGrupo();
+        idGrupo = ((LancamentoGrupoActivity) context).getIdGrupo();
 
         final ContaHolder holder = (ContaHolder) view.getTag();
         final String nomeConta = cursor.getString(4);
         final int idConta = cursor.getInt(1);
+        final Context mContext = context;
 
         holder.txtNome.setText(nomeConta);
 
         GradientDrawable gd = (GradientDrawable) holder.txtNome.getBackground();
-        gd.setColor(context.getResources().getColor(R.color.tile1));
+        gd.setColor(context.getResources().getColor(R.color.tile4));
         TextView txt = (TextView)holder.txtNome;
         txt.setTextColor(context.getResources().getColor(R.color.texto_tipo));
 
         holder.txtNome.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent lancamentoGruposIntent = new Intent(view.getContext(), LancamentoGrupoActivity.class);
-                lancamentoGruposIntent.putExtra("tipoLancamento",idTipoLancamento);
-                lancamentoGruposIntent.putExtra("nomeConta",nomeConta);
-                lancamentoGruposIntent.putExtra("idConta",idConta);
-                view.getContext().startActivity(lancamentoGruposIntent);
-
+                GradientDrawable gdv = (GradientDrawable) view.getBackground();
+                gdv.setColor(mContext.getResources().getColor(R.color.tile1));
+                ((LancamentoGrupoActivity) mContext).recebeConta(mDestino, idConta, nomeConta, idGrupo, nomeGrupo, idTipoLancamento);
             }
         });
 
