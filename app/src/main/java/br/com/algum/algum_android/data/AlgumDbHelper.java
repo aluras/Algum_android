@@ -57,15 +57,15 @@ public class AlgumDbHelper extends SQLiteOpenHelper {
         db.execSQL(SQL_CREATE_GRUPO_TABLE);
 
         final String SQL_CREATE_LANCAMENTO_TABLE = "CREATE TABLE " + AlgumDBContract.LancamentoEntry.TABLE_NAME + " (" +
-                AlgumDBContract.LancamentoEntry.COLUMN_ID + " INTEGER PRIMARY KEY," +
-                AlgumDBContract.LancamentoEntry.COLUMN_LANCAMENTO_ID + " INTEGER NOT NULL," +
+                AlgumDBContract.LancamentoEntry.COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
+                AlgumDBContract.LancamentoEntry.COLUMN_LANCAMENTO_ID + " INTEGER NULL," +
                 AlgumDBContract.LancamentoEntry.COLUMN_DATA + " DATE NOT NULL," +
                 AlgumDBContract.LancamentoEntry.COLUMN_VALOR + " DECIMAL NOT NULL," +
-                AlgumDBContract.LancamentoEntry.COLUMN_OBSERVACAO + " TEXT NOT NULL," +
+                AlgumDBContract.LancamentoEntry.COLUMN_OBSERVACAO + " TEXT NULL," +
                 AlgumDBContract.LancamentoEntry.COLUMN_TIPO_ID + " INTEGER NOT NULL," +
                 AlgumDBContract.LancamentoEntry.COLUMN_GRUPO_ID + " INTEGER NOT NULL," +
                 AlgumDBContract.LancamentoEntry.COLUMN_CONTA_ORIGEM_ID + " INTEGER NOT NULL," +
-                AlgumDBContract.LancamentoEntry.COLUMN_CONTA_DESTINO_ID + " INTEGER NOT NULL)";
+                AlgumDBContract.LancamentoEntry.COLUMN_CONTA_DESTINO_ID + " INTEGER NULL)";
 
         db.execSQL(SQL_CREATE_LANCAMENTO_TABLE);
 /*

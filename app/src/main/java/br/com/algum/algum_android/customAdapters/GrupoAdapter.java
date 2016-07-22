@@ -7,6 +7,7 @@ import android.graphics.drawable.GradientDrawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewParent;
 import android.widget.CursorAdapter;
 import android.widget.TextView;
 
@@ -60,6 +61,14 @@ public class GrupoAdapter extends CursorAdapter {
         holder.txtNome.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                ViewParent vwParent = view.getParent();
+
+                for(int index=0; index<((ViewGroup)vwParent).getChildCount(); ++index) {
+                    View nextChild = ((ViewGroup)vwParent).getChildAt(index);
+                    GradientDrawable gdv = (GradientDrawable) nextChild.getBackground();
+                    gdv.setColor((view.getContext().getResources().getColor(R.color.tile4)));
+                }
+
                 GradientDrawable gdv = (GradientDrawable) view.getBackground();
                 gdv.setColor(view.getContext().getResources().getColor(R.color.tile1));
                 Intent lancamentoContaIntent = new Intent(view.getContext(), LancamentoGrupoActivity.class);

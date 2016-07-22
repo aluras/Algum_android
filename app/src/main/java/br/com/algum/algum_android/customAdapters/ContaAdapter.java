@@ -7,6 +7,7 @@ import android.support.v4.widget.CursorAdapter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewParent;
 import android.widget.TextView;
 
 import br.com.algum.algum_android.LancamentoGrupoActivity;
@@ -107,6 +108,14 @@ public class ContaAdapter extends CursorAdapter {
         holder.txtNome.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                ViewParent vwParent = view.getParent();
+
+                for(int index=0; index<((ViewGroup)vwParent).getChildCount(); ++index) {
+                    View nextChild = ((ViewGroup)vwParent).getChildAt(index);
+                    GradientDrawable gdv = (GradientDrawable) nextChild.getBackground();
+                    gdv.setColor(mContext.getResources().getColor(R.color.tile4));
+                }
+
                 GradientDrawable gdv = (GradientDrawable) view.getBackground();
                 gdv.setColor(mContext.getResources().getColor(R.color.tile1));
                 ((LancamentoGrupoActivity) mContext).recebeConta(mDestino, idConta, nomeConta, idGrupo, nomeGrupo, idTipoLancamento);
