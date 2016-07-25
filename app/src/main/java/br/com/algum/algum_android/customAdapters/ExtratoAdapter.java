@@ -1,75 +1,72 @@
 package br.com.algum.algum_android.customAdapters;
 
-import android.app.Activity;
 import android.content.Context;
+import android.database.Cursor;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
+import android.widget.CursorAdapter;
 import android.widget.TextView;
 
 import java.text.SimpleDateFormat;
 
 import br.com.algum.algum_android.R;
-import br.com.algum.algum_android.entities.Lancamento;
 
 /**
  * Created by sn1007071 on 10/03/2016.
  */
-public class ExtratoAdapter extends ArrayAdapter {
+public class ExtratoAdapter extends CursorAdapter {
 
-    Context context;
-    int layoutResourceId;
-    Lancamento data[] = null;
+    private LayoutInflater mInflater;
+    private String strData = "";
 
-    public ExtratoAdapter(Context context, int resource, Lancamento[] data) {
-        super(context, resource, data);
-        this.layoutResourceId = resource;
-        this.context = context;
-        this.data = data;
+    public ExtratoAdapter(Context context, Cursor c, int flags) {
+        super(context, c, flags);
+        mInflater = LayoutInflater.from(context);
+
     }
 
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-        View row = convertView;
-        LancamentoHolder holder = null;
+    public View newView(Context context, Cursor cursor, ViewGroup parent) {
+        View view = mInflater.inflate(R.layout.item_extrato, parent, false);
+        final LancamentoHolder holder = new LancamentoHolder();
+        holder.txtData = (TextView)view.findViewById(R.id.txtData);
+        holder.txtValor = (TextView)view.findViewById(R.id.txtValor);
+        holder.txtGrupo = (TextView)view.findViewById(R.id.txtGrupo);
+        view.setTag(holder);
+        return view;
+    }
 
-        if (row == null){
-            LayoutInflater inflater = ((Activity)context).getLayoutInflater();
-            row = inflater.inflate(layoutResourceId,parent,false);
+    @Override
+    public void bindView(View view, Context context, Cursor cursor) {
 
-            holder = new LancamentoHolder();
-            //holder.txtData = (TextView)row.findViewById(R.id.txtData);
-            //holder.txtValor = (TextView)row.findViewById(R.id.txtValor);
-            //holder.txtGrupo = (TextView)row.findViewById(R.id.txtGrupo);
+        final String txtData = cursor.getString(2);
+        final String txtGrupo = cursor.getString(6);
+        final float txtValor = cursor.getFloat(3);
 
-            row.setTag(holder);
-        }
-        else
-        {
-            holder = (LancamentoHolder)row.getTag();
-        }
+        final LancamentoHolder holder = (LancamentoHolder) view.getTag();
 
-        Lancamento lancamento = data[position];
 
-        if(position != 0 && data[position-1].getData().equals(lancamento.getData())){
+        if(strData.equals(txtData) ){
             holder.txtData.setVisibility(View.GONE);
         }else{
             SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
-            holder.txtData.setText(format.format(lancamento.getData()));
+            holder.txtData.setText(txtData);
             holder.txtData.setVisibility(View.VISIBLE);
+            strData = txtData;
         }
 
-        holder.txtGrupo.setText(lancamento.getGrupo());
-        holder.txtValor.setText("R$ "+ String.format("%.2f", lancamento.getValor()));
-        if(lancamento.getValor()>=0){
+        holder.txtGrupo.setText(txtGrupo);
+        holder.txtValor.setText("R$ " + String.format("%.2f", txtValor));
+        if(txtValor>=0){
             holder.txtValor.setTextColor(context.getResources().getColor(R.color.receita));
         }else{
             holder.txtValor.setTextColor(context.getResources().getColor(R.color.despesa));
         }
 
-        return row;
+
     }
+
 
     static class LancamentoHolder {
         TextView txtData;

@@ -121,7 +121,7 @@ public class AlgumDBContract {
         public static final String TABLE_NAME = "lancamentos";
 
         public static final String COLUMN_ID = "_id";
-        public static final String COLUMN_LANCAMENTO_ID = "grupo_id";
+        public static final String COLUMN_LANCAMENTO_ID = "lancamento_id";
         public static final String COLUMN_DATA = "data";
         public static final String COLUMN_VALOR = "valor";
         public static final String COLUMN_OBSERVACAO = "observacao";

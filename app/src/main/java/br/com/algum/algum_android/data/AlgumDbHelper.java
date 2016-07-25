@@ -10,7 +10,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class AlgumDbHelper extends SQLiteOpenHelper {
 
     // If you change the database schema, you must increment the database version.
-    private static final int DATABASE_VERSION = 6;
+    private static final int DATABASE_VERSION = 7;
 
     public static final String DATABASE_NAME = "algum.db";
 

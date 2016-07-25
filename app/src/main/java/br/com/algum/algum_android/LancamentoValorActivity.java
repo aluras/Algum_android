@@ -104,30 +104,41 @@ public class LancamentoValorActivity extends BaseActivity
     }
 
     protected void gravar(){
-        TextView valor = (TextView) findViewById(R.id.txtValor);
-        TextView data = (TextView) findViewById(R.id.txtData);
-        TextView observacao = (TextView) findViewById(R.id.txtDetalhe);
+        try {
+            TextView valor = (TextView) findViewById(R.id.txtValor);
+            TextView data = (TextView) findViewById(R.id.txtData);
+            TextView observacao = (TextView) findViewById(R.id.txtDetalhe);
 
-        if (valor.getText().toString().trim().equals("")){
-            valor.setError("Digite o valor!");
-        }else{
-            ContentValues lancamentoValues = new ContentValues();
-            //lancamentoValues.put(AlgumDBContract.LancamentoEntry.COLUMN_ID, grupo.getInt("id"));
-            lancamentoValues.put(AlgumDBContract.LancamentoEntry.COLUMN_VALOR, valor.getText().toString());
-            lancamentoValues.put(AlgumDBContract.LancamentoEntry.COLUMN_DATA, data.getText().toString());
-            lancamentoValues.put(AlgumDBContract.LancamentoEntry.COLUMN_OBSERVACAO, observacao.getText().toString());
-            lancamentoValues.put(AlgumDBContract.LancamentoEntry.COLUMN_TIPO_ID, idTipoLancamento);
-            lancamentoValues.put(AlgumDBContract.LancamentoEntry.COLUMN_GRUPO_ID, idGrupo);
-            lancamentoValues.put(AlgumDBContract.LancamentoEntry.COLUMN_CONTA_ORIGEM_ID, idContaOrigem);
-            lancamentoValues.put(AlgumDBContract.LancamentoEntry.COLUMN_CONTA_DESTINO_ID, idContaDestino);
+            float nValor = Float.parseFloat(valor.getText().toString());
+            if (idTipoLancamento == 1){
+                nValor = nValor * -1;
+            }
 
-            getContentResolver().insert(AlgumDBContract.LancamentoEntry.CONTENT_URI, lancamentoValues);
+            if (valor.getText().toString().trim().equals("")){
+                valor.setError("Digite o valor!");
+            }else{
+                ContentValues lancamentoValues = new ContentValues();
+                //lancamentoValues.put(AlgumDBContract.LancamentoEntry.COLUMN_ID, grupo.getInt("id"));
+                lancamentoValues.put(AlgumDBContract.LancamentoEntry.COLUMN_VALOR, nValor);
+                lancamentoValues.put(AlgumDBContract.LancamentoEntry.COLUMN_DATA, data.getText().toString());
+                lancamentoValues.put(AlgumDBContract.LancamentoEntry.COLUMN_OBSERVACAO, observacao.getText().toString());
+                lancamentoValues.put(AlgumDBContract.LancamentoEntry.COLUMN_TIPO_ID, idTipoLancamento);
+                lancamentoValues.put(AlgumDBContract.LancamentoEntry.COLUMN_GRUPO_ID, idGrupo);
+                lancamentoValues.put(AlgumDBContract.LancamentoEntry.COLUMN_CONTA_ORIGEM_ID, idContaOrigem);
+                lancamentoValues.put(AlgumDBContract.LancamentoEntry.COLUMN_CONTA_DESTINO_ID, idContaDestino);
 
-            Toast.makeText(this, "Lançamento registrado.", Toast.LENGTH_LONG).show();
-            Intent intent = new Intent(this,LancamentoContasActivity.class);
-            startActivity(intent);
+                getContentResolver().insert(AlgumDBContract.LancamentoEntry.CONTENT_URI, lancamentoValues);
+
+                Toast.makeText(this, "Lançamento registrado.", Toast.LENGTH_LONG).show();
+                Intent intent = new Intent(this,LancamentoContasActivity.class);
+                startActivity(intent);
+
+            }
+        }catch (Exception exception) {
+            Toast.makeText(this, "Erro: " + exception.getMessage(), Toast.LENGTH_LONG).show();
 
         }
+
 
 
     }

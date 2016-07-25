@@ -37,7 +37,8 @@
             android:label="@string/title_activity_main"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".LancamentoValorActivity"
+        <activity
+            android:name=".LancamentoValorActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:label="@string/title_activity_main"
             android:screenOrientation="portrait"
@@ -71,6 +72,7 @@
                 android:resource="@xml/syncadapter" />
         </service>
 
+        <activity android:name=".ExtratoActivity"></activity>
     </application>
 
 </manifest>

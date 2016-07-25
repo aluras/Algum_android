@@ -107,6 +107,8 @@ public abstract class BaseActivity extends AppCompatActivity
 
         if (id == R.id.nav_lancamento) {
             intent = new Intent(this, LancamentoContasActivity.class);
+        }else if (id == R.id.nav_extrato){
+            intent = new Intent(this, ExtratoActivity.class);
         }else if (id == R.id.nav_exit) {
             getSharedPreferences(getString(R.string.userInfo), Context.MODE_PRIVATE).edit().clear().commit();
 
