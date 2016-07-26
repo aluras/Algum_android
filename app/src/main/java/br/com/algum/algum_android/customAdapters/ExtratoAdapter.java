@@ -41,20 +41,22 @@ public class ExtratoAdapter extends CursorAdapter {
     public void bindView(View view, Context context, Cursor cursor) {
 
         final String txtData = cursor.getString(2);
-        final String txtGrupo = cursor.getString(6);
+        final String txtGrupo = cursor.getString(12);
         final float txtValor = cursor.getFloat(3);
 
         final LancamentoHolder holder = (LancamentoHolder) view.getTag();
 
+        SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
+        holder.txtData.setText(txtData);
+        holder.txtData.setVisibility(View.VISIBLE);
+        strData = txtData;
 
-        if(strData.equals(txtData) ){
-            holder.txtData.setVisibility(View.GONE);
-        }else{
-            SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
-            holder.txtData.setText(txtData);
-            holder.txtData.setVisibility(View.VISIBLE);
-            strData = txtData;
+        if (cursor.moveToPrevious()){
+            if(txtData.equals(cursor.getString(2)) ){
+                holder.txtData.setVisibility(View.GONE);
+            }
         }
+
 
         holder.txtGrupo.setText(txtGrupo);
         holder.txtValor.setText("R$ " + String.format("%.2f", txtValor));

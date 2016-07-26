@@ -4,6 +4,7 @@ import android.content.ContentProvider;
 import android.content.ContentValues;
 import android.content.UriMatcher;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 import android.support.annotation.Nullable;
 
@@ -101,14 +102,17 @@ public class AlgumContentProvider extends ContentProvider {
                 break;
             }
             case LANCAMENTOS: {
-                retCursor = mDbHelper.getReadableDatabase().query(
-                        AlgumDBContract.LancamentoEntry.TABLE_NAME,
-                        projection,
-                        selection,
-                        selectionArgs,
-                        null,
-                        null,sortOrder
-                );
+                SQLiteQueryBuilder _QB = new SQLiteQueryBuilder();
+
+                _QB.setTables(AlgumDBContract.LancamentoEntry.TABLE_NAME +
+                    " INNER JOIN " + AlgumDBContract.GruposEntry.TABLE_NAME + " ON " +
+                        AlgumDBContract.GruposEntry.TABLE_NAME + "." + AlgumDBContract.GruposEntry.COLUMN_GRUPO_ID + " = " +
+                        AlgumDBContract.LancamentoEntry.TABLE_NAME + "." + AlgumDBContract.LancamentoEntry.COLUMN_GRUPO_ID);
+
+                String _OrderBy = AlgumDBContract.LancamentoEntry.TABLE_NAME + "." + AlgumDBContract.LancamentoEntry.COLUMN_DATA + " ASC ";
+
+                retCursor = _QB.query(mDbHelper.getReadableDatabase(),null,null,null,null,null,_OrderBy);
+
                 break;
             }
             default:
@@ -157,7 +161,7 @@ public class AlgumContentProvider extends ContentProvider {
             case LANCAMENTOS:{
                 long _id = mDbHelper.getWritableDatabase().insert(AlgumDBContract.LancamentoEntry.TABLE_NAME, null, values);
                 if ( _id > 0 )
-                    returnUri = AlgumDBContract.LancamentoEntry.buildGrupoUri(_id);
+                    returnUri = AlgumDBContract.LancamentoEntry.buildLancamentoUri(_id);
                 else
                     throw new android.database.SQLException("Failed to insert row into " + uri);
                 break;

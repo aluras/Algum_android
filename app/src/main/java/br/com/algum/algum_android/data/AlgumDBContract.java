@@ -130,7 +130,7 @@ public class AlgumDBContract {
         public static final String COLUMN_CONTA_ORIGEM_ID = "conta_origem_id";
         public static final String COLUMN_CONTA_DESTINO_ID = "conta_destino_id";
 
-        public static Uri buildGrupoUri(long id) {
+        public static Uri buildLancamentoUri(long id) {
             return ContentUris.withAppendedId(CONTENT_URI, id);
         }
     }
