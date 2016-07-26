@@ -13,6 +13,8 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.TextView;
 
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
@@ -28,6 +30,8 @@ public abstract class BaseActivity extends AppCompatActivity
     protected String email;
     protected int id_usuario;
 
+    protected View v;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -40,9 +44,11 @@ public abstract class BaseActivity extends AppCompatActivity
 
         if (sharedPref.contains(getString(R.string.tokenUsuario))){
             id_token = sharedPref.getString(getString(R.string.tokenUsuario),"");
-            email = sharedPref.getString(getString(R.string.emailUsuario),"");
+            email = sharedPref.getString(getString(R.string.emailUsuario), "");
             id_usuario = sharedPref.getInt(getString(R.string.idUsuario), 0);
 
+            TextView txtEmail = (TextView) v.findViewById(R.id.txtEmail);
+            txtEmail.setText(email);
 
         }else{
             Intent intent = new Intent();
@@ -63,6 +69,9 @@ public abstract class BaseActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        v = navigationView.getHeaderView(0);
+
     }
 
     @Override

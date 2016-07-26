@@ -46,7 +46,7 @@
         <activity
             android:name=".ExtratoActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
-            android:label="@string/title_activity_main"
+            android:label="@string/title_activity_extrato"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
 
