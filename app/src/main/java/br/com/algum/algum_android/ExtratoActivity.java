@@ -1,5 +1,7 @@
 package br.com.algum.algum_android;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -36,7 +38,9 @@ public class ExtratoActivity extends BaseActivity
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
 
-        Uri lancamentoUri = AlgumDBContract.LancamentoEntry.CONTENT_URI;
+        SharedPreferences sharedPref = getSharedPreferences(getString(R.string.userInfo), Context.MODE_PRIVATE);
+        Uri lancamentoUri = AlgumDBContract.LancamentoEntry.buildLancamentoUsuarioUri(sharedPref.getInt(getString(R.string.idUsuario),0));
+
         String selection = "";
 
 

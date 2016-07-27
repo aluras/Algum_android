@@ -20,8 +20,10 @@ public class AlgumContentProvider extends ContentProvider {
     private static final int CONTAS = 100;
     private static final int CONTAS_POR_USUARIO = 101;
     private static final int USUARIOS = 200;
+    private static final int USUARIOS_POR_ID = 201;
     private static final int GRUPOS = 300;
     private static final int LANCAMENTOS = 400;
+    private static final int LANCAMENTOS_POR_USUARIO = 401;
 
     private static UriMatcher buildUriMatcher() {
         // I know what you're thinking.  Why create a UriMatcher when you can use regular
@@ -38,10 +40,12 @@ public class AlgumContentProvider extends ContentProvider {
         matcher.addURI(authority, AlgumDBContract.PATH_CONTAS + "/*", CONTAS_POR_USUARIO);
 
         matcher.addURI(authority, AlgumDBContract.PATH_USUARIOS, USUARIOS);
+        matcher.addURI(authority, AlgumDBContract.PATH_USUARIOS + "/*", USUARIOS_POR_ID);
 
         matcher.addURI(authority, AlgumDBContract.PATH_GRUPOS, GRUPOS);
 
         matcher.addURI(authority, AlgumDBContract.PATH_LANCAMENTOS, LANCAMENTOS);
+        matcher.addURI(authority, AlgumDBContract.PATH_LANCAMENTOS + "/*", LANCAMENTOS_POR_USUARIO);
 
         return matcher;
     }
@@ -58,6 +62,11 @@ public class AlgumContentProvider extends ContentProvider {
         Cursor retCursor;
         switch (sUriMatcher.match(uri)) {
             case CONTAS_POR_USUARIO: {
+                if (selection != null && !selection.trim().isEmpty()){
+                    selection = selection + " AND ";
+                }
+                selection = selection + AlgumDBContract.ContasEntry.COLUMN_USUARIO_ID + " = " + uri.getLastPathSegment();
+
                 retCursor = mDbHelper.getReadableDatabase().query(
                         AlgumDBContract.ContasEntry.TABLE_NAME,
                         projection,
@@ -80,6 +89,23 @@ public class AlgumContentProvider extends ContentProvider {
                 break;
             }
             case USUARIOS: {
+
+                retCursor = mDbHelper.getReadableDatabase().query(
+                        AlgumDBContract.UsuariosEntry.TABLE_NAME,
+                        projection,
+                        selection,
+                        selectionArgs,
+                        null,
+                        null,sortOrder
+                );
+                break;
+            }
+            case USUARIOS_POR_ID: {
+                if (selection != null && !selection.trim().isEmpty()){
+                    selection = selection + " AND ";
+                }
+                selection = selection + AlgumDBContract.UsuariosEntry.COLUMN_ID + " = " + uri.getLastPathSegment();
+
                 retCursor = mDbHelper.getReadableDatabase().query(
                         AlgumDBContract.UsuariosEntry.TABLE_NAME,
                         projection,
@@ -112,6 +138,28 @@ public class AlgumContentProvider extends ContentProvider {
                 String _OrderBy = AlgumDBContract.LancamentoEntry.TABLE_NAME + "." + AlgumDBContract.LancamentoEntry.COLUMN_DATA + " ASC ";
 
                 retCursor = _QB.query(mDbHelper.getReadableDatabase(),null,null,null,null,null,_OrderBy);
+
+                break;
+            }
+            case LANCAMENTOS_POR_USUARIO: {
+                SQLiteQueryBuilder _QB = new SQLiteQueryBuilder();
+
+                if (selection != null && !selection.trim().isEmpty()){
+                    selection = selection + " AND ";
+                }
+                selection = selection + AlgumDBContract.ContasEntry.TABLE_NAME + "." + AlgumDBContract.ContasEntry.COLUMN_USUARIO_ID + " = " + uri.getLastPathSegment();
+
+                                _QB.setTables(AlgumDBContract.LancamentoEntry.TABLE_NAME +
+                        " INNER JOIN " + AlgumDBContract.GruposEntry.TABLE_NAME + " ON " +
+                        AlgumDBContract.GruposEntry.TABLE_NAME + "." + AlgumDBContract.GruposEntry.COLUMN_GRUPO_ID + " = " +
+                        AlgumDBContract.LancamentoEntry.TABLE_NAME + "." + AlgumDBContract.LancamentoEntry.COLUMN_GRUPO_ID +
+                        " INNER JOIN " + AlgumDBContract.ContasEntry.TABLE_NAME + " ON " +
+                        AlgumDBContract.ContasEntry.TABLE_NAME + "." + AlgumDBContract.ContasEntry.COLUMN_CONTA_ID + " = " +
+                        AlgumDBContract.LancamentoEntry.TABLE_NAME + "." + AlgumDBContract.LancamentoEntry.COLUMN_CONTA_ORIGEM_ID);
+
+                String _OrderBy = AlgumDBContract.LancamentoEntry.TABLE_NAME + "." + AlgumDBContract.LancamentoEntry.COLUMN_DATA + " ASC ";
+
+                retCursor = _QB.query(mDbHelper.getReadableDatabase(),null,selection,null,null,null,_OrderBy);
 
                 break;
             }
@@ -161,7 +209,7 @@ public class AlgumContentProvider extends ContentProvider {
             case LANCAMENTOS:{
                 long _id = mDbHelper.getWritableDatabase().insert(AlgumDBContract.LancamentoEntry.TABLE_NAME, null, values);
                 if ( _id > 0 )
-                    returnUri = AlgumDBContract.LancamentoEntry.buildLancamentoUri(_id);
+                    returnUri = null;//AlgumDBContract.LancamentoEntry.buildLancamentoUri(_id);
                 else
                     throw new android.database.SQLException("Failed to insert row into " + uri);
                 break;

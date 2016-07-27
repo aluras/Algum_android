@@ -237,6 +237,7 @@ public class MainActivity extends AppCompatActivity implements
                         }
 
                         JSONObject usuarioJson = new JSONObject(strRetorno);
+
                         ContentValues usuarioValues = new ContentValues();
                         usuarioValues.put(AlgumDBContract.UsuariosEntry.COLUMN_ID, usuarioJson.getJSONObject("Usuario").getInt("id"));
                         usuarioValues.put(AlgumDBContract.UsuariosEntry.COLUMN_EMAIL, usuarioJson.getJSONObject("Usuario").getString("email"));

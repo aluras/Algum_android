@@ -1,6 +1,8 @@
 package br.com.algum.algum_android;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -96,7 +98,9 @@ public class LancamentoGrupoActivity extends BaseActivity
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
 
-        Uri contasUri = AlgumDBContract.ContasEntry.CONTENT_URI;
+        SharedPreferences sharedPref = getSharedPreferences(getString(R.string.userInfo), Context.MODE_PRIVATE);
+        Uri contasUri = AlgumDBContract.ContasEntry.buildContaUsuarioUri(sharedPref.getInt(getString(R.string.idUsuario),0));
+
         String selection = "";
 
         switch (idTipoLancamento){

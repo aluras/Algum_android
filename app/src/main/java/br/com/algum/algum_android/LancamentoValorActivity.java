@@ -103,20 +103,20 @@ public class LancamentoValorActivity extends BaseActivity
 
     }
 
-    protected void gravar(){
+    protected void gravar() {
         try {
             TextView valor = (TextView) findViewById(R.id.txtValor);
             TextView data = (TextView) findViewById(R.id.txtData);
             TextView observacao = (TextView) findViewById(R.id.txtDetalhe);
 
-            float nValor = Float.parseFloat(valor.getText().toString());
-            if (idTipoLancamento == 1){
+            float nValor = Float.parseFloat(valor.getText().toString().replace(',', '.'));
+            if (idTipoLancamento == 1) {
                 nValor = nValor * -1;
             }
 
-            if (valor.getText().toString().trim().equals("")){
+            if (valor.getText().toString().trim().equals("")) {
                 valor.setError("Digite o valor!");
-            }else{
+            } else {
                 ContentValues lancamentoValues = new ContentValues();
                 //lancamentoValues.put(AlgumDBContract.LancamentoEntry.COLUMN_ID, grupo.getInt("id"));
                 lancamentoValues.put(AlgumDBContract.LancamentoEntry.COLUMN_VALOR, nValor);
@@ -130,10 +130,13 @@ public class LancamentoValorActivity extends BaseActivity
                 getContentResolver().insert(AlgumDBContract.LancamentoEntry.CONTENT_URI, lancamentoValues);
 
                 Toast.makeText(this, "Lançamento registrado.", Toast.LENGTH_LONG).show();
-                Intent intent = new Intent(this,LancamentoContasActivity.class);
+                Intent intent = new Intent(this, LancamentoContasActivity.class);
                 startActivity(intent);
 
             }
+        }catch (NumberFormatException exception) {
+            Toast.makeText(this, "Erro: Valor inválido.", Toast.LENGTH_LONG).show();
+
         }catch (Exception exception) {
             Toast.makeText(this, "Erro: " + exception.getMessage(), Toast.LENGTH_LONG).show();
 
