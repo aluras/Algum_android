@@ -11,6 +11,7 @@ import android.widget.TextView;
 import java.text.SimpleDateFormat;
 
 import br.com.algum.algum_android.R;
+import br.com.algum.algum_android.data.AlgumDBContract;
 
 /**
  * Created by sn1007071 on 10/03/2016.
@@ -40,9 +41,9 @@ public class ExtratoAdapter extends CursorAdapter {
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
 
-        final String txtData = cursor.getString(2);
-        final String txtGrupo = cursor.getString(12);
-        final float txtValor = cursor.getFloat(3);
+        final String txtData = cursor.getString(cursor.getColumnIndex(AlgumDBContract.LancamentoEntry.COLUMN_DATA));
+        final String txtGrupo = cursor.getString(cursor.getColumnIndex(AlgumDBContract.GruposEntry.COLUMN_NOME));
+        final float txtValor = cursor.getFloat(cursor.getColumnIndex(AlgumDBContract.LancamentoEntry.COLUMN_VALOR));
 
         final LancamentoHolder holder = (LancamentoHolder) view.getTag();
 
@@ -52,7 +53,7 @@ public class ExtratoAdapter extends CursorAdapter {
         strData = txtData;
 
         if (cursor.moveToPrevious()){
-            if(txtData.equals(cursor.getString(2)) ){
+            if(txtData.equals(cursor.getString(cursor.getColumnIndex(AlgumDBContract.LancamentoEntry.COLUMN_DATA))) ){
                 holder.txtData.setVisibility(View.GONE);
             }
         }

@@ -39,15 +39,23 @@ public class ExtratoActivity extends BaseActivity
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
 
         SharedPreferences sharedPref = getSharedPreferences(getString(R.string.userInfo), Context.MODE_PRIVATE);
-        Uri lancamentoUri = AlgumDBContract.LancamentoEntry.buildLancamentoUsuarioUri(sharedPref.getInt(getString(R.string.idUsuario),0));
+        Uri lancamentoUri = AlgumDBContract.LancamentoEntry.buildLancamentoUsuarioUri(sharedPref.getInt(getString(R.string.idUsuario), 0));
 
         String selection = "";
 
+        String[] projection =
+                {
+                        AlgumDBContract.LancamentoEntry.TABLE_NAME+"."+ AlgumDBContract.LancamentoEntry.COLUMN_ID
+                        , AlgumDBContract.LancamentoEntry.TABLE_NAME+"."+ AlgumDBContract.LancamentoEntry.COLUMN_DATA
+                        , AlgumDBContract.GruposEntry.TABLE_NAME+"."+ AlgumDBContract.GruposEntry.COLUMN_NOME
+                        , AlgumDBContract.LancamentoEntry.TABLE_NAME+"."+ AlgumDBContract.LancamentoEntry.COLUMN_VALOR
+                        , AlgumDBContract.LancamentoEntry.TABLE_NAME+"."+ AlgumDBContract.LancamentoEntry.COLUMN_LANCAMENTO_ID
+                };
 
         return new CursorLoader(
                 this,
                 lancamentoUri,
-                null,
+                projection,
                 selection,
                 null,
                 null

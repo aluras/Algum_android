@@ -109,23 +109,31 @@ public class LancamentoValorActivity extends BaseActivity
             TextView data = (TextView) findViewById(R.id.txtData);
             TextView observacao = (TextView) findViewById(R.id.txtDetalhe);
 
-            float nValor = Float.parseFloat(valor.getText().toString().replace(',', '.'));
-            if (idTipoLancamento == 1) {
-                nValor = nValor * -1;
-            }
-
             if (valor.getText().toString().trim().equals("")) {
                 valor.setError("Digite o valor!");
             } else {
+                float nValor = Float.parseFloat(valor.getText().toString().replace(',', '.'));
                 ContentValues lancamentoValues = new ContentValues();
-                //lancamentoValues.put(AlgumDBContract.LancamentoEntry.COLUMN_ID, grupo.getInt("id"));
+
+                if (idTipoLancamento == 3){
+                    lancamentoValues.put(AlgumDBContract.LancamentoEntry.COLUMN_VALOR, nValor);
+                    lancamentoValues.put(AlgumDBContract.LancamentoEntry.COLUMN_DATA, data.getText().toString());
+                    lancamentoValues.put(AlgumDBContract.LancamentoEntry.COLUMN_OBSERVACAO, observacao.getText().toString());
+                    lancamentoValues.put(AlgumDBContract.LancamentoEntry.COLUMN_GRUPO_ID, idGrupo);
+                    lancamentoValues.put(AlgumDBContract.LancamentoEntry.COLUMN_CONTA_ORIGEM_ID, idContaDestino);
+
+                    getContentResolver().insert(AlgumDBContract.LancamentoEntry.CONTENT_URI, lancamentoValues);
+                }
+
+                if (idTipoLancamento == 1 || idTipoLancamento == 3) {
+                    nValor = nValor * -1;
+                }
+
                 lancamentoValues.put(AlgumDBContract.LancamentoEntry.COLUMN_VALOR, nValor);
                 lancamentoValues.put(AlgumDBContract.LancamentoEntry.COLUMN_DATA, data.getText().toString());
                 lancamentoValues.put(AlgumDBContract.LancamentoEntry.COLUMN_OBSERVACAO, observacao.getText().toString());
-                lancamentoValues.put(AlgumDBContract.LancamentoEntry.COLUMN_TIPO_ID, idTipoLancamento);
                 lancamentoValues.put(AlgumDBContract.LancamentoEntry.COLUMN_GRUPO_ID, idGrupo);
                 lancamentoValues.put(AlgumDBContract.LancamentoEntry.COLUMN_CONTA_ORIGEM_ID, idContaOrigem);
-                lancamentoValues.put(AlgumDBContract.LancamentoEntry.COLUMN_CONTA_DESTINO_ID, idContaDestino);
 
                 getContentResolver().insert(AlgumDBContract.LancamentoEntry.CONTENT_URI, lancamentoValues);
 

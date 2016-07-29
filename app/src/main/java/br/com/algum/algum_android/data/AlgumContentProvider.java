@@ -157,9 +157,10 @@ public class AlgumContentProvider extends ContentProvider {
                         AlgumDBContract.ContasEntry.TABLE_NAME + "." + AlgumDBContract.ContasEntry.COLUMN_CONTA_ID + " = " +
                         AlgumDBContract.LancamentoEntry.TABLE_NAME + "." + AlgumDBContract.LancamentoEntry.COLUMN_CONTA_ORIGEM_ID);
 
-                String _OrderBy = AlgumDBContract.LancamentoEntry.TABLE_NAME + "." + AlgumDBContract.LancamentoEntry.COLUMN_DATA + " ASC ";
+                String _OrderBy = AlgumDBContract.LancamentoEntry.TABLE_NAME + "." + AlgumDBContract.LancamentoEntry.COLUMN_DATA + " DESC, " +
+                        AlgumDBContract.LancamentoEntry.TABLE_NAME+"."+ AlgumDBContract.LancamentoEntry.COLUMN_ID + " DESC ";
 
-                retCursor = _QB.query(mDbHelper.getReadableDatabase(),null,selection,null,null,null,_OrderBy);
+                retCursor = _QB.query(mDbHelper.getReadableDatabase(),projection,selection,selectionArgs,null,null,_OrderBy);
 
                 break;
             }
@@ -228,6 +229,18 @@ public class AlgumContentProvider extends ContentProvider {
 
     @Override
     public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
-        return 0;
+        int _id;
+        switch (sUriMatcher.match(uri)) {
+            case LANCAMENTOS: {
+                _id = mDbHelper.getWritableDatabase().update(AlgumDBContract.LancamentoEntry.TABLE_NAME, values, selection, selectionArgs);
+                //if (_id == 0)
+                //    throw new android.database.SQLException("Failed to update row into " + uri);
+                break;
+            }
+            default:
+                throw new UnsupportedOperationException("Unknown uri: " + uri);
+        }
+
+        return _id;
     }
 }
