@@ -1,8 +1,6 @@
 package br.com.algum.algum_android;
 
 import android.accounts.Account;
-import android.accounts.AccountManager;
-import android.content.Context;
 import android.database.Cursor;
 import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
@@ -42,35 +40,6 @@ public class LancamentoContasActivity extends BaseActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_lancamento_contas);
         super.onCreateDrawer();
-
-
-        /*
-        Account account = AlgumAuthenticatorService.GetAccount();
-
-        AccountManager accountManager = (AccountManager) context
-                .getSystemService(Context.ACCOUNT_SERVICE);
-
-        if (accountManager.addAccountExplicitly(account, null, null)) {
-
-            ContentResolver.setIsSyncable(account, StubProvider.AUTHORITY, 1);
-
-            ContentResolver.setSyncAutomatically(account,
-                    StubProvider.AUTHORITY, true);
-
-            ContentResolver.addPeriodicSync(account, StubProvider.AUTHORITY,
-                    new Bundle(), SYNC_FREQUENCY);
-        }
-        */
-/*
-        mAccount = CreateSyncAccount(this);
-        Bundle b = new Bundle();
-        b.putBoolean(
-                ContentResolver.SYNC_EXTRAS_MANUAL, true);
-        b.putBoolean(
-                ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
-        ContentResolver.addPeriodicSync(mAccount,ACCOUNT_TYPE,Bundle.EMPTY,60);
-        //ContentResolver.requestSync(mAccount, this.getString(R.string.content_authority), b);
-*/
 
         GridView gridContas = (GridView) findViewById(R.id.gridViewContas);
 
@@ -146,41 +115,6 @@ public class LancamentoContasActivity extends BaseActivity
 
     }
 
-
-    public static Account CreateSyncAccount(Context context) {
-        // Create the account type and default account
-        Account newAccount = new Account(context.getString(R.string.app_name), context.getString(R.string.sync_account_type));
-        // Get an instance of the Android account manager
-
-        AccountManager accountManager =
-                (AccountManager) context.getSystemService(
-                        context.ACCOUNT_SERVICE);
-
-        //AccountManager accountManager = AccountManager.get(context);
-
-        accountManager.addAccountExplicitly(newAccount, null, null);
-
-        // If the password doesn't exist, the account doesn't exist
-        if ( null == accountManager.getPassword(newAccount) ) {
-
-        /*
-         * Add the account and account type, no password or user data
-         * If successful, return the Account object, otherwise report an error.
-         */
-            if (!accountManager.addAccountExplicitly(newAccount, null, null)) {
-                return null;
-            }
-            /*
-             * If you don't set android:syncable="true" in
-             * in your <provider> element in the manifest,
-             * then call ContentResolver.setIsSyncable(account, AUTHORITY, 1)
-             * here.
-             */
-
-            //onAccountCreated(newAccount, context);
-        }
-        return newAccount;
-    }
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
