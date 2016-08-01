@@ -26,6 +26,9 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import br.com.algum.algum_android.R;
 import br.com.algum.algum_android.data.AlgumDBContract;
@@ -132,7 +135,8 @@ public class AlgumSyncAdapter extends AbstractThreadedSyncAdapter {
 
             lancamentos.moveToFirst();
             while(lancamentos.isAfterLast() == false){
-                String params = "date="+lancamentos.getString(lancamentos.getColumnIndex(AlgumDBContract.LancamentoEntry.COLUMN_DATA));
+                SimpleDateFormat dateFformat = new SimpleDateFormat("dd/MM/yyyy");
+                String params = "date="+dateFformat.format(new Date(lancamentos.getLong(lancamentos.getColumnIndex(AlgumDBContract.LancamentoEntry.COLUMN_DATA))) );
                 params = params + "&valor="+lancamentos.getString(lancamentos.getColumnIndex(AlgumDBContract.LancamentoEntry.COLUMN_VALOR));
                 params = params + "&observacao="+lancamentos.getString(lancamentos.getColumnIndex(AlgumDBContract.LancamentoEntry.COLUMN_OBSERVACAO));
                 params = params + "&grupo_id="+lancamentos.getString(lancamentos.getColumnIndex(AlgumDBContract.LancamentoEntry.COLUMN_GRUPO_ID));
@@ -166,12 +170,14 @@ public class AlgumSyncAdapter extends AbstractThreadedSyncAdapter {
                 Cursor cursor = getContext().getContentResolver().query(AlgumDBContract.LancamentoEntry.buildLancamentoUsuarioUri(usuarioId), null, mSelectionClause, mSelectionArgs, null);
 
                 if(cursor.getCount() < 1){
+                    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+                    Long date = dateFormat.parse(lancamento.getString("data")).getTime();
 
                     ContentValues lancamentoValues = new ContentValues();
                     lancamentoValues.put(AlgumDBContract.LancamentoEntry.COLUMN_LANCAMENTO_ID, lancamento.getInt("id"));
                     lancamentoValues.put(AlgumDBContract.LancamentoEntry.COLUMN_CONTA_ORIGEM_ID, lancamento.getInt("conta_id"));
                     lancamentoValues.put(AlgumDBContract.LancamentoEntry.COLUMN_GRUPO_ID, lancamento.getInt("grupo_id"));
-                    lancamentoValues.put(AlgumDBContract.LancamentoEntry.COLUMN_DATA, lancamento.getString("data"));
+                    lancamentoValues.put(AlgumDBContract.LancamentoEntry.COLUMN_DATA, date);
                     lancamentoValues.put(AlgumDBContract.LancamentoEntry.COLUMN_OBSERVACAO, lancamento.getString("observacao"));
                     lancamentoValues.put(AlgumDBContract.LancamentoEntry.COLUMN_VALOR, lancamento.getLong("valor"));
 
@@ -182,6 +188,8 @@ public class AlgumSyncAdapter extends AbstractThreadedSyncAdapter {
 
 
         }catch (JSONException e) {
+            e.printStackTrace();
+        } catch (ParseException e) {
             e.printStackTrace();
         }
 

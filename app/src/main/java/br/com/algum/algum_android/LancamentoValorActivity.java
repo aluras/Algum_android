@@ -109,6 +109,9 @@ public class LancamentoValorActivity extends BaseActivity
             TextView data = (TextView) findViewById(R.id.txtData);
             TextView observacao = (TextView) findViewById(R.id.txtDetalhe);
 
+            SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
+            Date date = format.parse(data.getText().toString());
+
             if (valor.getText().toString().trim().equals("")) {
                 valor.setError("Digite o valor!");
             } else {
@@ -117,7 +120,7 @@ public class LancamentoValorActivity extends BaseActivity
 
                 if (idTipoLancamento == 3){
                     lancamentoValues.put(AlgumDBContract.LancamentoEntry.COLUMN_VALOR, nValor);
-                    lancamentoValues.put(AlgumDBContract.LancamentoEntry.COLUMN_DATA, data.getText().toString());
+                    lancamentoValues.put(AlgumDBContract.LancamentoEntry.COLUMN_DATA, date.getTime());
                     lancamentoValues.put(AlgumDBContract.LancamentoEntry.COLUMN_OBSERVACAO, observacao.getText().toString());
                     lancamentoValues.put(AlgumDBContract.LancamentoEntry.COLUMN_GRUPO_ID, idGrupo);
                     lancamentoValues.put(AlgumDBContract.LancamentoEntry.COLUMN_CONTA_ORIGEM_ID, idContaDestino);
@@ -130,7 +133,7 @@ public class LancamentoValorActivity extends BaseActivity
                 }
 
                 lancamentoValues.put(AlgumDBContract.LancamentoEntry.COLUMN_VALOR, nValor);
-                lancamentoValues.put(AlgumDBContract.LancamentoEntry.COLUMN_DATA, data.getText().toString());
+                lancamentoValues.put(AlgumDBContract.LancamentoEntry.COLUMN_DATA, date.getTime());
                 lancamentoValues.put(AlgumDBContract.LancamentoEntry.COLUMN_OBSERVACAO, observacao.getText().toString());
                 lancamentoValues.put(AlgumDBContract.LancamentoEntry.COLUMN_GRUPO_ID, idGrupo);
                 lancamentoValues.put(AlgumDBContract.LancamentoEntry.COLUMN_CONTA_ORIGEM_ID, idContaOrigem);

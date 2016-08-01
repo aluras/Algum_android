@@ -59,7 +59,7 @@ public class AlgumDbHelper extends SQLiteOpenHelper {
         final String SQL_CREATE_LANCAMENTO_TABLE = "CREATE TABLE " + AlgumDBContract.LancamentoEntry.TABLE_NAME + " (" +
                 AlgumDBContract.LancamentoEntry.COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
                 AlgumDBContract.LancamentoEntry.COLUMN_LANCAMENTO_ID + " INTEGER NULL," +
-                AlgumDBContract.LancamentoEntry.COLUMN_DATA + " DATE NOT NULL," +
+                AlgumDBContract.LancamentoEntry.COLUMN_DATA + " INT NOT NULL," +
                 AlgumDBContract.LancamentoEntry.COLUMN_VALOR + " DECIMAL NOT NULL," +
                 AlgumDBContract.LancamentoEntry.COLUMN_OBSERVACAO + " TEXT NULL," +
                 AlgumDBContract.LancamentoEntry.COLUMN_GRUPO_ID + " INTEGER NOT NULL," +

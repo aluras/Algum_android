@@ -16,6 +16,7 @@ public class AlgumAuthenticatorService extends Service {
         mAuthenticator = new AlgumAuthenticator(this);
     }
 
+
     /*
      * When the system binds to this Service to make the RPC call
      * return the authenticator's IBinder.

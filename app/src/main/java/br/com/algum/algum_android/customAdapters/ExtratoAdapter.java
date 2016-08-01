@@ -9,6 +9,7 @@ import android.widget.CursorAdapter;
 import android.widget.TextView;
 
 import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import br.com.algum.algum_android.R;
 import br.com.algum.algum_android.data.AlgumDBContract;
@@ -41,19 +42,20 @@ public class ExtratoAdapter extends CursorAdapter {
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
 
-        final String txtData = cursor.getString(cursor.getColumnIndex(AlgumDBContract.LancamentoEntry.COLUMN_DATA));
+        SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
+
+        final String txtData = format.format(new Date(cursor.getLong(cursor.getColumnIndex(AlgumDBContract.LancamentoEntry.COLUMN_DATA))));
         final String txtGrupo = cursor.getString(cursor.getColumnIndex(AlgumDBContract.GruposEntry.COLUMN_NOME));
         final float txtValor = cursor.getFloat(cursor.getColumnIndex(AlgumDBContract.LancamentoEntry.COLUMN_VALOR));
 
         final LancamentoHolder holder = (LancamentoHolder) view.getTag();
 
-        SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
         holder.txtData.setText(txtData);
         holder.txtData.setVisibility(View.VISIBLE);
         strData = txtData;
 
         if (cursor.moveToPrevious()){
-            if(txtData.equals(cursor.getString(cursor.getColumnIndex(AlgumDBContract.LancamentoEntry.COLUMN_DATA))) ){
+            if(txtData.equals(format.format(new Date(cursor.getLong(cursor.getColumnIndex(AlgumDBContract.LancamentoEntry.COLUMN_DATA)))) )){
                 holder.txtData.setVisibility(View.GONE);
             }
         }
