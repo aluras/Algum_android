@@ -6,9 +6,9 @@
     <string name="tokenUsuario">tokenUsuario</string>
     <string name="userInfo">userInfo</string>
 
-    <string name="despesa">Despesa</string>
-    <string name="receita">Receita</string>
-    <string name="transferencia">Transferência</string>
+    <string name="despesa">Gastei</string>
+    <string name="receita">Recebi</string>
+    <string name="transferencia">Transferi</string>
     <string name="contas">Contas</string>
     <string name="contaOrigem">Conta de origem</string>
     <string name="contaDestino">Conta de destino</string>

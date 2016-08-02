@@ -39,20 +39,21 @@ import br.com.algum.algum_android.data.AlgumDBContract;
 public class AlgumSyncAdapter extends AbstractThreadedSyncAdapter {
 
     public final String LOG_TAG = AlgumSyncAdapter.class.getSimpleName();
-
-    public static final int SYNC_INTERVAL = 60 * 180;
-    public static final int SYNC_FLEXTIME = SYNC_INTERVAL/3;
-    private static final long DAY_IN_MILLIS = 1000 * 60 * 60 * 24;
-    private static final int WEATHER_NOTIFICATION_ID = 3004;
+    private String tok;
 
     public AlgumSyncAdapter(Context context, boolean autoInitialize) {
         super(context, autoInitialize);
+
+        SharedPreferences sharedPref = getContext().getSharedPreferences(getContext().getString(R.string.userInfo), Context.MODE_PRIVATE);
+        tok = sharedPref.getString(getContext().getString(R.string.tokenUsuario), "");
     }
 
 
     @Override
     public void onPerformSync(Account account, Bundle extras, String authority, ContentProviderClient provider, SyncResult syncResult) {
         Log.d(LOG_TAG, "Starting sync");
+
+
 
         SharedPreferences sharedPref = getContext().getSharedPreferences(getContext().getString(R.string.userInfo), Context.MODE_PRIVATE);
         int usuarioId = sharedPref.getInt(getContext().getString(R.string.idUsuario),0);
@@ -179,13 +180,13 @@ public class AlgumSyncAdapter extends AbstractThreadedSyncAdapter {
                     lancamentoValues.put(AlgumDBContract.LancamentoEntry.COLUMN_GRUPO_ID, lancamento.getInt("grupo_id"));
                     lancamentoValues.put(AlgumDBContract.LancamentoEntry.COLUMN_DATA, date);
                     lancamentoValues.put(AlgumDBContract.LancamentoEntry.COLUMN_OBSERVACAO, lancamento.getString("observacao"));
-                    lancamentoValues.put(AlgumDBContract.LancamentoEntry.COLUMN_VALOR, lancamento.getLong("valor"));
+                    lancamentoValues.put(AlgumDBContract.LancamentoEntry.COLUMN_VALOR, lancamento.getString("valor"));
 
                     getContext().getContentResolver().insert(AlgumDBContract.LancamentoEntry.CONTENT_URI, lancamentoValues);
                 }
             }
 
-
+            syncResult.delayUntil = 12 * 60 * 60;
 
         }catch (JSONException e) {
             e.printStackTrace();
@@ -196,9 +197,6 @@ public class AlgumSyncAdapter extends AbstractThreadedSyncAdapter {
     }
 
     private String callService(String pUrl){
-
-        SharedPreferences sharedPref = getContext().getSharedPreferences(getContext().getString(R.string.userInfo), Context.MODE_PRIVATE);
-        String tok = sharedPref.getString(getContext().getString(R.string.tokenUsuario), "");
 
         HttpURLConnection urlConnection = null;
         BufferedReader reader = null;

@@ -225,11 +225,9 @@ public class MainActivity extends AppCompatActivity implements
              */
             ContentResolver.setIsSyncable(newAccount,AUTHORITY, 1);
 
-            ContentResolver.setSyncAutomatically(newAccount,
-                    AUTHORITY, true);
+            ContentResolver.setSyncAutomatically(newAccount, AUTHORITY, true);
 
-            ContentResolver.addPeriodicSync(newAccount, AUTHORITY,
-                    new Bundle(), 12* 60 * 60);
+            ContentResolver.addPeriodicSync(newAccount, AUTHORITY, new Bundle(), 12 * 60 * 60 * 1000);
 
             return newAccount;
         } else {
@@ -328,6 +326,8 @@ public class MainActivity extends AppCompatActivity implements
 
                     }
 
+                    ContentResolver.requestSync(mAccount,AUTHORITY,new Bundle());
+
                     return usuarioId;
                 } catch (IOException e) {
                     Log.e(LOG_TAG, "Error ", e);
@@ -390,7 +390,6 @@ public class MainActivity extends AppCompatActivity implements
                 View loading = (View) findViewById(R.id.loadingPanel);
                 loading.setVisibility(View.GONE);
             }else{
-
                  Intent intent = new Intent(mContext,LancamentoContasActivity.class);
                 startActivity(intent);
             }

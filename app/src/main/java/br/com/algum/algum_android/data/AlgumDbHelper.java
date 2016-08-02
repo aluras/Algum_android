@@ -29,19 +29,7 @@ public class AlgumDbHelper extends SQLiteOpenHelper {
                 AlgumDBContract.ContasEntry.COLUMN_NOME + " TEXT NOT NULL)";
 
         db.execSQL(SQL_CREATE_CONTA_TABLE);
-/*
-        //TODO: Remove after the sync adapter is ready
-        String SQL_INSERT_CONTA = "INSERT INTO contas VALUES(1,1,1,2,'Conta Corrente')";
-        db.execSQL(SQL_INSERT_CONTA);
-        SQL_INSERT_CONTA = "INSERT INTO contas VALUES(2,2,2,2,'Investimento')";
-        db.execSQL(SQL_INSERT_CONTA);
-        SQL_INSERT_CONTA = "INSERT INTO contas VALUES(3,3,3,2,'Cartão de Crédito')";
-        db.execSQL(SQL_INSERT_CONTA);
-        SQL_INSERT_CONTA = "INSERT INTO contas VALUES(4,4,4,2,'Espécie')";
-        db.execSQL(SQL_INSERT_CONTA);
-        SQL_INSERT_CONTA = "INSERT INTO contas VALUES(5,5,5,2,'VR')";
-        db.execSQL(SQL_INSERT_CONTA);
-*/
+
         final String SQL_CREATE_USUARIO_TABLE = "CREATE TABLE " + AlgumDBContract.UsuariosEntry.TABLE_NAME + " (" +
                 AlgumDBContract.UsuariosEntry.COLUMN_ID + " INTEGER PRIMARY KEY," +
                 AlgumDBContract.UsuariosEntry.COLUMN_EMAIL + " TEXT NOT NULL)";
@@ -67,13 +55,15 @@ public class AlgumDbHelper extends SQLiteOpenHelper {
                 AlgumDBContract.LancamentoEntry.COLUMN_CONTA_DESTINO_ID + " INTEGER NULL)";
 
         db.execSQL(SQL_CREATE_LANCAMENTO_TABLE);
-/*
-        //TODO: Remove after the sync adapter is ready
-        String SQL_INSERT_GRUPO = "INSERT INTO grupos VALUES(1,1,'Alimentação')";
-        db.execSQL(SQL_INSERT_GRUPO);
-        SQL_INSERT_GRUPO = "INSERT INTO grupos VALUES(2,2,'Educação')";
-        db.execSQL(SQL_INSERT_GRUPO);
-*/
+
+        final String SQL_CREATE_LOG_TABLE = "CREATE TABLE " + AlgumDBContract.LogEntry.TABLE_NAME + " (" +
+                AlgumDBContract.LogEntry.COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
+                AlgumDBContract.LogEntry.COLUMN_DATA + " INT NOT NULL," +
+                AlgumDBContract.LogEntry.COLUMN_MENSAGEM + " TEXT NULL," +
+                AlgumDBContract.LogEntry.COLUMN_USUARIO_ID + " INTEGER NOT NULL)";
+
+        db.execSQL(SQL_CREATE_LOG_TABLE);
+
     }
 
     @Override

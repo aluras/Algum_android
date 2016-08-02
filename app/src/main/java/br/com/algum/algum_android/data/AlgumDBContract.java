@@ -22,6 +22,8 @@ public class AlgumDBContract {
     public static final String PATH_GRUPOS = "grupos";
     public static final String PATH_LANCAMENTOS = "lancamentos";
 
+    public static final String PATH_LOG = "log";
+
     public static final String DATE_FORMAT = "yyyyMMdd";
 
     /**
@@ -132,6 +134,23 @@ public class AlgumDBContract {
         public static Uri buildLancamentoUsuarioUri(long id) {
             return ContentUris.withAppendedId(CONTENT_URI, id);
         }
+    }
+
+    public static final class LogEntry implements BaseColumns{
+        public static final Uri CONTENT_URI =
+                BASE_CONTENT_URI.buildUpon().appendPath(PATH_LOG).build();
+
+        public static final String CONTENT_TYPE =
+                "vnd.android.cursor.dir/" + CONTENT_AUTHORITY + "/" + PATH_LOG;
+        public static final String CONTENT_ITEM_TYPE =
+                "vnd.android.cursor.item/" + CONTENT_AUTHORITY + "/" + PATH_LOG;
+
+        public static final String TABLE_NAME = "log";
+
+        public static final String COLUMN_ID = "_id";
+        public static final String COLUMN_DATA = "data";
+        public static final String COLUMN_MENSAGEM = "mensagem";
+        public static final String COLUMN_USUARIO_ID = "usuario_id";
     }
 
 }

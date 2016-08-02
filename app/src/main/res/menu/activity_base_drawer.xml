@@ -8,6 +8,10 @@
         <item
             android:id="@+id/nav_extrato"
             android:title="Extrato" />
+        <item
+            android:id="@+id/nav_log"
+            android:title="Log - Admin" />
+
     </group>
 
     <group>

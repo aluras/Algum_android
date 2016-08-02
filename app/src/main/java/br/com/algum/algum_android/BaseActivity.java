@@ -118,6 +118,8 @@ public abstract class BaseActivity extends AppCompatActivity
             intent = new Intent(this, LancamentoContasActivity.class);
         }else if (id == R.id.nav_extrato){
             intent = new Intent(this, ExtratoActivity.class);
+        }else if (id == R.id.nav_log){
+            intent = new Intent(this, ViewLogActivity.class);
         }else if (id == R.id.nav_exit) {
             getSharedPreferences(getString(R.string.userInfo), Context.MODE_PRIVATE).edit().clear().commit();
 
@@ -131,7 +133,7 @@ public abstract class BaseActivity extends AppCompatActivity
                     .build();
 
             if(googleApiClient.isConnected()) {
-                Auth.GoogleSignInApi.revokeAccess(googleApiClient);
+                Auth.GoogleSignInApi.signOut(googleApiClient);
             }
             intent = new Intent(this, MainActivity.class);
 //        }else if (id == R.id.nav_grupos) {

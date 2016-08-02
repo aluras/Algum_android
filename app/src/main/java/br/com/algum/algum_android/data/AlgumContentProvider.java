@@ -19,11 +19,16 @@ public class AlgumContentProvider extends ContentProvider {
 
     private static final int CONTAS = 100;
     private static final int CONTAS_POR_USUARIO = 101;
+
     private static final int USUARIOS = 200;
     private static final int USUARIOS_POR_ID = 201;
+
     private static final int GRUPOS = 300;
+
     private static final int LANCAMENTOS = 400;
     private static final int LANCAMENTOS_POR_USUARIO = 401;
+
+    private static final int LOG = 900;
 
     private static UriMatcher buildUriMatcher() {
         // I know what you're thinking.  Why create a UriMatcher when you can use regular
@@ -46,6 +51,8 @@ public class AlgumContentProvider extends ContentProvider {
 
         matcher.addURI(authority, AlgumDBContract.PATH_LANCAMENTOS, LANCAMENTOS);
         matcher.addURI(authority, AlgumDBContract.PATH_LANCAMENTOS + "/*", LANCAMENTOS_POR_USUARIO);
+
+        matcher.addURI(authority, AlgumDBContract.PATH_LOG, LOG);
 
         return matcher;
     }
@@ -164,6 +171,17 @@ public class AlgumContentProvider extends ContentProvider {
 
                 break;
             }
+            case LOG: {
+                retCursor = mDbHelper.getReadableDatabase().query(
+                        AlgumDBContract.LogEntry.TABLE_NAME,
+                        projection,
+                        selection,
+                        selectionArgs,
+                        null,
+                        null,sortOrder
+                );
+                break;
+            }
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
@@ -211,6 +229,14 @@ public class AlgumContentProvider extends ContentProvider {
                 long _id = mDbHelper.getWritableDatabase().insert(AlgumDBContract.LancamentoEntry.TABLE_NAME, null, values);
                 if ( _id > 0 )
                     returnUri = null;//AlgumDBContract.LancamentoEntry.buildLancamentoUri(_id);
+                else
+                    throw new android.database.SQLException("Failed to insert row into " + uri);
+                break;
+            }
+            case LOG:{
+                long _id = mDbHelper.getWritableDatabase().insert(AlgumDBContract.LogEntry.TABLE_NAME, null, values);
+                if ( _id > 0 )
+                    returnUri = null;
                 else
                     throw new android.database.SQLException("Failed to insert row into " + uri);
                 break;
