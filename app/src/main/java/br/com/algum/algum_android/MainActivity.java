@@ -86,9 +86,6 @@ public class MainActivity extends AppCompatActivity implements
 
         mContext = this;
 
-        mAccount = CreateSyncAccount(this);
-
-
     }
 
     @Override
@@ -205,6 +202,8 @@ public class MainActivity extends AppCompatActivity implements
      * @param context The application context
      */
     public static Account CreateSyncAccount(Context context) {
+        Log.d(TAG, "Creating Sync Account");
+
         // Create the account type and default account
         Account newAccount = new Account(
                 ACCOUNT, ACCOUNT_TYPE);
@@ -223,11 +222,12 @@ public class MainActivity extends AppCompatActivity implements
              * then call context.setIsSyncable(account, AUTHORITY, 1)
              * here.
              */
-            ContentResolver.setIsSyncable(newAccount,AUTHORITY, 1);
+            Log.d(TAG, "Starting Sync Services");
+            ContentResolver.setIsSyncable(newAccount, AUTHORITY, 1);
 
             ContentResolver.setSyncAutomatically(newAccount, AUTHORITY, true);
 
-            ContentResolver.addPeriodicSync(newAccount, AUTHORITY, new Bundle(), 12 * 60 * 60 * 1000);
+            ContentResolver.addPeriodicSync(newAccount, AUTHORITY, new Bundle(), 12 * 60 * 60);
 
             return newAccount;
         } else {
@@ -302,11 +302,16 @@ public class MainActivity extends AppCompatActivity implements
                         SharedPreferences sharedPref = getSharedPreferences(getString(R.string.userInfo), Context.MODE_PRIVATE);
                         SharedPreferences.Editor editor = sharedPref.edit();
                         editor.putInt(getString(R.string.idUsuario), usuarioJson.getJSONObject("Usuario").getInt("id"));
-                        editor.putString(getString(R.string.emailUsuario),usuarioJson.getJSONObject("Usuario").getString("email"));
+                        editor.putString(getString(R.string.emailUsuario), usuarioJson.getJSONObject("Usuario").getString("email"));
                         editor.commit();
 
 
                         usuarioId = usuarioJson.getJSONObject("Usuario").getInt("id");
+
+                        Log.d(TAG, "Usuario novo");
+
+                        mAccount = CreateSyncAccount(mContext);
+                        ContentResolver.requestSync(mAccount,AUTHORITY,new Bundle());
 
                     }else{
                         InputStream inputStream = urlConnection.getErrorStream();
@@ -325,8 +330,6 @@ public class MainActivity extends AppCompatActivity implements
                         throw new Exception(strRetorno.toString());
 
                     }
-
-                    ContentResolver.requestSync(mAccount,AUTHORITY,new Bundle());
 
                     return usuarioId;
                 } catch (IOException e) {
@@ -357,8 +360,9 @@ public class MainActivity extends AppCompatActivity implements
                 editor.putInt(getString(R.string.idUsuario), usuarioId);
                 editor.putString(getString(R.string.emailUsuario), cursor.getString(cursor.getColumnIndex("email")));
                 editor.commit();
+                Log.d(TAG, "Usuario existente");
             }
-
+            cursor.close();
 
             return usuarioId;
         }
@@ -390,7 +394,8 @@ public class MainActivity extends AppCompatActivity implements
                 View loading = (View) findViewById(R.id.loadingPanel);
                 loading.setVisibility(View.GONE);
             }else{
-                 Intent intent = new Intent(mContext,LancamentoContasActivity.class);
+                //mAccount = CreateSyncAccount(mContext);
+                Intent intent = new Intent(mContext,LancamentoContasActivity.class);
                 startActivity(intent);
             }
 

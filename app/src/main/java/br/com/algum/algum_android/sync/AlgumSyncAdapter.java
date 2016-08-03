@@ -67,6 +67,7 @@ public class AlgumSyncAdapter extends AbstractThreadedSyncAdapter {
         String format = "json";
 
         try {
+            Log.d(LOG_TAG, "Starting sync Contas");
             //Atualiza Contas
             final String CONTA_BASE_URL = getContext().getString(R.string.WSurl) + "contas";
             ContasJsonStr = callService(CONTA_BASE_URL);
@@ -95,9 +96,11 @@ public class AlgumSyncAdapter extends AbstractThreadedSyncAdapter {
 
                     getContext().getContentResolver().insert(AlgumDBContract.ContasEntry.CONTENT_URI, contasValues);
                 }
+                cursor.close();
             }
 
 
+            Log.d(LOG_TAG, "Starting sync Grupos");
             //Atualiza Grupos
             final String GRUPO_BASE_URL = getContext().getString(R.string.WSurl) + "grupos";
             GruposJsonStr = callService(GRUPO_BASE_URL);
@@ -123,8 +126,10 @@ public class AlgumSyncAdapter extends AbstractThreadedSyncAdapter {
 
                     getContext().getContentResolver().insert(AlgumDBContract.GruposEntry.CONTENT_URI, gruposValues);
                 }
+                cursor.close();
             }
 
+            Log.d(LOG_TAG, "Starting sync Lancamentos");
             //Atualiza Lançamentos
             final String LANCAMENTO_BASE_URL = getContext().getString(R.string.WSurl) + "lancamentos";
 
@@ -157,6 +162,7 @@ public class AlgumSyncAdapter extends AbstractThreadedSyncAdapter {
 
                 lancamentos.moveToNext();
             }
+            lancamentos.close();
             //-- RECEBE OS QUE NÃO ESTÃO LOCAL
             LancamentosJsonStr = callService(LANCAMENTO_BASE_URL);
             JSONArray lancamentoArray = new JSONArray(LancamentosJsonStr);
@@ -184,14 +190,16 @@ public class AlgumSyncAdapter extends AbstractThreadedSyncAdapter {
 
                     getContext().getContentResolver().insert(AlgumDBContract.LancamentoEntry.CONTENT_URI, lancamentoValues);
                 }
+                cursor.close();
             }
 
-            syncResult.delayUntil = 12 * 60 * 60;
+            Log.d(LOG_TAG, "Finishing sync");
+            //syncResult.delayUntil = 12 * 60 * 60;
 
         }catch (JSONException e) {
-            e.printStackTrace();
+            Log.e(LOG_TAG, "Error ", e);
         } catch (ParseException e) {
-            e.printStackTrace();
+            Log.e(LOG_TAG, "Error ", e);
         }
 
     }
