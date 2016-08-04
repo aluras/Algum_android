@@ -1,7 +1,6 @@
 package br.com.algum.algum_android.sync;
 
 import android.accounts.Account;
-import android.accounts.AccountManager;
 import android.content.AbstractThreadedSyncAdapter;
 import android.content.ContentProviderClient;
 import android.content.ContentValues;
@@ -12,6 +11,14 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
+
+import com.google.android.gms.auth.api.Auth;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.auth.api.signin.GoogleSignInResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.OptionalPendingResult;
+import com.google.android.gms.common.api.ResultCallback;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -41,11 +48,14 @@ public class AlgumSyncAdapter extends AbstractThreadedSyncAdapter {
     public final String LOG_TAG = AlgumSyncAdapter.class.getSimpleName();
     private String tok;
 
+    private Account mAccount;
+    private Bundle mExtras;
+    private String mAuthority;
+    private ContentProviderClient mProvider;
+    private SyncResult mSsyncResult;
+
     public AlgumSyncAdapter(Context context, boolean autoInitialize) {
         super(context, autoInitialize);
-
-        SharedPreferences sharedPref = getContext().getSharedPreferences(getContext().getString(R.string.userInfo), Context.MODE_PRIVATE);
-        tok = sharedPref.getString(getContext().getString(R.string.tokenUsuario), "");
     }
 
 
@@ -53,11 +63,60 @@ public class AlgumSyncAdapter extends AbstractThreadedSyncAdapter {
     public void onPerformSync(Account account, Bundle extras, String authority, ContentProviderClient provider, SyncResult syncResult) {
         Log.d(LOG_TAG, "Starting sync");
 
-
+        mAccount = account;
+        mExtras = extras;
+        mAuthority = authority;
+        mProvider = provider;
+        mSsyncResult = syncResult;
 
         SharedPreferences sharedPref = getContext().getSharedPreferences(getContext().getString(R.string.userInfo), Context.MODE_PRIVATE);
-        int usuarioId = sharedPref.getInt(getContext().getString(R.string.idUsuario),0);
 
+        if (!sharedPref.contains(getContext().getString(R.string.idUsuario))){
+            Log.d(LOG_TAG, "Finishing Sync - No user data");
+            return;
+        }
+
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken(getContext().getString(R.string.algum_server_client_id))
+                .build();
+
+        GoogleApiClient mGoogleApiClient = new GoogleApiClient.Builder(getContext())
+                .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
+                .build();
+
+        mGoogleApiClient.connect();
+
+        OptionalPendingResult<GoogleSignInResult> opr = Auth.GoogleSignInApi.silentSignIn(mGoogleApiClient);
+
+        if (opr.isDone()) {
+            // If the user's cached credentials are valid, the OptionalPendingResult will be "done"
+            // and the GoogleSignInResult will be available instantly.
+            GoogleSignInResult result = opr.get();
+            performSync(account,extras,authority,provider,syncResult,result);
+        } else {
+            opr.setResultCallback(new ResultCallback<GoogleSignInResult>() {
+                @Override
+                public void onResult(GoogleSignInResult googleSignInResult) {
+                    performSync(mAccount,mExtras,mAuthority,mProvider,mSsyncResult,googleSignInResult);
+                }
+            });
+        }
+    }
+
+    public void performSync(Account account, Bundle extras, String authority, ContentProviderClient provider, SyncResult syncResult,GoogleSignInResult googleSignInResult ) {
+
+        SharedPreferences sharedPref = getContext().getSharedPreferences(getContext().getString(R.string.userInfo), Context.MODE_PRIVATE);
+        int usuarioId = sharedPref.getInt(getContext().getString(R.string.idUsuario), 0);
+
+        if (googleSignInResult.isSuccess()) {
+            GoogleSignInAccount acct = googleSignInResult.getSignInAccount();
+            tok = acct.getIdToken();
+        } else {
+            SharedPreferences.Editor editor = sharedPref.edit();
+            editor.remove(getContext().getString(R.string.emailUsuario));
+            editor.commit();
+            return;
+        }
 
         // Will contain the raw JSON response as a string.
         String ContasJsonStr = null;
@@ -67,6 +126,35 @@ public class AlgumSyncAdapter extends AbstractThreadedSyncAdapter {
         String format = "json";
 
         try {
+            Log.d(LOG_TAG, "Starting sync Grupos");
+            //Atualiza Grupos
+            final String GRUPO_BASE_URL = getContext().getString(R.string.WSurl) + "grupos";
+            GruposJsonStr = callService(GRUPO_BASE_URL);
+
+            JSONArray gruposArray = new JSONArray(GruposJsonStr);
+
+            for(int i = 0; i < gruposArray.length(); i++){
+
+                JSONObject grupoJson = gruposArray.getJSONObject(i);
+                JSONObject grupo = grupoJson.getJSONObject("Grupo");
+
+                String mSelectionClause = AlgumDBContract.GruposEntry.COLUMN_GRUPO_ID + " = ? ";
+                String[] mSelectionArgs = {grupo.getString("id")};
+                Cursor cursor = getContext().getContentResolver().query(AlgumDBContract.GruposEntry.CONTENT_URI, null, mSelectionClause, mSelectionArgs, null);
+
+                if(cursor.getCount() < 1){
+
+                    ContentValues gruposValues = new ContentValues();
+                    gruposValues.put(AlgumDBContract.GruposEntry.COLUMN_ID, grupo.getInt("id"));
+                    gruposValues.put(AlgumDBContract.GruposEntry.COLUMN_NOME, grupo.getString("nome"));
+                    gruposValues.put(AlgumDBContract.GruposEntry.COLUMN_GRUPO_ID, grupo.getInt("id"));
+                    gruposValues.put(AlgumDBContract.GruposEntry.COLUMN_TIPO_ID, grupo.getInt("id_tipo_grupo"));
+
+                    getContext().getContentResolver().insert(AlgumDBContract.GruposEntry.CONTENT_URI, gruposValues);
+                }
+                cursor.close();
+            }
+
             Log.d(LOG_TAG, "Starting sync Contas");
             //Atualiza Contas
             final String CONTA_BASE_URL = getContext().getString(R.string.WSurl) + "contas";
@@ -99,35 +187,6 @@ public class AlgumSyncAdapter extends AbstractThreadedSyncAdapter {
                 cursor.close();
             }
 
-
-            Log.d(LOG_TAG, "Starting sync Grupos");
-            //Atualiza Grupos
-            final String GRUPO_BASE_URL = getContext().getString(R.string.WSurl) + "grupos";
-            GruposJsonStr = callService(GRUPO_BASE_URL);
-
-            JSONArray gruposArray = new JSONArray(GruposJsonStr);
-
-            for(int i = 0; i < gruposArray.length(); i++){
-
-                JSONObject grupoJson = gruposArray.getJSONObject(i);
-                JSONObject grupo = grupoJson.getJSONObject("Grupo");
-
-                String mSelectionClause = AlgumDBContract.GruposEntry.COLUMN_GRUPO_ID + " = ? ";
-                String[] mSelectionArgs = {grupo.getString("id")};
-                Cursor cursor = getContext().getContentResolver().query(AlgumDBContract.GruposEntry.CONTENT_URI, null, mSelectionClause, mSelectionArgs, null);
-
-                if(cursor.getCount() < 1){
-
-                    ContentValues gruposValues = new ContentValues();
-                    gruposValues.put(AlgumDBContract.GruposEntry.COLUMN_ID, grupo.getInt("id"));
-                    gruposValues.put(AlgumDBContract.GruposEntry.COLUMN_NOME, grupo.getString("nome"));
-                    gruposValues.put(AlgumDBContract.GruposEntry.COLUMN_GRUPO_ID, grupo.getInt("id"));
-                    gruposValues.put(AlgumDBContract.GruposEntry.COLUMN_TIPO_ID, grupo.getInt("id_tipo_grupo"));
-
-                    getContext().getContentResolver().insert(AlgumDBContract.GruposEntry.CONTENT_URI, gruposValues);
-                }
-                cursor.close();
-            }
 
             Log.d(LOG_TAG, "Starting sync Lancamentos");
             //Atualiza Lançamentos
@@ -194,7 +253,11 @@ public class AlgumSyncAdapter extends AbstractThreadedSyncAdapter {
             }
 
             Log.d(LOG_TAG, "Finishing sync");
-            //syncResult.delayUntil = 12 * 60 * 60;
+            SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+
+            SharedPreferences.Editor editor = sharedPref.edit();
+            editor.putString(getContext().getString(R.string.dataSync), dateFormat.format(new Date()));
+            editor.commit();
 
         }catch (JSONException e) {
             Log.e(LOG_TAG, "Error ", e);
@@ -262,9 +325,6 @@ public class AlgumSyncAdapter extends AbstractThreadedSyncAdapter {
 
     private String callServiceGravaLancamento(String pUrl, String params){
 
-        SharedPreferences sharedPref = getContext().getSharedPreferences(getContext().getString(R.string.userInfo), Context.MODE_PRIVATE);
-        String tok = sharedPref.getString(getContext().getString(R.string.tokenUsuario), "");
-
         HttpURLConnection urlConnection = null;
         BufferedReader reader = null;
 
@@ -325,33 +385,4 @@ public class AlgumSyncAdapter extends AbstractThreadedSyncAdapter {
         }
     }
 
-    public static Account CreateSyncAccount(Context context) {
-        // Create the account type and default account
-        Account newAccount = new Account(
-                context.getString(R.string.app_name), context.getString(R.string.sync_account_type));
-        // Get an instance of the Android account manager
-        AccountManager accountManager =
-                (AccountManager) context.getSystemService(
-                        context.ACCOUNT_SERVICE);
-        // If the password doesn't exist, the account doesn't exist
-        if ( null == accountManager.getPassword(newAccount) ) {
-
-        /*
-         * Add the account and account type, no password or user data
-         * If successful, return the Account object, otherwise report an error.
-         */
-            if (!accountManager.addAccountExplicitly(newAccount, "", null)) {
-                return null;
-            }
-            /*
-             * If you don't set android:syncable="true" in
-             * in your <provider> element in the manifest,
-             * then call ContentResolver.setIsSyncable(account, AUTHORITY, 1)
-             * here.
-             */
-
-            //onAccountCreated(newAccount, context);
-        }
-        return newAccount;
-    }
 }

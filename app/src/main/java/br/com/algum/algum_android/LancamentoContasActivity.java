@@ -1,6 +1,8 @@
 package br.com.algum.algum_android;
 
 import android.accounts.Account;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
@@ -40,6 +42,11 @@ public class LancamentoContasActivity extends BaseActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_lancamento_contas);
         super.onCreateDrawer();
+
+        TextView txtDataSync = (TextView) findViewById(R.id.txtDataSync);
+        SharedPreferences sharedPref = getSharedPreferences(getString(R.string.userInfo), Context.MODE_PRIVATE);
+        txtDataSync.setText("Sincronizado em: " + sharedPref.getString(getString(R.string.dataSync), ""));
+
 
         GridView gridContas = (GridView) findViewById(R.id.gridViewContas);
 

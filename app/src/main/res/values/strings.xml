@@ -4,6 +4,7 @@
     <string name="idUsuario">idUsuario</string>
     <string name="emailUsuario">email</string>
     <string name="tokenUsuario">tokenUsuario</string>
+    <string name="dataSync">dataSync</string>
     <string name="userInfo">userInfo</string>
 
     <string name="despesa">Gastei</string>

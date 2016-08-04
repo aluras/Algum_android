@@ -59,8 +59,8 @@ public class MainActivity extends AppCompatActivity implements
     public static final String ACCOUNT_TYPE = "algum.com.br";
     // The account name
     public static final String ACCOUNT = "dummyaccount";
-    // Instance fields
-    Account mAccount;
+
+    public Account mAccount;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,13 +86,15 @@ public class MainActivity extends AppCompatActivity implements
 
         mContext = this;
 
+        mAccount = CreateSyncAccount(mContext);
+
     }
 
     @Override
     public void onStart() {
         super.onStart();
         SharedPreferences sharedPref = getSharedPreferences(getString(R.string.userInfo), Context.MODE_PRIVATE);
-        if(sharedPref.contains(getString(R.string.tokenUsuario))){
+        if(sharedPref.contains(getString(R.string.emailUsuario))){
             OptionalPendingResult<GoogleSignInResult> opr = Auth.GoogleSignInApi.silentSignIn(mGoogleApiClient);
 
             if (opr.isDone()) {
@@ -142,7 +144,6 @@ public class MainActivity extends AppCompatActivity implements
             SharedPreferences sharedPref = getSharedPreferences(getString(R.string.userInfo), Context.MODE_PRIVATE);
             SharedPreferences.Editor editor = sharedPref.edit();
             editor.putString(getString(R.string.emailUsuario), email);
-            editor.putString(getString(R.string.tokenUsuario), id_token);
             editor.commit();
 
             ValidaUsuarioTask validaUsuarioTask = new ValidaUsuarioTask();
@@ -230,13 +231,9 @@ public class MainActivity extends AppCompatActivity implements
             ContentResolver.addPeriodicSync(newAccount, AUTHORITY, new Bundle(), 12 * 60 * 60);
 
             return newAccount;
-        } else {
-            /*
-             * The account exists or some other error occurred. Log this, report it,
-             * or handle it internally.
-             */
-            return null;
         }
+
+        return null;
     }
 
     public class ValidaUsuarioTask extends AsyncTask<String, Void, Integer> {
@@ -310,8 +307,11 @@ public class MainActivity extends AppCompatActivity implements
 
                         Log.d(TAG, "Usuario novo");
 
-                        mAccount = CreateSyncAccount(mContext);
-                        ContentResolver.requestSync(mAccount,AUTHORITY,new Bundle());
+                        Bundle bundle = new Bundle();
+                        bundle.putBoolean(ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
+                        bundle.putBoolean(ContentResolver.SYNC_EXTRAS_MANUAL, true);
+
+                        ContentResolver.requestSync(mAccount, AUTHORITY, bundle);
 
                     }else{
                         InputStream inputStream = urlConnection.getErrorStream();

@@ -14,7 +14,7 @@ public class AlgumSyncService extends Service {
 
     @Override
     public void onCreate() {
-        Log.d("SunshineSyncService", "onCreate - SunshineSyncService");
+        Log.d("AlgumSyncService", "onCreate - AlgumSyncService");
         synchronized (sSyncAdapterLock) {
             if (sAlgumSyncAdapter == null) {
                 sAlgumSyncAdapter = new AlgumSyncAdapter(getApplicationContext(), true);

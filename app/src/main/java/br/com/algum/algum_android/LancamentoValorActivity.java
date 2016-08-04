@@ -60,7 +60,7 @@ public class LancamentoValorActivity extends BaseActivity
         }
 
         TextView txtTipoLancamento = (TextView) findViewById(R.id.txtTipoLancamento);
-        txtTipoLancamento.setText("Nova " + tipoLancamento + " - " + intent.getStringExtra("nomeGrupo"));
+        txtTipoLancamento.setText(tipoLancamento + " - " + intent.getStringExtra("nomeGrupo"));
 
         TextView txtConta = (TextView) findViewById(R.id.txtConta);
         if(idTipoLancamento == 3){

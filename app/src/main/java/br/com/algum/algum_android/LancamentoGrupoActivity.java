@@ -83,7 +83,7 @@ public class LancamentoGrupoActivity extends BaseActivity
         }
 
         TextView txtTipoLancamento = (TextView) findViewById(R.id.txtTipoLancamento);
-        txtTipoLancamento.setText("Nova " + tipoLancamento + " - " + nomeGrupo);
+        txtTipoLancamento.setText(tipoLancamento + " - " + nomeGrupo);
 
         mContasAdapter = new ContaAdapter(this,null, 0, false);
         mContasAdapterDestino = new ContaAdapter(this,null, 0, true);

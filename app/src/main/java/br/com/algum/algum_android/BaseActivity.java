@@ -26,9 +26,9 @@ public abstract class BaseActivity extends AppCompatActivity
 
     private static final String TAG = "BaseActivity";
 
-    protected String id_token;
     protected String email;
     protected int id_usuario;
+    protected GoogleApiClient mGoogleApiClient;
 
     protected View v;
 
@@ -42,8 +42,7 @@ public abstract class BaseActivity extends AppCompatActivity
         super.onStart();
         SharedPreferences sharedPref = getSharedPreferences(getString(R.string.userInfo), Context.MODE_PRIVATE);
 
-        if (sharedPref.contains(getString(R.string.tokenUsuario))){
-            id_token = sharedPref.getString(getString(R.string.tokenUsuario),"");
+        if (sharedPref.contains(getString(R.string.emailUsuario))){
             email = sharedPref.getString(getString(R.string.emailUsuario), "");
             id_usuario = sharedPref.getInt(getString(R.string.idUsuario), 0);
 
@@ -128,13 +127,33 @@ public abstract class BaseActivity extends AppCompatActivity
                     .requestEmail()
                     .build();
 
-            GoogleApiClient googleApiClient = new GoogleApiClient.Builder(this)
+            mGoogleApiClient = new GoogleApiClient.Builder(this)
                     .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
                     .build();
 
+            mGoogleApiClient.registerConnectionCallbacks(new GoogleApiClient.ConnectionCallbacks() {
+                @Override
+                public void onConnectionSuspended(int cause) {
+                }
+
+                @Override
+                public void onConnected(Bundle arg0) {
+                    Auth.GoogleSignInApi.revokeAccess(mGoogleApiClient);
+                }
+            });
+
+            mGoogleApiClient.connect();
+
+
+            /*
+            googleApiClient.connect();
             if(googleApiClient.isConnected()) {
-                Auth.GoogleSignInApi.signOut(googleApiClient);
+                Log.d(TAG,"googleApiClient connected");
+                googleApiClient.clearDefaultAccountAndReconnect();
+                //Auth.GoogleSignInApi.signOut(googleApiClient);
             }
+            */
+
             intent = new Intent(this, MainActivity.class);
 //        }else if (id == R.id.nav_grupos) {
 //            intent = new Intent(this, Grupos.class);
