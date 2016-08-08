@@ -1,5 +1,7 @@
 package br.com.algum.algum_android;
 
+import android.accounts.Account;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -21,6 +23,8 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 
+import br.com.algum.algum_android.data.AlgumDBContract;
+
 public abstract class BaseActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,GoogleApiClient.OnConnectionFailedListener {
 
@@ -29,6 +33,13 @@ public abstract class BaseActivity extends AppCompatActivity
     protected String email;
     protected int id_usuario;
     protected GoogleApiClient mGoogleApiClient;
+
+    // The authority for the sync adapter's content provider
+    public static final String AUTHORITY = "br.com.algum.algum_android.provider";
+    // An account type, in the form of a domain name
+    public static final String ACCOUNT_TYPE = "algum.com.br";
+    // The account name
+    public static final String ACCOUNT = "dummyaccount";
 
     protected View v;
 
@@ -101,6 +112,16 @@ public abstract class BaseActivity extends AppCompatActivity
         if (id == R.id.action_settings) {
             return true;
         }
+        if (id == R.id.action_refresh){
+            Account newAccount = new Account(
+                    ACCOUNT, ACCOUNT_TYPE);
+
+            Bundle bundle = new Bundle();
+            bundle.putBoolean(ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
+            bundle.putBoolean(ContentResolver.SYNC_EXTRAS_MANUAL, true);
+
+            ContentResolver.requestSync(newAccount, AUTHORITY, bundle);
+        }
 
         return super.onOptionsItemSelected(item);
     }
@@ -120,6 +141,11 @@ public abstract class BaseActivity extends AppCompatActivity
         }else if (id == R.id.nav_log){
             intent = new Intent(this, ViewLogActivity.class);
         }else if (id == R.id.nav_exit) {
+            getContentResolver().delete(AlgumDBContract.LancamentoEntry.CONTENT_URI, null,null);
+            getContentResolver().delete(AlgumDBContract.ContasEntry.CONTENT_URI, null, null);
+            getContentResolver().delete(AlgumDBContract.GruposEntry.CONTENT_URI, null,null);
+            getContentResolver().delete(AlgumDBContract.UsuariosEntry.CONTENT_URI, null,null);
+
             getSharedPreferences(getString(R.string.userInfo), Context.MODE_PRIVATE).edit().clear().commit();
 
             GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)

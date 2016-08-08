@@ -2,6 +2,7 @@ package br.com.algum.algum_android;
 
 import android.accounts.Account;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.drawable.GradientDrawable;
@@ -90,6 +91,15 @@ public class LancamentoContasActivity extends BaseActivity
 
         gridContas.setAdapter(mGruposAdapter);
 
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        Intent intent = new Intent(Intent.ACTION_MAIN);
+        intent.addCategory(Intent.CATEGORY_HOME);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
     }
 
     private void mudaTipo(View v) {

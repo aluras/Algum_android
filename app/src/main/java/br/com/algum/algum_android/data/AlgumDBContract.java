@@ -128,8 +128,8 @@ public class AlgumDBContract {
         public static final String COLUMN_VALOR = "valor";
         public static final String COLUMN_OBSERVACAO = "observacao";
         public static final String COLUMN_GRUPO_ID = "grupo_id";
-        public static final String COLUMN_CONTA_ORIGEM_ID = "conta_origem_id";
-        public static final String COLUMN_CONTA_DESTINO_ID = "conta_destino_id";
+        public static final String COLUMN_CONTA_ID = "conta_id";
+        public static final String COLUMN_USUARIO_ID = "usuario_id";
 
         public static Uri buildLancamentoUsuarioUri(long id) {
             return ContentUris.withAppendedId(CONTENT_URI, id);

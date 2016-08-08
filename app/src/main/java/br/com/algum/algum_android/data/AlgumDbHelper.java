@@ -51,8 +51,8 @@ public class AlgumDbHelper extends SQLiteOpenHelper {
                 AlgumDBContract.LancamentoEntry.COLUMN_VALOR + " DECIMAL NOT NULL," +
                 AlgumDBContract.LancamentoEntry.COLUMN_OBSERVACAO + " TEXT NULL," +
                 AlgumDBContract.LancamentoEntry.COLUMN_GRUPO_ID + " INTEGER NOT NULL," +
-                AlgumDBContract.LancamentoEntry.COLUMN_CONTA_ORIGEM_ID + " INTEGER NOT NULL," +
-                AlgumDBContract.LancamentoEntry.COLUMN_CONTA_DESTINO_ID + " INTEGER NULL)";
+                AlgumDBContract.LancamentoEntry.COLUMN_CONTA_ID + " INTEGER NOT NULL,"+
+                AlgumDBContract.LancamentoEntry.COLUMN_USUARIO_ID + " INTEGER NOT NULL)";
 
         db.execSQL(SQL_CREATE_LANCAMENTO_TABLE);
 

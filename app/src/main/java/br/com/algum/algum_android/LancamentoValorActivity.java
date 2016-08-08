@@ -3,7 +3,9 @@ package br.com.algum.algum_android;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.util.Log;
@@ -104,6 +106,13 @@ public class LancamentoValorActivity extends BaseActivity
 
     }
 
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        Intent intent = new Intent(this,MainActivity.class);
+        startActivity(intent);
+    }
+
     protected void gravar() {
         try {
             TextView valor = (TextView) findViewById(R.id.txtValor);
@@ -116,16 +125,21 @@ public class LancamentoValorActivity extends BaseActivity
             if (valor.getText().toString().trim().equals("")) {
                 valor.setError("Digite o valor!");
             } else {
+
+                SharedPreferences sharedPref = getSharedPreferences(getString(R.string.userInfo), Context.MODE_PRIVATE);
+                int usuarioId = sharedPref.getInt(getString(R.string.idUsuario),0);
+
                 float nValor = Float.parseFloat(valor.getText().toString().replace(',', '.'));
                 ContentValues lancamentoValues = new ContentValues();
 
-                if (idTipoLancamento == 3){
-                    lancamentoValues.put(AlgumDBContract.LancamentoEntry.COLUMN_VALOR, nValor);
-                    lancamentoValues.put(AlgumDBContract.LancamentoEntry.COLUMN_DATA, date.getTime());
-                    lancamentoValues.put(AlgumDBContract.LancamentoEntry.COLUMN_OBSERVACAO, observacao.getText().toString());
-                    lancamentoValues.put(AlgumDBContract.LancamentoEntry.COLUMN_GRUPO_ID, idGrupo);
-                    lancamentoValues.put(AlgumDBContract.LancamentoEntry.COLUMN_CONTA_ORIGEM_ID, idContaDestino);
+                lancamentoValues.put(AlgumDBContract.LancamentoEntry.COLUMN_VALOR, nValor);
+                lancamentoValues.put(AlgumDBContract.LancamentoEntry.COLUMN_DATA, date.getTime());
+                lancamentoValues.put(AlgumDBContract.LancamentoEntry.COLUMN_OBSERVACAO, observacao.getText().toString());
+                lancamentoValues.put(AlgumDBContract.LancamentoEntry.COLUMN_GRUPO_ID, idGrupo);
+                lancamentoValues.put(AlgumDBContract.LancamentoEntry.COLUMN_CONTA_ID, idContaDestino);
+                lancamentoValues.put(AlgumDBContract.LancamentoEntry.COLUMN_USUARIO_ID, usuarioId);
 
+                if (idTipoLancamento == 3){
                     getContentResolver().insert(AlgumDBContract.LancamentoEntry.CONTENT_URI, lancamentoValues);
                 }
 
@@ -134,10 +148,7 @@ public class LancamentoValorActivity extends BaseActivity
                 }
 
                 lancamentoValues.put(AlgumDBContract.LancamentoEntry.COLUMN_VALOR, nValor);
-                lancamentoValues.put(AlgumDBContract.LancamentoEntry.COLUMN_DATA, date.getTime());
-                lancamentoValues.put(AlgumDBContract.LancamentoEntry.COLUMN_OBSERVACAO, observacao.getText().toString());
-                lancamentoValues.put(AlgumDBContract.LancamentoEntry.COLUMN_GRUPO_ID, idGrupo);
-                lancamentoValues.put(AlgumDBContract.LancamentoEntry.COLUMN_CONTA_ORIGEM_ID, idContaOrigem);
+                lancamentoValues.put(AlgumDBContract.LancamentoEntry.COLUMN_CONTA_ID, idContaOrigem);
 
                 getContentResolver().insert(AlgumDBContract.LancamentoEntry.CONTENT_URI, lancamentoValues);
 

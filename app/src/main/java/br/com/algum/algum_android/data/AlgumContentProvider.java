@@ -22,6 +22,7 @@ public class AlgumContentProvider extends ContentProvider {
 
     private static final int USUARIOS = 200;
     private static final int USUARIOS_POR_ID = 201;
+    private static final int USUARIOS_LOGOUT = 202;
 
     private static final int GRUPOS = 300;
 
@@ -162,7 +163,7 @@ public class AlgumContentProvider extends ContentProvider {
                         AlgumDBContract.LancamentoEntry.TABLE_NAME + "." + AlgumDBContract.LancamentoEntry.COLUMN_GRUPO_ID +
                         " INNER JOIN " + AlgumDBContract.ContasEntry.TABLE_NAME + " ON " +
                         AlgumDBContract.ContasEntry.TABLE_NAME + "." + AlgumDBContract.ContasEntry.COLUMN_CONTA_ID + " = " +
-                        AlgumDBContract.LancamentoEntry.TABLE_NAME + "." + AlgumDBContract.LancamentoEntry.COLUMN_CONTA_ORIGEM_ID);
+                        AlgumDBContract.LancamentoEntry.TABLE_NAME + "." + AlgumDBContract.LancamentoEntry.COLUMN_CONTA_ID);
 
                 String _OrderBy = AlgumDBContract.LancamentoEntry.TABLE_NAME + "." + AlgumDBContract.LancamentoEntry.COLUMN_DATA + " DESC, " +
                         AlgumDBContract.LancamentoEntry.TABLE_NAME+"."+ AlgumDBContract.LancamentoEntry.COLUMN_ID + " DESC ";
@@ -250,8 +251,29 @@ public class AlgumContentProvider extends ContentProvider {
 
     @Override
     public int delete(Uri uri, String selection, String[] selectionArgs) {
-        return 0;
-    }
+        int _id;
+        switch (sUriMatcher.match(uri)) {
+            case LANCAMENTOS: {
+                _id = mDbHelper.getWritableDatabase().delete(AlgumDBContract.LancamentoEntry.TABLE_NAME, selection, selectionArgs);
+                 break;
+            }
+            case CONTAS: {
+                _id = mDbHelper.getWritableDatabase().delete(AlgumDBContract.ContasEntry.TABLE_NAME, selection, selectionArgs);
+                break;
+            }
+            case GRUPOS: {
+                _id = mDbHelper.getWritableDatabase().delete(AlgumDBContract.GruposEntry.TABLE_NAME, selection, selectionArgs);
+                break;
+            }
+            case USUARIOS: {
+                _id = mDbHelper.getWritableDatabase().delete(AlgumDBContract.UsuariosEntry.TABLE_NAME, selection, selectionArgs);
+                break;
+            }
+            default:
+                throw new UnsupportedOperationException("Unknown uri: " + uri);
+        }
+
+        return _id;    }
 
     @Override
     public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
@@ -268,5 +290,13 @@ public class AlgumContentProvider extends ContentProvider {
         }
 
         return _id;
+    }
+
+    public void logout(){
+        mDbHelper.getWritableDatabase().delete(AlgumDBContract.LancamentoEntry.TABLE_NAME, null, null);
+        mDbHelper.getWritableDatabase().delete(AlgumDBContract.ContasEntry.TABLE_NAME, null, null);
+        mDbHelper.getWritableDatabase().delete(AlgumDBContract.GruposEntry.TABLE_NAME, null, null);
+        mDbHelper.getWritableDatabase().delete(AlgumDBContract.UsuariosEntry.TABLE_NAME, null, null);
+
     }
 }
