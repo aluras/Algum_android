@@ -24,6 +24,7 @@
 
     <string name="action_settings">Configurações</string>
     <string name="action_refresh">Atualizar</string>
+
     <string name="title_activity_main">Lançamento</string>
     <string name="title_activity_contas">Contas</string>
     <string name="title_activity_grupos">Grupos</string>

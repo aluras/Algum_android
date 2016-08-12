@@ -15,6 +15,8 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.auth.api.Auth;
@@ -151,7 +153,15 @@ public class MainActivity extends AppCompatActivity implements
 
 
         }else{
-            Toast.makeText(MainActivity.this, result.toString(), Toast.LENGTH_LONG).show();
+            Toast toast = new Toast(getApplicationContext());
+            View layout = getLayoutInflater().inflate(R.layout.toast,(ViewGroup) findViewById(R.id.toast_layout_root));
+            TextView text = (TextView) layout.findViewById(R.id.toastText);
+            text.setText(result.toString());
+            text.setTextColor(getResources().getColor(R.color.colorBack));
+            toast.setView(layout);
+            toast.setDuration(Toast.LENGTH_LONG);
+            toast.show();
+
             Log.e(TAG, result.getStatus().toString());
             View btnLogin = (View) findViewById(R.id.sign_in_button);
             btnLogin.setVisibility(View.VISIBLE);

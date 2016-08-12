@@ -1,5 +1,6 @@
 package br.com.algum.algum_android.customAdapters;
 
+import android.app.Dialog;
 import android.content.Context;
 import android.database.Cursor;
 import android.view.LayoutInflater;
@@ -40,7 +41,7 @@ public class ExtratoAdapter extends CursorAdapter {
     }
 
     @Override
-    public void bindView(View view, Context context, Cursor cursor) {
+    public void bindView(View view, final Context context, Cursor cursor) {
 
         SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
 
@@ -69,6 +70,14 @@ public class ExtratoAdapter extends CursorAdapter {
             holder.txtValor.setTextColor(context.getResources().getColor(R.color.despesa));
         }
 
+        view.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Dialog dialog = new Dialog(context);
+                dialog.setContentView(R.layout.detail_lancamento);
+                dialog.show();
+            }
+        });
 
     }
 

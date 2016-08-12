@@ -39,6 +39,7 @@ import java.util.Date;
 
 import br.com.algum.algum_android.R;
 import br.com.algum.algum_android.data.AlgumDBContract;
+import br.com.algum.algum_android.utils.Controle;
 
 /**
  * Created by sn1007071 on 28/03/2016.
@@ -53,6 +54,8 @@ public class AlgumSyncAdapter extends AbstractThreadedSyncAdapter {
     private String mAuthority;
     private ContentProviderClient mProvider;
     private SyncResult mSsyncResult;
+
+    private int usuarioId;
 
     public AlgumSyncAdapter(Context context, boolean autoInitialize) {
         super(context, autoInitialize);
@@ -106,7 +109,7 @@ public class AlgumSyncAdapter extends AbstractThreadedSyncAdapter {
     public void performSync(Account account, Bundle extras, String authority, ContentProviderClient provider, SyncResult syncResult,GoogleSignInResult googleSignInResult ) {
 
         SharedPreferences sharedPref = getContext().getSharedPreferences(getContext().getString(R.string.userInfo), Context.MODE_PRIVATE);
-        int usuarioId = sharedPref.getInt(getContext().getString(R.string.idUsuario), 0);
+        usuarioId = sharedPref.getInt(getContext().getString(R.string.idUsuario), 0);
 
         if (googleSignInResult.isSuccess()) {
             GoogleSignInAccount acct = googleSignInResult.getSignInAccount();
@@ -166,8 +169,8 @@ public class AlgumSyncAdapter extends AbstractThreadedSyncAdapter {
 
                 JSONObject contaJson = contasArray.getJSONObject(i);
                 JSONObject conta = contaJson.getJSONObject("Conta");
-                JSONArray contaUsuarioArray = contaJson.getJSONArray("ContaUsuario");
-                JSONObject contaUsuario = contaUsuarioArray.getJSONObject(0);
+                JSONObject contaUsuario = contaJson.getJSONObject("ContaUsuario");
+                ;
 
                 String mSelectionClause = AlgumDBContract.ContasEntry.COLUMN_CONTA_ID + " = ? ";
                 String[] mSelectionArgs = {conta.getString("id")};
@@ -262,8 +265,10 @@ public class AlgumSyncAdapter extends AbstractThreadedSyncAdapter {
             editor.commit();
 
         }catch (JSONException e) {
+            Controle.gravaLog(getContext(),e.getMessage(),usuarioId);
             Log.e(LOG_TAG, "Error ", e);
         } catch (ParseException e) {
+            Controle.gravaLog(getContext(),e.getMessage(),usuarioId);
             Log.e(LOG_TAG, "Error ", e);
         }
 
@@ -307,11 +312,19 @@ public class AlgumSyncAdapter extends AbstractThreadedSyncAdapter {
             }
             return buffer.toString();
         }catch (IOException e) {
+            Controle.gravaLog(getContext(),e.getMessage(),usuarioId);
             Log.e(LOG_TAG, "Error ", e);
             // If the code didn't successfully get the weather data, there's no point in attempting
             // to parse it.
             return "";
-        }finally {
+        }catch (Exception e){
+            Controle.gravaLog(getContext(),e.getMessage(),usuarioId);
+            Log.e(LOG_TAG, "Error ", e);
+            // If the code didn't successfully get the weather data, there's no point in attempting
+            // to parse it.
+            return "";
+        }
+        finally {
             if (urlConnection != null) {
                 urlConnection.disconnect();
             }
@@ -369,6 +382,7 @@ public class AlgumSyncAdapter extends AbstractThreadedSyncAdapter {
             }
             return buffer.toString();
         }catch (IOException e) {
+            Controle.gravaLog(getContext(),e.getMessage(),usuarioId);
             Log.e(LOG_TAG, "Error ", e);
             // If the code didn't successfully get the weather data, there's no point in attempting
             // to parse it.

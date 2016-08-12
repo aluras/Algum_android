@@ -292,11 +292,4 @@ public class AlgumContentProvider extends ContentProvider {
         return _id;
     }
 
-    public void logout(){
-        mDbHelper.getWritableDatabase().delete(AlgumDBContract.LancamentoEntry.TABLE_NAME, null, null);
-        mDbHelper.getWritableDatabase().delete(AlgumDBContract.ContasEntry.TABLE_NAME, null, null);
-        mDbHelper.getWritableDatabase().delete(AlgumDBContract.GruposEntry.TABLE_NAME, null, null);
-        mDbHelper.getWritableDatabase().delete(AlgumDBContract.UsuariosEntry.TABLE_NAME, null, null);
-
-    }
 }

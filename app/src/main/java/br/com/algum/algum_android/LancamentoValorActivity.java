@@ -16,7 +16,6 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -152,16 +151,20 @@ public class LancamentoValorActivity extends BaseActivity
 
                 getContentResolver().insert(AlgumDBContract.LancamentoEntry.CONTENT_URI, lancamentoValues);
 
-                Toast.makeText(this, "Lançamento registrado.", Toast.LENGTH_LONG).show();
+                showMessage("Lançamento registrado.");
                 Intent intent = new Intent(this, LancamentoContasActivity.class);
                 startActivity(intent);
 
             }
         }catch (NumberFormatException exception) {
-            Toast.makeText(this, "Erro: Valor inválido.", Toast.LENGTH_LONG).show();
+            showMessage("Erro: Valor inválido.");
+            TextView txtValor = (TextView) findViewById(R.id.txtValor);
+            if(txtValor.requestFocus()) {
+                getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
+            }
 
         }catch (Exception exception) {
-            Toast.makeText(this, "Erro: " + exception.getMessage(), Toast.LENGTH_LONG).show();
+            showMessage("Erro: " + exception.getMessage());
             Log.e(LOG_TAG, "Error ", exception);
 
         }

@@ -3,6 +3,8 @@
     <color name="colorPrimary">#69CC69</color>
     <color name="colorPrimaryDark">#42AF42</color>
     <color name="colorAccent">#249624</color>
+    <color name="colorBack">#ffffff</color>
+    <color name="colorText">#000000</color>
 
     <color name="despesa">#DB5353</color>
     <color name="receita">#42AF42</color>

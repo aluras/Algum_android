@@ -16,7 +16,9 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
@@ -43,9 +45,12 @@ public abstract class BaseActivity extends AppCompatActivity
 
     protected View v;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
+
     }
 
     @Override
@@ -81,6 +86,14 @@ public abstract class BaseActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
 
         v = navigationView.getHeaderView(0);
+
+        SharedPreferences sharedPref = getSharedPreferences(getString(R.string.userInfo), Context.MODE_PRIVATE);
+
+        if(sharedPref.getString(getString(R.string.emailUsuario), "").equals("andrelrs80@gmail.com")){
+            MenuItem menu = navigationView.getMenu().findItem(R.id.nav_log);
+            menu.setVisible(true);
+        };
+
 
     }
 
@@ -203,5 +216,18 @@ public abstract class BaseActivity extends AppCompatActivity
         // An unresolvable error has occurred and Google APIs (including Sign-In) will not
         // be available.
         Log.d(TAG, "onConnectionFailed:" + connectionResult);
+    }
+
+    public void showMessage(String message){
+
+        Toast toast = new Toast(getApplicationContext());
+        View layout = getLayoutInflater().inflate(R.layout.toast,(ViewGroup) findViewById(R.id.toast_layout_root));
+        TextView text = (TextView) layout.findViewById(R.id.toastText);
+        text.setText(message);
+        text.setTextColor(getResources().getColor(R.color.colorBack));
+        toast.setView(layout);
+        toast.setDuration(Toast.LENGTH_LONG);
+        toast.show();
+
     }
 }
