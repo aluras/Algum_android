@@ -26,8 +26,6 @@ import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.OptionalPendingResult;
-import com.google.android.gms.common.api.ResultCallback;
 
 import org.json.JSONObject;
 
@@ -60,7 +58,7 @@ public class MainActivity extends AppCompatActivity implements
     // An account type, in the form of a domain name
     public static final String ACCOUNT_TYPE = "algum.com.br";
     // The account name
-    public static final String ACCOUNT = "dummyaccount";
+    public static String account;
 
     public Account mAccount;
 
@@ -88,7 +86,7 @@ public class MainActivity extends AppCompatActivity implements
 
         mContext = this;
 
-        mAccount = CreateSyncAccount(mContext);
+        //mAccount = CreateSyncAccount(mContext);
 
     }
 
@@ -97,6 +95,10 @@ public class MainActivity extends AppCompatActivity implements
         super.onStart();
         SharedPreferences sharedPref = getSharedPreferences(getString(R.string.userInfo), Context.MODE_PRIVATE);
         if(sharedPref.contains(getString(R.string.emailUsuario))){
+
+            Intent intent = new Intent(mContext,LancamentoContasActivity.class);
+            startActivity(intent);
+            /*
             OptionalPendingResult<GoogleSignInResult> opr = Auth.GoogleSignInApi.silentSignIn(mGoogleApiClient);
 
             if (opr.isDone()) {
@@ -112,6 +114,7 @@ public class MainActivity extends AppCompatActivity implements
                     }
                 });
             }
+            */
         }else{
 
             View btnLogin = (View) findViewById(R.id.sign_in_button);
@@ -217,7 +220,7 @@ public class MainActivity extends AppCompatActivity implements
 
         // Create the account type and default account
         Account newAccount = new Account(
-                ACCOUNT, ACCOUNT_TYPE);
+                account, ACCOUNT_TYPE);
         // Get an instance of the Android account manager
         AccountManager accountManager =
                 (AccountManager) context.getSystemService(
@@ -238,7 +241,7 @@ public class MainActivity extends AppCompatActivity implements
 
             ContentResolver.setSyncAutomatically(newAccount, AUTHORITY, true);
 
-            ContentResolver.addPeriodicSync(newAccount, AUTHORITY, new Bundle(), 12 * 60 * 60);
+            ContentResolver.addPeriodicSync(newAccount, AUTHORITY, new Bundle(), 20 * 60);
 
             return newAccount;
         }
@@ -312,16 +315,11 @@ public class MainActivity extends AppCompatActivity implements
                         editor.putString(getString(R.string.emailUsuario), usuarioJson.getJSONObject("Usuario").getString("email"));
                         editor.commit();
 
-
                         usuarioId = usuarioJson.getJSONObject("Usuario").getInt("id");
 
                         Log.d(TAG, "Usuario novo");
 
-                        Bundle bundle = new Bundle();
-                        bundle.putBoolean(ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
-                        bundle.putBoolean(ContentResolver.SYNC_EXTRAS_MANUAL, true);
 
-                        ContentResolver.requestSync(mAccount, AUTHORITY, bundle);
 
                     }else{
                         InputStream inputStream = urlConnection.getErrorStream();
@@ -404,7 +402,17 @@ public class MainActivity extends AppCompatActivity implements
                 View loading = (View) findViewById(R.id.loadingPanel);
                 loading.setVisibility(View.GONE);
             }else{
-                //mAccount = CreateSyncAccount(mContext);
+                SharedPreferences sharedPref = getSharedPreferences(getString(R.string.userInfo), Context.MODE_PRIVATE);
+                account = sharedPref.getString(getString(R.string.emailUsuario), "");
+
+                mAccount = CreateSyncAccount(mContext);
+
+                Bundle bundle = new Bundle();
+                bundle.putBoolean(ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
+                bundle.putBoolean(ContentResolver.SYNC_EXTRAS_MANUAL, true);
+
+                ContentResolver.requestSync(mAccount, AUTHORITY, bundle);
+
                 Intent intent = new Intent(mContext,LancamentoContasActivity.class);
                 startActivity(intent);
             }

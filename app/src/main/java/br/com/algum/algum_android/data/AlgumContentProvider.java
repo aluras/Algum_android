@@ -136,16 +136,14 @@ public class AlgumContentProvider extends ContentProvider {
                 break;
             }
             case LANCAMENTOS: {
-                SQLiteQueryBuilder _QB = new SQLiteQueryBuilder();
-
-                _QB.setTables(AlgumDBContract.LancamentoEntry.TABLE_NAME +
-                    " INNER JOIN " + AlgumDBContract.GruposEntry.TABLE_NAME + " ON " +
-                        AlgumDBContract.GruposEntry.TABLE_NAME + "." + AlgumDBContract.GruposEntry.COLUMN_GRUPO_ID + " = " +
-                        AlgumDBContract.LancamentoEntry.TABLE_NAME + "." + AlgumDBContract.LancamentoEntry.COLUMN_GRUPO_ID);
-
-                String _OrderBy = AlgumDBContract.LancamentoEntry.TABLE_NAME + "." + AlgumDBContract.LancamentoEntry.COLUMN_DATA + " ASC ";
-
-                retCursor = _QB.query(mDbHelper.getReadableDatabase(),null,null,null,null,null,_OrderBy);
+                retCursor = mDbHelper.getReadableDatabase().query(
+                        AlgumDBContract.LancamentoEntry.TABLE_NAME,
+                        projection,
+                        selection,
+                        selectionArgs,
+                        null,
+                        null, sortOrder
+                );
 
                 break;
             }
@@ -156,6 +154,7 @@ public class AlgumContentProvider extends ContentProvider {
                     selection = selection + " AND ";
                 }
                 selection = selection + AlgumDBContract.ContasEntry.TABLE_NAME + "." + AlgumDBContract.ContasEntry.COLUMN_USUARIO_ID + " = " + uri.getLastPathSegment();
+                selection = selection + " AND " + AlgumDBContract.LancamentoEntry.TABLE_NAME + "." + AlgumDBContract.LancamentoEntry.COLUMN_EXCLUIDO + " = 0 ";
 
                                 _QB.setTables(AlgumDBContract.LancamentoEntry.TABLE_NAME +
                         " INNER JOIN " + AlgumDBContract.GruposEntry.TABLE_NAME + " ON " +
@@ -288,7 +287,7 @@ public class AlgumContentProvider extends ContentProvider {
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
-
+        getContext().getContentResolver().notifyChange(uri,null);
         return _id;
     }
 

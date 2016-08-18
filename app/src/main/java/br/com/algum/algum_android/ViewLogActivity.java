@@ -1,14 +1,19 @@
 package br.com.algum.algum_android;
 
-import android.app.Activity;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
+import android.support.v7.app.AppCompatActivity;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 
 import br.com.algum.algum_android.data.AlgumDBContract;
 
-public class ViewLogActivity extends Activity {
+public class ViewLogActivity extends AppCompatActivity
+        implements LoaderManager.LoaderCallbacks<Cursor> {
 
     private SimpleCursorAdapter dataAdapter;
 
@@ -20,33 +25,45 @@ public class ViewLogActivity extends Activity {
         ListView listViewLog = (ListView) findViewById(R.id.listViewLog);
 
         String[] columns = new String[] {
-                AlgumDBContract.LogEntry.COLUMN_DATA,
                 AlgumDBContract.LogEntry.COLUMN_MENSAGEM
         };
 
         int[] to = new int[]{
-                R.id.txtLogData,
                 R.id.txtLogMensagem
         };
-
-        Cursor cursor = getContentResolver().query(
-                AlgumDBContract.LogEntry.CONTENT_URI,
-                null,
-                null,
-                null,
-                null
-        );
 
         dataAdapter = new SimpleCursorAdapter(
                 this,
                 R.layout.item_log,
-                cursor,
+                null,
                 columns,
                 to,
                 0
         );
-
+        getSupportLoaderManager().initLoader(0, null, this);
         listViewLog.setAdapter(dataAdapter);
 
+    }
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        Uri gruposUri = AlgumDBContract.LogEntry.CONTENT_URI;
+        return new CursorLoader(
+                this,
+                gruposUri,
+                null,
+                null,
+                null,
+                null
+        );    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        dataAdapter.swapCursor(data);
+        dataAdapter.notifyDataSetChanged();    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+        dataAdapter.swapCursor(null);
     }
 }

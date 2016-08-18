@@ -18,6 +18,9 @@
     <string name="planejadomes">Planejado</string>
     <string name="extrato">Extrato</string>
 
+    <string name="cancelar">Cancelar</string>
+    <string name="excluir">Excluir</string>
+
 
     <string name="navigation_drawer_open">Abrir menu de navegação</string>
     <string name="navigation_drawer_close">Fechar menu de navegação</string>

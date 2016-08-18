@@ -1,7 +1,10 @@
 package br.com.algum.algum_android.customAdapters;
 
+import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.ContentValues;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.database.Cursor;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -45,9 +48,12 @@ public class ExtratoAdapter extends CursorAdapter {
 
         SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
 
+        final int idLancamento = cursor.getInt(cursor.getColumnIndex(AlgumDBContract.LancamentoEntry.COLUMN_ID));
         final String txtData = format.format(new Date(cursor.getLong(cursor.getColumnIndex(AlgumDBContract.LancamentoEntry.COLUMN_DATA))));
         final String txtGrupo = cursor.getString(cursor.getColumnIndex(AlgumDBContract.GruposEntry.COLUMN_NOME));
+        final String txtConta = cursor.getString(cursor.getColumnIndex("conta_nome"));
         final float txtValor = cursor.getFloat(cursor.getColumnIndex(AlgumDBContract.LancamentoEntry.COLUMN_VALOR));
+        final String txtObservacao = cursor.getString(cursor.getColumnIndex(AlgumDBContract.LancamentoEntry.COLUMN_OBSERVACAO));
 
         final LancamentoHolder holder = (LancamentoHolder) view.getTag();
 
@@ -73,8 +79,48 @@ public class ExtratoAdapter extends CursorAdapter {
         view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Dialog dialog = new Dialog(context);
-                dialog.setContentView(R.layout.detail_lancamento);
+                AlertDialog.Builder builder = new AlertDialog.Builder(context);
+
+                View detailView = mInflater.inflate(R.layout.detail_lancamento, null);
+                TextView lancamentoData = (TextView) detailView.findViewById(R.id.lancamento_data);
+                lancamentoData.setText("Data: " + txtData);
+                TextView lancamentoGrupo = (TextView) detailView.findViewById(R.id.lancamento_grupo);
+                lancamentoGrupo.setText("Grupo: " + txtGrupo);
+                TextView lancamentoConta = (TextView) detailView.findViewById(R.id.lancamento_conta);
+                lancamentoConta.setText("Conta: " + txtConta);
+                TextView lancamentoValor = (TextView) detailView.findViewById(R.id.lancamento_valor);
+                lancamentoValor.setText("Valor: R$ " + txtValor);
+                if(txtValor>=0){
+                    lancamentoValor.setTextColor(context.getResources().getColor(R.color.receita));
+                }else{
+                    lancamentoValor.setTextColor(context.getResources().getColor(R.color.despesa));
+                }
+                TextView lancamentoObservacao = (TextView) detailView.findViewById(R.id.lancamento_observacao);
+                lancamentoObservacao.setText("Observação: " + txtObservacao);
+
+                builder.setView(detailView)
+                        .setTitle(context.getString(R.string.title_activity_main))
+                        .setPositiveButton(R.string.excluir, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                ContentValues lancamentoValues = new ContentValues();
+                                lancamentoValues.put(AlgumDBContract.LancamentoEntry.COLUMN_EXCLUIDO, 1);
+                                String selection = AlgumDBContract.LancamentoEntry.COLUMN_ID + " = ? ";
+                                String[] selectionArgs = {Integer.toString(idLancamento)};
+                                context.getContentResolver().update(AlgumDBContract.LancamentoEntry.CONTENT_URI, lancamentoValues,selection,selectionArgs);
+                            }
+                        })
+                        .setNegativeButton(R.string.cancelar, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+
+                            }
+                        });
+
+
+
+                Dialog dialog = builder.create();
+
                 dialog.show();
             }
         });

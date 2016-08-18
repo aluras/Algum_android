@@ -57,13 +57,18 @@ public class AlgumSyncAdapter extends AbstractThreadedSyncAdapter {
 
     private int usuarioId;
 
+    private SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+
+    private SimpleDateFormat dateTimeFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+
+
     public AlgumSyncAdapter(Context context, boolean autoInitialize) {
         super(context, autoInitialize);
     }
 
 
     @Override
-    public void onPerformSync(Account account, Bundle extras, String authority, ContentProviderClient provider, SyncResult syncResult) {
+    public void onPerformSync(Account account, Bundle extras, String authority, ContentProviderClient provider, final SyncResult syncResult) {
         Log.d(LOG_TAG, "Starting sync");
 
         mAccount = account;
@@ -81,6 +86,7 @@ public class AlgumSyncAdapter extends AbstractThreadedSyncAdapter {
 
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken(getContext().getString(R.string.algum_server_client_id))
+                .requestEmail()
                 .build();
 
         GoogleApiClient mGoogleApiClient = new GoogleApiClient.Builder(getContext())
@@ -100,7 +106,8 @@ public class AlgumSyncAdapter extends AbstractThreadedSyncAdapter {
             opr.setResultCallback(new ResultCallback<GoogleSignInResult>() {
                 @Override
                 public void onResult(GoogleSignInResult googleSignInResult) {
-                    performSync(mAccount,mExtras,mAuthority,mProvider,mSsyncResult,googleSignInResult);
+                    mSsyncResult.delayUntil = 10;
+                    //performSync(mAccount,mExtras,mAuthority,mProvider,mSsyncResult,googleSignInResult);
                 }
             });
         }
@@ -195,6 +202,26 @@ public class AlgumSyncAdapter extends AbstractThreadedSyncAdapter {
             //Atualiza Lançamentos
             final String LANCAMENTO_BASE_URL = getContext().getString(R.string.WSurl) + "lancamentos";
 
+            // EXCLUI LANCAMENTOS
+            String projectionDelete[] = {AlgumDBContract.LancamentoEntry.TABLE_NAME+".*"};
+            String selectionDelete = AlgumDBContract.LancamentoEntry.COLUMN_EXCLUIDO + " = 1 ";
+            Cursor lancamentosDelete = getContext().getContentResolver().query(AlgumDBContract.LancamentoEntry.CONTENT_URI,projectionDelete,selectionDelete,null,null);
+
+            lancamentosDelete.moveToFirst();
+            while(lancamentosDelete.isAfterLast() == false){
+
+                if(lancamentosDelete.getInt(lancamentosDelete.getColumnIndex(AlgumDBContract.LancamentoEntry.COLUMN_LANCAMENTO_ID))>0){
+                    callServiceExclui(LANCAMENTO_BASE_URL+"/"+lancamentosDelete.getString(lancamentosDelete.getColumnIndex(AlgumDBContract.LancamentoEntry.COLUMN_LANCAMENTO_ID)));
+                }
+
+                String selection = AlgumDBContract.LancamentoEntry.COLUMN_ID + " = ? ";
+                String[] selectionArgs = {lancamentosDelete.getString(lancamentosDelete.getColumnIndex(AlgumDBContract.LancamentoEntry.COLUMN_ID))};
+                getContext().getContentResolver().delete(AlgumDBContract.LancamentoEntry.CONTENT_URI, selection,selectionArgs);
+
+                lancamentosDelete.moveToNext();
+            }
+            lancamentosDelete.close();
+
             // -- ENVIA OS NOVOS
             String projection[] = {AlgumDBContract.LancamentoEntry.TABLE_NAME+".*"};
             String selection = AlgumDBContract.LancamentoEntry.COLUMN_LANCAMENTO_ID + " IS NULL ";
@@ -251,6 +278,7 @@ public class AlgumSyncAdapter extends AbstractThreadedSyncAdapter {
                     lancamentoValues.put(AlgumDBContract.LancamentoEntry.COLUMN_OBSERVACAO, lancamento.getString("observacao"));
                     lancamentoValues.put(AlgumDBContract.LancamentoEntry.COLUMN_VALOR, lancamento.getString("valor"));
                     lancamentoValues.put(AlgumDBContract.LancamentoEntry.COLUMN_USUARIO_ID, lancamento.getString("usuario_id"));
+                    lancamentoValues.put(AlgumDBContract.LancamentoEntry.COLUMN_EXCLUIDO, 0);
 
                     getContext().getContentResolver().insert(AlgumDBContract.LancamentoEntry.CONTENT_URI, lancamentoValues);
                 }
@@ -258,17 +286,20 @@ public class AlgumSyncAdapter extends AbstractThreadedSyncAdapter {
             }
 
             Log.d(LOG_TAG, "Finishing sync");
-            SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 
             SharedPreferences.Editor editor = sharedPref.edit();
             editor.putString(getContext().getString(R.string.dataSync), dateFormat.format(new Date()));
             editor.commit();
 
+            Controle.gravaLog(getContext(), dateTimeFormat.format(new Date()) + " Sincronização concluída.", usuarioId);
+
+
+
         }catch (JSONException e) {
-            Controle.gravaLog(getContext(),e.getMessage(),usuarioId);
+            Controle.gravaLog(getContext(),dateTimeFormat.format(new Date()) + " - " + e.toString() + e.getMessage(),usuarioId);
             Log.e(LOG_TAG, "Error ", e);
         } catch (ParseException e) {
-            Controle.gravaLog(getContext(),e.getMessage(),usuarioId);
+            Controle.gravaLog(getContext(),dateTimeFormat.format(new Date()) + " - " + e.toString() + e.getMessage(),usuarioId);
             Log.e(LOG_TAG, "Error ", e);
         }
 
@@ -312,13 +343,13 @@ public class AlgumSyncAdapter extends AbstractThreadedSyncAdapter {
             }
             return buffer.toString();
         }catch (IOException e) {
-            Controle.gravaLog(getContext(),e.getMessage(),usuarioId);
+            Controle.gravaLog(getContext(),dateTimeFormat.format(new Date()) + " - " + e.toString() + e.getMessage(),usuarioId);
             Log.e(LOG_TAG, "Error ", e);
             // If the code didn't successfully get the weather data, there's no point in attempting
             // to parse it.
             return "";
         }catch (Exception e){
-            Controle.gravaLog(getContext(),e.getMessage(),usuarioId);
+            Controle.gravaLog(getContext(),dateTimeFormat.format(new Date()) + " - " + e.toString() + e.getMessage(),usuarioId);
             Log.e(LOG_TAG, "Error ", e);
             // If the code didn't successfully get the weather data, there's no point in attempting
             // to parse it.
@@ -382,7 +413,7 @@ public class AlgumSyncAdapter extends AbstractThreadedSyncAdapter {
             }
             return buffer.toString();
         }catch (IOException e) {
-            Controle.gravaLog(getContext(),e.getMessage(),usuarioId);
+            Controle.gravaLog(getContext(),dateTimeFormat.format(new Date()) + " - " + e.toString() + e.getMessage(),usuarioId);
             Log.e(LOG_TAG, "Error ", e);
             // If the code didn't successfully get the weather data, there's no point in attempting
             // to parse it.
@@ -401,4 +432,45 @@ public class AlgumSyncAdapter extends AbstractThreadedSyncAdapter {
         }
     }
 
+    private void callServiceExclui(String pUrl){
+
+        HttpURLConnection urlConnection = null;
+        BufferedReader reader = null;
+
+        try{
+            Uri builtUri = Uri.parse(pUrl).buildUpon().build();
+
+            URL url = new URL(builtUri.toString());
+
+            urlConnection = (HttpURLConnection) url.openConnection();
+            urlConnection.setRequestProperty("Content-Type",
+                    "application/x-www-form-urlencoded");
+            urlConnection.setRequestMethod("DELETE");
+            urlConnection.setDoInput(true);
+            urlConnection.setRequestProperty("Application-Authorization", tok);
+            urlConnection.setUseCaches(false);
+
+            urlConnection.getResponseCode();
+
+
+        }catch (IOException e) {
+            Controle.gravaLog(getContext(), dateTimeFormat.format(new Date()) + " - " + e.toString() + e.getMessage(), usuarioId);
+            Log.e(LOG_TAG, "Error ", e);
+        } catch (Exception e){
+            Controle.gravaLog(getContext(), dateTimeFormat.format(new Date()) + " - " + e.toString() + e.getMessage(), usuarioId);
+            Log.e(LOG_TAG, "Error ", e);
+
+        }finally {
+            if (urlConnection != null) {
+                urlConnection.disconnect();
+            }
+            if (reader != null) {
+                try {
+                    reader.close();
+                } catch (final IOException e) {
+                    Log.e(LOG_TAG, "Error closing stream", e);
+                }
+            }
+        }
+    }
 }

@@ -41,7 +41,7 @@ public abstract class BaseActivity extends AppCompatActivity
     // An account type, in the form of a domain name
     public static final String ACCOUNT_TYPE = "algum.com.br";
     // The account name
-    public static final String ACCOUNT = "dummyaccount";
+    public static String account;
 
     protected View v;
 
@@ -126,8 +126,11 @@ public abstract class BaseActivity extends AppCompatActivity
             return true;
         }
         if (id == R.id.action_refresh){
+
+            account = email;
+
             Account newAccount = new Account(
-                    ACCOUNT, ACCOUNT_TYPE);
+                    account, ACCOUNT_TYPE);
 
             Bundle bundle = new Bundle();
             bundle.putBoolean(ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
@@ -154,6 +157,18 @@ public abstract class BaseActivity extends AppCompatActivity
         }else if (id == R.id.nav_log){
             intent = new Intent(this, ViewLogActivity.class);
         }else if (id == R.id.nav_exit) {
+            account = email;
+
+            Account newAccount = new Account(
+                    account, ACCOUNT_TYPE);
+
+            Bundle bundle = new Bundle();
+            bundle.putBoolean(ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
+            bundle.putBoolean(ContentResolver.SYNC_EXTRAS_MANUAL, true);
+
+            ContentResolver.removePeriodicSync(newAccount, AUTHORITY, bundle);
+
+
             getContentResolver().delete(AlgumDBContract.LancamentoEntry.CONTENT_URI, null,null);
             getContentResolver().delete(AlgumDBContract.ContasEntry.CONTENT_URI, null, null);
             getContentResolver().delete(AlgumDBContract.GruposEntry.CONTENT_URI, null,null);
