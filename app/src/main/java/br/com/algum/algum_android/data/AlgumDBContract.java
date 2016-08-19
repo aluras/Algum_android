@@ -18,6 +18,7 @@ public class AlgumDBContract {
     public static final Uri BASE_CONTENT_URI = Uri.parse("content://" + CONTENT_AUTHORITY);
 
     public static final String PATH_CONTAS = "contas";
+    public static final String PATH_TIPO_CONTA = "tipoConta";
     public static final String PATH_USUARIOS = "usuarios";
     public static final String PATH_GRUPOS = "grupos";
     public static final String PATH_LANCAMENTOS = "lancamentos";
@@ -64,10 +65,29 @@ public class AlgumDBContract {
         public static final String COLUMN_TIPO_CONTA_ID = "tipo_conta_id";
         public static final String COLUMN_USUARIO_ID = "usuario_id";
         public static final String COLUMN_NOME = "nome";
+        public static final String COLUMN_SALDO_INICIAL = "saldo_inicial";
+        public static final String COLUMN_SALDO = "saldo";
 
         public static Uri buildContaUsuarioUri(long id) {
             return ContentUris.withAppendedId(CONTENT_URI, id);
         }
+
+    }
+
+    public static final class TipoContaEntry implements BaseColumns {
+
+        public static final Uri CONTENT_URI =
+                BASE_CONTENT_URI.buildUpon().appendPath(PATH_TIPO_CONTA).build();
+
+        public static final String CONTENT_TYPE =
+                "vnd.android.cursor.dir/" + CONTENT_AUTHORITY + "/" + PATH_TIPO_CONTA;
+        public static final String CONTENT_ITEM_TYPE =
+                "vnd.android.cursor.item/" + CONTENT_AUTHORITY + "/" + PATH_TIPO_CONTA;
+
+        public static final String TABLE_NAME = "tipoConta";
+
+        public static final String COLUMN_ID = "_id";
+        public static final String COLUMN_NOME = "nome";
 
     }
 

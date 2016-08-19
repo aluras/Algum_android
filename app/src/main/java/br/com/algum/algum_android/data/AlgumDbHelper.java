@@ -26,7 +26,9 @@ public class AlgumDbHelper extends SQLiteOpenHelper {
                 AlgumDBContract.ContasEntry.COLUMN_CONTA_ID + " INTEGER NOT NULL," +
                 AlgumDBContract.ContasEntry.COLUMN_TIPO_CONTA_ID + " INTEGER NOT NULL," +
                 AlgumDBContract.ContasEntry.COLUMN_USUARIO_ID + " INTEGER NOT NULL, " +
-                AlgumDBContract.ContasEntry.COLUMN_NOME + " TEXT NOT NULL)";
+                AlgumDBContract.ContasEntry.COLUMN_NOME + " TEXT NOT NULL, " +
+                AlgumDBContract.ContasEntry.COLUMN_SALDO_INICIAL + " DECIMAL NOT NULL, " +
+                AlgumDBContract.ContasEntry.COLUMN_SALDO + " DECIMAL NOT NULL)";
 
         db.execSQL(SQL_CREATE_CONTA_TABLE);
 

@@ -284,6 +284,12 @@ public class AlgumContentProvider extends ContentProvider {
                 //    throw new android.database.SQLException("Failed to update row into " + uri);
                 break;
             }
+            case CONTAS: {
+                _id = mDbHelper.getWritableDatabase().update(AlgumDBContract.ContasEntry.TABLE_NAME, values, selection, selectionArgs);
+                //if (_id == 0)
+                //    throw new android.database.SQLException("Failed to update row into " + uri);
+                break;
+            }
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }

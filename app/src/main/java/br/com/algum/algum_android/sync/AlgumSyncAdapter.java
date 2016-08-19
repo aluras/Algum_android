@@ -183,16 +183,20 @@ public class AlgumSyncAdapter extends AbstractThreadedSyncAdapter {
                 String[] mSelectionArgs = {conta.getString("id")};
                 Cursor cursor = getContext().getContentResolver().query(AlgumDBContract.ContasEntry.CONTENT_URI, null, mSelectionClause, mSelectionArgs, null);
 
+                ContentValues contasValues = new ContentValues();
+                contasValues.put(AlgumDBContract.ContasEntry.COLUMN_ID, contaUsuario.getInt("id"));
+                contasValues.put(AlgumDBContract.ContasEntry.COLUMN_NOME, conta.getString("nome"));
+                contasValues.put(AlgumDBContract.ContasEntry.COLUMN_CONTA_ID, conta.getInt("id"));
+                contasValues.put(AlgumDBContract.ContasEntry.COLUMN_TIPO_CONTA_ID, conta.getInt("tipo_conta_id"));
+                contasValues.put(AlgumDBContract.ContasEntry.COLUMN_USUARIO_ID, contaUsuario.getInt("usuario_id"));
+                contasValues.put(AlgumDBContract.ContasEntry.COLUMN_SALDO_INICIAL, conta.getInt("saldo_inicial"));
+                contasValues.put(AlgumDBContract.ContasEntry.COLUMN_SALDO, conta.getInt("saldo"));
+
                 if(cursor.getCount() < 1){
 
-                    ContentValues contasValues = new ContentValues();
-                    contasValues.put(AlgumDBContract.ContasEntry.COLUMN_ID, contaUsuario.getInt("id"));
-                    contasValues.put(AlgumDBContract.ContasEntry.COLUMN_NOME, conta.getString("nome"));
-                    contasValues.put(AlgumDBContract.ContasEntry.COLUMN_CONTA_ID, conta.getInt("id"));
-                    contasValues.put(AlgumDBContract.ContasEntry.COLUMN_TIPO_CONTA_ID, conta.getInt("tipo_conta_id"));
-                    contasValues.put(AlgumDBContract.ContasEntry.COLUMN_USUARIO_ID, contaUsuario.getInt("usuario_id"));
-
                     getContext().getContentResolver().insert(AlgumDBContract.ContasEntry.CONTENT_URI, contasValues);
+                }else{
+                    getContext().getContentResolver().update(AlgumDBContract.ContasEntry.CONTENT_URI, contasValues, mSelectionClause,mSelectionArgs);
                 }
                 cursor.close();
             }
