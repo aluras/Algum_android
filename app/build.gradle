@@ -1,7 +1,7 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 23
+    compileSdkVersion 24
     buildToolsVersion "23.0.3"
     defaultConfig {
         applicationId "br.com.algum.algum_android"
@@ -14,6 +14,14 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+        debug {
+            applicationIdSuffix ".debug"
+            versionNameSuffix '-DEBUG'
+        }
+        beta {
+            applicationIdSuffix ".beta"
+            versionNameSuffix '-BETA'
         }
     }
     productFlavors {
@@ -29,6 +37,7 @@ dependencies {
     compile 'com.google.android.gms:play-services-identity:8.4.0'
     compile 'com.android.support:design:24.0.0-alpha1'
 }
+
 
 
 
