@@ -1,6 +1,7 @@
 package br.com.algum.algum_android.customAdapters;
 
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -8,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.CursorAdapter;
 import android.widget.TextView;
 
+import br.com.algum.algum_android.ContasEditActivity;
 import br.com.algum.algum_android.R;
 import br.com.algum.algum_android.data.AlgumDBContract;
 
@@ -33,11 +35,12 @@ public class ConfigContaAdapter extends CursorAdapter {
         return view;    }
 
     @Override
-    public void bindView(View view, Context context, Cursor cursor) {
+    public void bindView(View view, final Context context, Cursor cursor) {
 
         final String txtNome = cursor.getString(cursor.getColumnIndex(AlgumDBContract.ContasEntry.COLUMN_NOME));
         final String txtTipo = cursor.getString(cursor.getColumnIndex(AlgumDBContract.TipoContaEntry.COLUMN_NOME));
         final Float txtSaldo = cursor.getFloat(cursor.getColumnIndex(AlgumDBContract.ContasEntry.COLUMN_SALDO));
+        final int idConta = cursor.getInt(cursor.getColumnIndex(AlgumDBContract.ContasEntry.COLUMN_ID));
 
         final ContaHolder holder = (ContaHolder) view.getTag();
 
@@ -50,6 +53,16 @@ public class ConfigContaAdapter extends CursorAdapter {
         }else{
             holder.txtSaldo.setTextColor(context.getResources().getColor(R.color.despesa));
         }
+
+        view.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent();
+                intent = new Intent(context, ContasEditActivity.class);
+                intent.putExtra("idConta",idConta);
+                context.startActivity(intent);
+            }
+        });
 
 
     }

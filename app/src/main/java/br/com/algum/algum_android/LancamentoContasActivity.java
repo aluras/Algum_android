@@ -46,7 +46,7 @@ public class LancamentoContasActivity extends BaseActivity
 
         TextView txtDataSync = (TextView) findViewById(R.id.txtDataSync);
         SharedPreferences sharedPref = getSharedPreferences(getString(R.string.userInfo), Context.MODE_PRIVATE);
-        txtDataSync.setText("Sincronizado em: " + sharedPref.getString(getString(R.string.dataSync), ""));
+        //txtDataSync.setText("Sincronizado em: " + sharedPref.getString(getString(R.string.dataSync), ""));
 
 
         GridView gridContas = (GridView) findViewById(R.id.gridViewContas);

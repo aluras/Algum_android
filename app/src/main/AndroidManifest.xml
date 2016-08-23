@@ -65,7 +65,8 @@
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:label="@string/title_activity_contas"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme.NoActionBar"
+            android:parentActivityName=".ContasActivity" />
 
         <provider
             android:name=".data.AlgumContentProvider"

@@ -1,6 +1,7 @@
 package br.com.algum.algum_android;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
@@ -9,6 +10,8 @@ import android.support.design.widget.NavigationView;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.ListView;
 
 import br.com.algum.algum_android.customAdapters.ConfigContaAdapter;
@@ -61,4 +64,31 @@ public class ContasActivity extends BaseActivity
     public void onLoaderReset(Loader<Cursor> loader) {
         mAdapter.swapCursor(null);
     }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        if (this.getClass().getSimpleName().equals("ContasActivity")){
+            menu.findItem(R.id.action_add).setVisible(true);
+        }
+        return super.onPrepareOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.action_add) {
+            Intent intent = new Intent();
+            intent = new Intent(this, ContasEditActivity.class);
+            startActivity(intent);
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
 }

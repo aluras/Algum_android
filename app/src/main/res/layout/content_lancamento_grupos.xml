@@ -46,7 +46,7 @@
             android:layout_height="wrap_content"
             android:id="@+id/gridViewGrupos"
             android:layout_below="@+id/txtContaOrigem"
-            android:columnWidth="80dp"
+            android:columnWidth="100dp"
             android:numColumns="auto_fit"
             android:paddingLeft="5dp"
             android:paddingRight="5dp"

@@ -54,7 +54,7 @@ public class MainActivity extends AppCompatActivity implements
     private GoogleApiClient mGoogleApiClient;
 
     // The authority for the sync adapter's content provider
-    public static final String AUTHORITY = "br.com.algum.algum_android.provider";
+    public static final String AUTHORITY = BuildConfig.APPLICATION_ID + ".provider";
     // An account type, in the form of a domain name
     public static final String ACCOUNT_TYPE = "algum.com.br";
     // The account name
@@ -220,7 +220,7 @@ public class MainActivity extends AppCompatActivity implements
 
         // Create the account type and default account
         Account newAccount = new Account(
-                account, ACCOUNT_TYPE);
+                account, context.getString(R.string.sync_account_type));
         // Get an instance of the Android account manager
         AccountManager accountManager =
                 (AccountManager) context.getSystemService(

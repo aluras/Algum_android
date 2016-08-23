@@ -37,7 +37,7 @@ public abstract class BaseActivity extends AppCompatActivity
     protected GoogleApiClient mGoogleApiClient;
 
     // The authority for the sync adapter's content provider
-    public static final String AUTHORITY = "br.com.algum.algum_android.provider";
+    public static final String AUTHORITY = BuildConfig.APPLICATION_ID + ".provider";
     // An account type, in the form of a domain name
     public static final String ACCOUNT_TYPE = "algum.com.br";
     // The account name
@@ -89,10 +89,10 @@ public abstract class BaseActivity extends AppCompatActivity
 
         SharedPreferences sharedPref = getSharedPreferences(getString(R.string.userInfo), Context.MODE_PRIVATE);
 
-        if(sharedPref.getString(getString(R.string.emailUsuario), "").equals("andrelrs80@gmail.com")){
+        //if(sharedPref.getString(getString(R.string.emailUsuario), "").equals("andrelrs80@gmail.com")){
             MenuItem menu = navigationView.getMenu().findItem(R.id.nav_log);
             menu.setVisible(true);
-        };
+        //};
 
 
     }
@@ -115,6 +115,11 @@ public abstract class BaseActivity extends AppCompatActivity
     }
 
     @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        return super.onPrepareOptionsMenu(menu);
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
@@ -130,7 +135,7 @@ public abstract class BaseActivity extends AppCompatActivity
             account = email;
 
             Account newAccount = new Account(
-                    account, ACCOUNT_TYPE);
+                    account, getString(R.string.sync_account_type));
 
             Bundle bundle = new Bundle();
             bundle.putBoolean(ContentResolver.SYNC_EXTRAS_EXPEDITED, true);

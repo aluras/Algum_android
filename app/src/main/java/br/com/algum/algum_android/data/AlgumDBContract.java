@@ -8,12 +8,14 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import br.com.algum.algum_android.BuildConfig;
+
 /**
  * Created by sn1007071 on 28/03/2016.
  */
 public class AlgumDBContract {
 
-    public static final String CONTENT_AUTHORITY = "br.com.algum.algum_android.provider";
+    public static final String CONTENT_AUTHORITY = BuildConfig.APPLICATION_ID + ".provider";
 
     public static final Uri BASE_CONTENT_URI = Uri.parse("content://" + CONTENT_AUTHORITY);
 

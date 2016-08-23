@@ -34,7 +34,7 @@
                 android:textColor="@color/texto_tipo"
                 android:background="@drawable/rouded_corner"
                 android:textStyle="bold"
-                android:layout_marginRight="5dp"
+                android:layout_marginRight="2dp"
                 android:layout_marginLeft="5dp" />
 
             <TextView
@@ -46,8 +46,8 @@
                 android:gravity="center"
                 android:textColor="@color/texto_tipo"
                 android:background="@drawable/rouded_corner"
-                android:layout_marginRight="5dp"
-                android:layout_marginLeft="5dp" />
+                android:layout_marginRight="2dp"
+                android:layout_marginLeft="2dp" />
 
             <TextView
                 android:layout_width="fill_parent"
@@ -58,7 +58,7 @@
                 android:gravity="center"
                 android:textColor="@color/texto_tipo"
                 android:background="@drawable/rouded_corner"
-                android:layout_marginLeft="5dp"
+                android:layout_marginLeft="2dp"
                 android:layout_marginRight="5dp" />
         </LinearLayout>
 
@@ -67,7 +67,7 @@
             android:layout_height="wrap_content"
             android:id="@+id/gridViewContas"
             android:layout_below="@+id/linearLayout"
-            android:columnWidth="80dp"
+            android:columnWidth="100dp"
             android:numColumns="auto_fit"
             android:paddingLeft="5dp"
             android:paddingRight="5dp"

@@ -129,6 +129,7 @@ public class AlgumSyncAdapter extends AbstractThreadedSyncAdapter {
         }
 
         // Will contain the raw JSON response as a string.
+        String TipoContasJsonStr = null;
         String ContasJsonStr = null;
         String GruposJsonStr = null;
         String LancamentosJsonStr = null;
@@ -136,6 +137,35 @@ public class AlgumSyncAdapter extends AbstractThreadedSyncAdapter {
         String format = "json";
 
         try {
+
+            Log.d(LOG_TAG, "Starting sync Tipo Contas");
+            //Atualiza Contas
+            final String TIPO_CONTA_BASE_URL = getContext().getString(R.string.WSurl) + "tipo_contas";
+            TipoContasJsonStr = callService(TIPO_CONTA_BASE_URL);
+
+            JSONArray tipoContasArray = new JSONArray(TipoContasJsonStr);
+
+            for(int i = 0; i < tipoContasArray.length(); i++){
+
+                JSONObject tipoContaJson = tipoContasArray.getJSONObject(i);
+
+                String mSelectionClause = AlgumDBContract.TipoContaEntry.COLUMN_ID + " = ? ";
+                String[] mSelectionArgs = {tipoContaJson.getString("id")};
+                Cursor cursor = getContext().getContentResolver().query(AlgumDBContract.TipoContaEntry.CONTENT_URI, null, mSelectionClause, mSelectionArgs, null);
+
+                ContentValues tipoContasValues = new ContentValues();
+                tipoContasValues.put(AlgumDBContract.TipoContaEntry.COLUMN_ID, tipoContaJson.getInt("id"));
+                tipoContasValues.put(AlgumDBContract.TipoContaEntry.COLUMN_NOME, tipoContaJson.getString("nome"));
+
+                if(cursor.getCount() < 1){
+                    getContext().getContentResolver().insert(AlgumDBContract.TipoContaEntry.CONTENT_URI, tipoContasValues);
+                }else{
+                    getContext().getContentResolver().update(AlgumDBContract.TipoContaEntry.CONTENT_URI, tipoContasValues, mSelectionClause,mSelectionArgs);
+                }
+                cursor.close();
+            }
+
+
             Log.d(LOG_TAG, "Starting sync Grupos");
             //Atualiza Grupos
             final String GRUPO_BASE_URL = getContext().getString(R.string.WSurl) + "grupos";
@@ -152,15 +182,16 @@ public class AlgumSyncAdapter extends AbstractThreadedSyncAdapter {
                 String[] mSelectionArgs = {grupo.getString("id")};
                 Cursor cursor = getContext().getContentResolver().query(AlgumDBContract.GruposEntry.CONTENT_URI, null, mSelectionClause, mSelectionArgs, null);
 
+                ContentValues gruposValues = new ContentValues();
+                gruposValues.put(AlgumDBContract.GruposEntry.COLUMN_ID, grupo.getInt("id"));
+                gruposValues.put(AlgumDBContract.GruposEntry.COLUMN_NOME, grupo.getString("nome"));
+                gruposValues.put(AlgumDBContract.GruposEntry.COLUMN_GRUPO_ID, grupo.getInt("id"));
+                gruposValues.put(AlgumDBContract.GruposEntry.COLUMN_TIPO_ID, grupo.getInt("id_tipo_grupo"));
+
                 if(cursor.getCount() < 1){
-
-                    ContentValues gruposValues = new ContentValues();
-                    gruposValues.put(AlgumDBContract.GruposEntry.COLUMN_ID, grupo.getInt("id"));
-                    gruposValues.put(AlgumDBContract.GruposEntry.COLUMN_NOME, grupo.getString("nome"));
-                    gruposValues.put(AlgumDBContract.GruposEntry.COLUMN_GRUPO_ID, grupo.getInt("id"));
-                    gruposValues.put(AlgumDBContract.GruposEntry.COLUMN_TIPO_ID, grupo.getInt("id_tipo_grupo"));
-
                     getContext().getContentResolver().insert(AlgumDBContract.GruposEntry.CONTENT_URI, gruposValues);
+                }else{
+                    getContext().getContentResolver().update(AlgumDBContract.GruposEntry.CONTENT_URI, gruposValues, mSelectionClause, mSelectionArgs);
                 }
                 cursor.close();
             }
@@ -177,7 +208,6 @@ public class AlgumSyncAdapter extends AbstractThreadedSyncAdapter {
                 JSONObject contaJson = contasArray.getJSONObject(i);
                 JSONObject conta = contaJson.getJSONObject("Conta");
                 JSONObject contaUsuario = contaJson.getJSONObject("ContaUsuario");
-                ;
 
                 String mSelectionClause = AlgumDBContract.ContasEntry.COLUMN_CONTA_ID + " = ? ";
                 String[] mSelectionArgs = {conta.getString("id")};

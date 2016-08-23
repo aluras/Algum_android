@@ -19,6 +19,7 @@ public class AlgumContentProvider extends ContentProvider {
 
     private static final int CONTAS = 100;
     private static final int CONTAS_POR_USUARIO = 101;
+    private static final int TIPOS_CONTAS = 102;
 
     private static final int USUARIOS = 200;
     private static final int USUARIOS_POR_ID = 201;
@@ -44,6 +45,7 @@ public class AlgumContentProvider extends ContentProvider {
         // For each type of URI you want to add, create a corresponding code.
         matcher.addURI(authority, AlgumDBContract.PATH_CONTAS, CONTAS);
         matcher.addURI(authority, AlgumDBContract.PATH_CONTAS + "/*", CONTAS_POR_USUARIO);
+        matcher.addURI(authority, AlgumDBContract.PATH_TIPO_CONTA, TIPOS_CONTAS);
 
         matcher.addURI(authority, AlgumDBContract.PATH_USUARIOS, USUARIOS);
         matcher.addURI(authority, AlgumDBContract.PATH_USUARIOS + "/*", USUARIOS_POR_ID);
@@ -96,7 +98,17 @@ public class AlgumContentProvider extends ContentProvider {
                 );
                 break;
             }
-            case USUARIOS: {
+            case TIPOS_CONTAS: {
+                retCursor = mDbHelper.getReadableDatabase().query(
+                        AlgumDBContract.TipoContaEntry.TABLE_NAME,
+                        projection,
+                        selection,
+                        selectionArgs,
+                        null,
+                        null,sortOrder
+                );
+                break;
+            }            case USUARIOS: {
 
                 retCursor = mDbHelper.getReadableDatabase().query(
                         AlgumDBContract.UsuariosEntry.TABLE_NAME,
@@ -209,6 +221,14 @@ public class AlgumContentProvider extends ContentProvider {
                     throw new android.database.SQLException("Failed to insert row into " + uri);
                 break;
             }
+            case TIPOS_CONTAS:{
+                long _id = mDbHelper.getWritableDatabase().insert(AlgumDBContract.TipoContaEntry.TABLE_NAME, null, values);
+                if ( _id > 0 )
+                    returnUri = null;
+                else
+                    throw new android.database.SQLException("Failed to insert row into " + uri);
+                break;
+            }
             case USUARIOS:{
                 long _id = mDbHelper.getWritableDatabase().insert(AlgumDBContract.UsuariosEntry.TABLE_NAME, null, values);
                 if ( _id > 0 )
@@ -260,6 +280,10 @@ public class AlgumContentProvider extends ContentProvider {
                 _id = mDbHelper.getWritableDatabase().delete(AlgumDBContract.ContasEntry.TABLE_NAME, selection, selectionArgs);
                 break;
             }
+            case TIPOS_CONTAS: {
+                _id = mDbHelper.getWritableDatabase().delete(AlgumDBContract.TipoContaEntry.TABLE_NAME, selection, selectionArgs);
+                break;
+            }
             case GRUPOS: {
                 _id = mDbHelper.getWritableDatabase().delete(AlgumDBContract.GruposEntry.TABLE_NAME, selection, selectionArgs);
                 break;
@@ -286,6 +310,18 @@ public class AlgumContentProvider extends ContentProvider {
             }
             case CONTAS: {
                 _id = mDbHelper.getWritableDatabase().update(AlgumDBContract.ContasEntry.TABLE_NAME, values, selection, selectionArgs);
+                //if (_id == 0)
+                //    throw new android.database.SQLException("Failed to update row into " + uri);
+                break;
+            }
+            case TIPOS_CONTAS: {
+                _id = mDbHelper.getWritableDatabase().update(AlgumDBContract.TipoContaEntry.TABLE_NAME, values, selection, selectionArgs);
+                //if (_id == 0)
+                //    throw new android.database.SQLException("Failed to update row into " + uri);
+                break;
+            }
+            case GRUPOS: {
+                _id = mDbHelper.getWritableDatabase().update(AlgumDBContract.GruposEntry.TABLE_NAME, values, selection, selectionArgs);
                 //if (_id == 0)
                 //    throw new android.database.SQLException("Failed to update row into " + uri);
                 break;

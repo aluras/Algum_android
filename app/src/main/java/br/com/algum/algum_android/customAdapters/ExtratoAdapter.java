@@ -89,7 +89,7 @@ public class ExtratoAdapter extends CursorAdapter {
                 TextView lancamentoConta = (TextView) detailView.findViewById(R.id.lancamento_conta);
                 lancamentoConta.setText("Conta: " + txtConta);
                 TextView lancamentoValor = (TextView) detailView.findViewById(R.id.lancamento_valor);
-                lancamentoValor.setText("Valor: R$ " + txtValor);
+                lancamentoValor.setText("Valor: R$ " + String.format("%.2f", txtValor));
                 if(txtValor>=0){
                     lancamentoValor.setTextColor(context.getResources().getColor(R.color.receita));
                 }else{

@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
-import android.view.Menu;
 import android.view.MenuItem;
 
 public class ContasEditActivity extends BaseActivity
@@ -33,12 +32,6 @@ public class ContasEditActivity extends BaseActivity
 
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.edit_conta_menu, menu);
-        return true;
-    }
 
 
     @Override
