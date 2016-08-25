@@ -49,6 +49,7 @@ public class ExtratoAdapter extends CursorAdapter {
         SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
 
         final int idLancamento = cursor.getInt(cursor.getColumnIndex(AlgumDBContract.LancamentoEntry.COLUMN_ID));
+        final int idConta = cursor.getInt(cursor.getColumnIndex(AlgumDBContract.LancamentoEntry.COLUMN_CONTA_ID));
         final String txtData = format.format(new Date(cursor.getLong(cursor.getColumnIndex(AlgumDBContract.LancamentoEntry.COLUMN_DATA))));
         final String txtGrupo = cursor.getString(cursor.getColumnIndex(AlgumDBContract.GruposEntry.COLUMN_NOME));
         final String txtConta = cursor.getString(cursor.getColumnIndex("conta_nome"));
@@ -108,6 +109,13 @@ public class ExtratoAdapter extends CursorAdapter {
                                 String selection = AlgumDBContract.LancamentoEntry.COLUMN_ID + " = ? ";
                                 String[] selectionArgs = {Integer.toString(idLancamento)};
                                 context.getContentResolver().update(AlgumDBContract.LancamentoEntry.CONTENT_URI, lancamentoValues,selection,selectionArgs);
+
+                                ContentValues saldoValue = new ContentValues();
+                                saldoValue.put(AlgumDBContract.LancamentoEntry.COLUMN_VALOR,-txtValor);
+                                saldoValue.put(AlgumDBContract.ContasEntry.COLUMN_CONTA_ID, idConta);
+
+                                context.getContentResolver().update(AlgumDBContract.ContasEntry.CONTENT_SALDO_URI, saldoValue, null, null);
+
                             }
                         })
                         .setNegativeButton(R.string.cancelar, new DialogInterface.OnClickListener() {

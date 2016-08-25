@@ -20,6 +20,7 @@ public class AlgumContentProvider extends ContentProvider {
     private static final int CONTAS = 100;
     private static final int CONTAS_POR_USUARIO = 101;
     private static final int TIPOS_CONTAS = 102;
+    private static final int SALDO_CONTA = 103;
 
     private static final int USUARIOS = 200;
     private static final int USUARIOS_POR_ID = 201;
@@ -46,6 +47,7 @@ public class AlgumContentProvider extends ContentProvider {
         matcher.addURI(authority, AlgumDBContract.PATH_CONTAS, CONTAS);
         matcher.addURI(authority, AlgumDBContract.PATH_CONTAS + "/*", CONTAS_POR_USUARIO);
         matcher.addURI(authority, AlgumDBContract.PATH_TIPO_CONTA, TIPOS_CONTAS);
+        matcher.addURI(authority, AlgumDBContract.PATH_SALDO_CONTA, SALDO_CONTA);
 
         matcher.addURI(authority, AlgumDBContract.PATH_USUARIOS, USUARIOS);
         matcher.addURI(authority, AlgumDBContract.PATH_USUARIOS + "/*", USUARIOS_POR_ID);
@@ -72,6 +74,25 @@ public class AlgumContentProvider extends ContentProvider {
         Cursor retCursor;
         switch (sUriMatcher.match(uri)) {
             case CONTAS_POR_USUARIO: {
+                SQLiteQueryBuilder _QB = new SQLiteQueryBuilder();
+
+                if (selection != null && !selection.trim().isEmpty()){
+                    selection = selection + " AND ";
+                }
+                selection = selection + AlgumDBContract.ContasEntry.TABLE_NAME + "." + AlgumDBContract.ContasEntry.COLUMN_USUARIO_ID + " = " + uri.getLastPathSegment();
+
+                _QB.setTables(AlgumDBContract.ContasEntry.TABLE_NAME +
+                        " INNER JOIN " + AlgumDBContract.TipoContaEntry.TABLE_NAME + " ON " +
+                        AlgumDBContract.TipoContaEntry.TABLE_NAME + "." + AlgumDBContract.TipoContaEntry.COLUMN_ID + " = " +
+                        AlgumDBContract.ContasEntry.TABLE_NAME + "." + AlgumDBContract.ContasEntry.COLUMN_TIPO_CONTA_ID);
+
+                String _OrderBy = AlgumDBContract.ContasEntry.TABLE_NAME + "." + AlgumDBContract.ContasEntry.COLUMN_NOME + " ASC ";
+
+                retCursor = _QB.query(mDbHelper.getReadableDatabase(),projection,selection,selectionArgs,null,null,_OrderBy);
+
+                break;
+
+/*
                 if (selection != null && !selection.trim().isEmpty()){
                     selection = selection + " AND ";
                 }
@@ -86,6 +107,7 @@ public class AlgumContentProvider extends ContentProvider {
                         null,sortOrder
                 );
                 break;
+*/
             }
             case CONTAS: {
                 retCursor = mDbHelper.getReadableDatabase().query(
@@ -300,7 +322,7 @@ public class AlgumContentProvider extends ContentProvider {
 
     @Override
     public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
-        int _id;
+        int _id = 0;
         switch (sUriMatcher.match(uri)) {
             case LANCAMENTOS: {
                 _id = mDbHelper.getWritableDatabase().update(AlgumDBContract.LancamentoEntry.TABLE_NAME, values, selection, selectionArgs);
@@ -312,6 +334,14 @@ public class AlgumContentProvider extends ContentProvider {
                 _id = mDbHelper.getWritableDatabase().update(AlgumDBContract.ContasEntry.TABLE_NAME, values, selection, selectionArgs);
                 //if (_id == 0)
                 //    throw new android.database.SQLException("Failed to update row into " + uri);
+                break;
+            }
+            case SALDO_CONTA: {
+
+                String strUpdate = "update "+ AlgumDBContract.ContasEntry.TABLE_NAME
+                        +" set "+ AlgumDBContract.ContasEntry.COLUMN_SALDO+" = "+ AlgumDBContract.ContasEntry.COLUMN_SALDO+"+("+values.getAsString(AlgumDBContract.LancamentoEntry.COLUMN_VALOR)+")"
+                        +" where "+ AlgumDBContract.ContasEntry.COLUMN_CONTA_ID+" = "+ values.getAsString(AlgumDBContract.ContasEntry.COLUMN_CONTA_ID);
+                mDbHelper.getWritableDatabase().execSQL(strUpdate);
                 break;
             }
             case TIPOS_CONTAS: {

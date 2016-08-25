@@ -139,8 +139,14 @@ public class LancamentoValorActivity extends BaseActivity
                 lancamentoValues.put(AlgumDBContract.LancamentoEntry.COLUMN_USUARIO_ID, usuarioId);
                 lancamentoValues.put(AlgumDBContract.LancamentoEntry.COLUMN_EXCLUIDO, 0);
 
+                ContentValues saldoValue = new ContentValues();
+                saldoValue.put(AlgumDBContract.LancamentoEntry.COLUMN_VALOR,nValor);
+                saldoValue.put(AlgumDBContract.ContasEntry.COLUMN_CONTA_ID,idContaDestino);
+
                 if (idTipoLancamento == 3){
                     getContentResolver().insert(AlgumDBContract.LancamentoEntry.CONTENT_URI, lancamentoValues);
+                    getContentResolver().update(AlgumDBContract.ContasEntry.CONTENT_SALDO_URI, saldoValue, null, null);
+
                 }
 
                 if (idTipoLancamento == 1 || idTipoLancamento == 3) {
@@ -151,6 +157,11 @@ public class LancamentoValorActivity extends BaseActivity
                 lancamentoValues.put(AlgumDBContract.LancamentoEntry.COLUMN_CONTA_ID, idContaOrigem);
 
                 getContentResolver().insert(AlgumDBContract.LancamentoEntry.CONTENT_URI, lancamentoValues);
+
+                saldoValue.put(AlgumDBContract.LancamentoEntry.COLUMN_VALOR,nValor);
+                saldoValue.put(AlgumDBContract.ContasEntry.COLUMN_CONTA_ID, idContaOrigem);
+
+                getContentResolver().update(AlgumDBContract.ContasEntry.CONTENT_SALDO_URI,saldoValue,null,null);
 
                 showMessage("Lançamento registrado.");
                 Intent intent = new Intent(this, LancamentoContasActivity.class);

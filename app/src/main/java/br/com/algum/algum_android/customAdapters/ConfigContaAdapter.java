@@ -38,7 +38,7 @@ public class ConfigContaAdapter extends CursorAdapter {
     public void bindView(View view, final Context context, Cursor cursor) {
 
         final String txtNome = cursor.getString(cursor.getColumnIndex(AlgumDBContract.ContasEntry.COLUMN_NOME));
-        final String txtTipo = cursor.getString(cursor.getColumnIndex(AlgumDBContract.TipoContaEntry.COLUMN_NOME));
+        final String txtTipo = cursor.getString(cursor.getColumnIndex(AlgumDBContract.TipoContaEntry.COLUMN_DESCRICAO));
         final Float txtSaldo = cursor.getFloat(cursor.getColumnIndex(AlgumDBContract.ContasEntry.COLUMN_SALDO));
         final int idConta = cursor.getInt(cursor.getColumnIndex(AlgumDBContract.ContasEntry.COLUMN_ID));
 

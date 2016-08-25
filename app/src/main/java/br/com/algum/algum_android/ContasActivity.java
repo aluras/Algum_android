@@ -40,14 +40,22 @@ public class ContasActivity extends BaseActivity
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         SharedPreferences sharedPref = getSharedPreferences(getString(R.string.userInfo), Context.MODE_PRIVATE);
-        Uri contasUri = AlgumDBContract.ContasEntry.buildContaUsuarioUri(sharedPref.getInt(getString(R.string.idUsuario),0));
+        Uri contasUri = AlgumDBContract.ContasEntry.buildContaUsuarioUri(sharedPref.getInt(getString(R.string.idUsuario), 0));
 
         String selection = "";
+
+        String[] projection =
+                {
+                        AlgumDBContract.ContasEntry.TABLE_NAME+"."+ AlgumDBContract.ContasEntry.COLUMN_ID
+                        , AlgumDBContract.ContasEntry.TABLE_NAME+"."+ AlgumDBContract.ContasEntry.COLUMN_NOME
+                        , AlgumDBContract.ContasEntry.TABLE_NAME+"."+ AlgumDBContract.ContasEntry.COLUMN_SALDO
+                        , AlgumDBContract.TipoContaEntry.TABLE_NAME+"."+ AlgumDBContract.TipoContaEntry.COLUMN_DESCRICAO
+                };
 
         return new CursorLoader(
                 this,
                 contasUri,
-                null,
+                projection,
                 selection,
                 null,
                 null

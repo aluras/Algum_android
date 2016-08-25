@@ -148,14 +148,15 @@ public class AlgumSyncAdapter extends AbstractThreadedSyncAdapter {
             for(int i = 0; i < tipoContasArray.length(); i++){
 
                 JSONObject tipoContaJson = tipoContasArray.getJSONObject(i);
+                JSONObject tipoConta = tipoContaJson.getJSONObject("TipoConta");
 
                 String mSelectionClause = AlgumDBContract.TipoContaEntry.COLUMN_ID + " = ? ";
-                String[] mSelectionArgs = {tipoContaJson.getString("id")};
+                String[] mSelectionArgs = {tipoConta.getString("id")};
                 Cursor cursor = getContext().getContentResolver().query(AlgumDBContract.TipoContaEntry.CONTENT_URI, null, mSelectionClause, mSelectionArgs, null);
 
                 ContentValues tipoContasValues = new ContentValues();
-                tipoContasValues.put(AlgumDBContract.TipoContaEntry.COLUMN_ID, tipoContaJson.getInt("id"));
-                tipoContasValues.put(AlgumDBContract.TipoContaEntry.COLUMN_NOME, tipoContaJson.getString("nome"));
+                tipoContasValues.put(AlgumDBContract.TipoContaEntry.COLUMN_ID, tipoConta.getInt("id"));
+                tipoContasValues.put(AlgumDBContract.TipoContaEntry.COLUMN_DESCRICAO, tipoConta.getString("descricao"));
 
                 if(cursor.getCount() < 1){
                     getContext().getContentResolver().insert(AlgumDBContract.TipoContaEntry.CONTENT_URI, tipoContasValues);
@@ -199,6 +200,42 @@ public class AlgumSyncAdapter extends AbstractThreadedSyncAdapter {
             Log.d(LOG_TAG, "Starting sync Contas");
             //Atualiza Contas
             final String CONTA_BASE_URL = getContext().getString(R.string.WSurl) + "contas";
+            // -- ENVIA OS NOVOS
+            String[] projectionContasAlteradas = {AlgumDBContract.ContasEntry.TABLE_NAME+".*"};
+            String selectionContasAlteradas = AlgumDBContract.ContasEntry.COLUMN_ALTERADO + " = 1 ";
+            Cursor contas = getContext().getContentResolver().query(AlgumDBContract.ContasEntry.buildContaUsuarioUri(usuarioId),projectionContasAlteradas,selectionContasAlteradas,null,null);
+
+            contas.moveToFirst();
+            while(contas.isAfterLast() == false){
+                String params = "nome="+contas.getString(contas.getColumnIndex(AlgumDBContract.ContasEntry.COLUMN_NOME));
+                params = params + "&saldo_inicial="+contas.getString(contas.getColumnIndex(AlgumDBContract.ContasEntry.COLUMN_SALDO_INICIAL));
+                params = params + "&saldo="+contas.getString(contas.getColumnIndex(AlgumDBContract.ContasEntry.COLUMN_SALDO));
+                params = params + "&tipo_conta_id="+contas.getString(contas.getColumnIndex(AlgumDBContract.ContasEntry.COLUMN_TIPO_CONTA_ID));
+                params = params + "&usuario_id="+contas.getString(contas.getColumnIndex(AlgumDBContract.ContasEntry.COLUMN_USUARIO_ID));
+
+                if(contas.getInt(contas.getColumnIndex(AlgumDBContract.ContasEntry.COLUMN_CONTA_ID))> 0){
+                    params = params + "&id="+contas.getString(contas.getColumnIndex(AlgumDBContract.ContasEntry.COLUMN_CONTA_ID));
+                    ContasJsonStr = callServiceGrava(CONTA_BASE_URL + "/" + contas.getString(contas.getColumnIndex(AlgumDBContract.ContasEntry.COLUMN_CONTA_ID)), params);
+                }else{
+                    ContasJsonStr = callServiceGrava(CONTA_BASE_URL, params);
+                }
+
+
+                JSONObject conta = new JSONObject(ContasJsonStr).getJSONObject("Conta");
+
+                String mSelectionClause = AlgumDBContract.ContasEntry.COLUMN_ID + " = ? ";
+                String[] mSelectionArgs = {contas.getString(contas.getColumnIndex(AlgumDBContract.ContasEntry.COLUMN_ID))};
+
+                ContentValues values = new ContentValues();
+                values.put(AlgumDBContract.ContasEntry.COLUMN_CONTA_ID, conta.getInt("id"));
+                values.put(AlgumDBContract.ContasEntry.COLUMN_ALTERADO, 0);
+
+                getContext().getContentResolver().update(AlgumDBContract.ContasEntry.CONTENT_URI,values,mSelectionClause,mSelectionArgs);
+
+                contas.moveToNext();
+            }
+            contas.close();
+            //RECEBE AS DO SERVIDOR
             ContasJsonStr = callService(CONTA_BASE_URL);
 
             JSONArray contasArray = new JSONArray(ContasJsonStr);
@@ -211,10 +248,9 @@ public class AlgumSyncAdapter extends AbstractThreadedSyncAdapter {
 
                 String mSelectionClause = AlgumDBContract.ContasEntry.COLUMN_CONTA_ID + " = ? ";
                 String[] mSelectionArgs = {conta.getString("id")};
-                Cursor cursor = getContext().getContentResolver().query(AlgumDBContract.ContasEntry.CONTENT_URI, null, mSelectionClause, mSelectionArgs, null);
+                Cursor cursor = getContext().getContentResolver().query(AlgumDBContract.ContasEntry.buildContaUsuarioUri(usuarioId), null, mSelectionClause, mSelectionArgs, null);
 
                 ContentValues contasValues = new ContentValues();
-                contasValues.put(AlgumDBContract.ContasEntry.COLUMN_ID, contaUsuario.getInt("id"));
                 contasValues.put(AlgumDBContract.ContasEntry.COLUMN_NOME, conta.getString("nome"));
                 contasValues.put(AlgumDBContract.ContasEntry.COLUMN_CONTA_ID, conta.getInt("id"));
                 contasValues.put(AlgumDBContract.ContasEntry.COLUMN_TIPO_CONTA_ID, conta.getInt("tipo_conta_id"));
@@ -237,7 +273,7 @@ public class AlgumSyncAdapter extends AbstractThreadedSyncAdapter {
             final String LANCAMENTO_BASE_URL = getContext().getString(R.string.WSurl) + "lancamentos";
 
             // EXCLUI LANCAMENTOS
-            String projectionDelete[] = {AlgumDBContract.LancamentoEntry.TABLE_NAME+".*"};
+            String[] projectionDelete = {AlgumDBContract.LancamentoEntry.TABLE_NAME+".*"};
             String selectionDelete = AlgumDBContract.LancamentoEntry.COLUMN_EXCLUIDO + " = 1 ";
             Cursor lancamentosDelete = getContext().getContentResolver().query(AlgumDBContract.LancamentoEntry.CONTENT_URI,projectionDelete,selectionDelete,null,null);
 
@@ -272,7 +308,7 @@ public class AlgumSyncAdapter extends AbstractThreadedSyncAdapter {
                 params = params + "&conta_id="+lancamentos.getString(lancamentos.getColumnIndex(AlgumDBContract.LancamentoEntry.COLUMN_CONTA_ID));
                 params = params + "&usuario_id="+lancamentos.getString(lancamentos.getColumnIndex(AlgumDBContract.LancamentoEntry.COLUMN_USUARIO_ID));
 
-                LancamentosJsonStr = callServiceGravaLancamento(LANCAMENTO_BASE_URL,params);
+                LancamentosJsonStr = callServiceGrava(LANCAMENTO_BASE_URL,params);
 
                 JSONObject lancamento = new JSONObject(LancamentosJsonStr).getJSONObject("Lancamento");
 
@@ -403,7 +439,7 @@ public class AlgumSyncAdapter extends AbstractThreadedSyncAdapter {
         }
     }
 
-    private String callServiceGravaLancamento(String pUrl, String params){
+    private String callServiceGrava(String pUrl, String params){
 
         HttpURLConnection urlConnection = null;
         BufferedReader reader = null;
