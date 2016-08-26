@@ -197,76 +197,6 @@ public class AlgumSyncAdapter extends AbstractThreadedSyncAdapter {
                 cursor.close();
             }
 
-            Log.d(LOG_TAG, "Starting sync Contas");
-            //Atualiza Contas
-            final String CONTA_BASE_URL = getContext().getString(R.string.WSurl) + "contas";
-            // -- ENVIA OS NOVOS
-            String[] projectionContasAlteradas = {AlgumDBContract.ContasEntry.TABLE_NAME+".*"};
-            String selectionContasAlteradas = AlgumDBContract.ContasEntry.COLUMN_ALTERADO + " = 1 ";
-            Cursor contas = getContext().getContentResolver().query(AlgumDBContract.ContasEntry.buildContaUsuarioUri(usuarioId),projectionContasAlteradas,selectionContasAlteradas,null,null);
-
-            contas.moveToFirst();
-            while(contas.isAfterLast() == false){
-                String params = "nome="+contas.getString(contas.getColumnIndex(AlgumDBContract.ContasEntry.COLUMN_NOME));
-                params = params + "&saldo_inicial="+contas.getString(contas.getColumnIndex(AlgumDBContract.ContasEntry.COLUMN_SALDO_INICIAL));
-                params = params + "&saldo="+contas.getString(contas.getColumnIndex(AlgumDBContract.ContasEntry.COLUMN_SALDO));
-                params = params + "&tipo_conta_id="+contas.getString(contas.getColumnIndex(AlgumDBContract.ContasEntry.COLUMN_TIPO_CONTA_ID));
-                params = params + "&usuario_id="+contas.getString(contas.getColumnIndex(AlgumDBContract.ContasEntry.COLUMN_USUARIO_ID));
-
-                if(contas.getInt(contas.getColumnIndex(AlgumDBContract.ContasEntry.COLUMN_CONTA_ID))> 0){
-                    params = params + "&id="+contas.getString(contas.getColumnIndex(AlgumDBContract.ContasEntry.COLUMN_CONTA_ID));
-                    ContasJsonStr = callServiceGrava(CONTA_BASE_URL + "/" + contas.getString(contas.getColumnIndex(AlgumDBContract.ContasEntry.COLUMN_CONTA_ID)), params);
-                }else{
-                    ContasJsonStr = callServiceGrava(CONTA_BASE_URL, params);
-                }
-
-
-                JSONObject conta = new JSONObject(ContasJsonStr).getJSONObject("Conta");
-
-                String mSelectionClause = AlgumDBContract.ContasEntry.COLUMN_ID + " = ? ";
-                String[] mSelectionArgs = {contas.getString(contas.getColumnIndex(AlgumDBContract.ContasEntry.COLUMN_ID))};
-
-                ContentValues values = new ContentValues();
-                values.put(AlgumDBContract.ContasEntry.COLUMN_CONTA_ID, conta.getInt("id"));
-                values.put(AlgumDBContract.ContasEntry.COLUMN_ALTERADO, 0);
-
-                getContext().getContentResolver().update(AlgumDBContract.ContasEntry.CONTENT_URI,values,mSelectionClause,mSelectionArgs);
-
-                contas.moveToNext();
-            }
-            contas.close();
-            //RECEBE AS DO SERVIDOR
-            ContasJsonStr = callService(CONTA_BASE_URL);
-
-            JSONArray contasArray = new JSONArray(ContasJsonStr);
-
-            for(int i = 0; i < contasArray.length(); i++){
-
-                JSONObject contaJson = contasArray.getJSONObject(i);
-                JSONObject conta = contaJson.getJSONObject("Conta");
-                JSONObject contaUsuario = contaJson.getJSONObject("ContaUsuario");
-
-                String mSelectionClause = AlgumDBContract.ContasEntry.COLUMN_CONTA_ID + " = ? ";
-                String[] mSelectionArgs = {conta.getString("id")};
-                Cursor cursor = getContext().getContentResolver().query(AlgumDBContract.ContasEntry.buildContaUsuarioUri(usuarioId), null, mSelectionClause, mSelectionArgs, null);
-
-                ContentValues contasValues = new ContentValues();
-                contasValues.put(AlgumDBContract.ContasEntry.COLUMN_NOME, conta.getString("nome"));
-                contasValues.put(AlgumDBContract.ContasEntry.COLUMN_CONTA_ID, conta.getInt("id"));
-                contasValues.put(AlgumDBContract.ContasEntry.COLUMN_TIPO_CONTA_ID, conta.getInt("tipo_conta_id"));
-                contasValues.put(AlgumDBContract.ContasEntry.COLUMN_USUARIO_ID, contaUsuario.getInt("usuario_id"));
-                contasValues.put(AlgumDBContract.ContasEntry.COLUMN_SALDO_INICIAL, conta.getInt("saldo_inicial"));
-                contasValues.put(AlgumDBContract.ContasEntry.COLUMN_SALDO, conta.getInt("saldo"));
-
-                if(cursor.getCount() < 1){
-
-                    getContext().getContentResolver().insert(AlgumDBContract.ContasEntry.CONTENT_URI, contasValues);
-                }else{
-                    getContext().getContentResolver().update(AlgumDBContract.ContasEntry.CONTENT_URI, contasValues, mSelectionClause,mSelectionArgs);
-                }
-                cursor.close();
-            }
-
 
             Log.d(LOG_TAG, "Starting sync Lancamentos");
             //Atualiza Lançamentos
@@ -354,6 +284,77 @@ public class AlgumSyncAdapter extends AbstractThreadedSyncAdapter {
                 }
                 cursor.close();
             }
+
+            Log.d(LOG_TAG, "Starting sync Contas");
+            //Atualiza Contas
+            final String CONTA_BASE_URL = getContext().getString(R.string.WSurl) + "contas";
+            // -- ENVIA OS NOVOS
+            String[] projectionContasAlteradas = {AlgumDBContract.ContasEntry.TABLE_NAME+".*"};
+            String selectionContasAlteradas = AlgumDBContract.ContasEntry.COLUMN_ALTERADO + " = 1 ";
+            Cursor contas = getContext().getContentResolver().query(AlgumDBContract.ContasEntry.buildContaUsuarioUri(usuarioId),projectionContasAlteradas,selectionContasAlteradas,null,null);
+
+            contas.moveToFirst();
+            while(contas.isAfterLast() == false){
+                String params = "nome="+contas.getString(contas.getColumnIndex(AlgumDBContract.ContasEntry.COLUMN_NOME));
+                params = params + "&saldo_inicial="+contas.getString(contas.getColumnIndex(AlgumDBContract.ContasEntry.COLUMN_SALDO_INICIAL));
+                params = params + "&saldo="+contas.getString(contas.getColumnIndex(AlgumDBContract.ContasEntry.COLUMN_SALDO));
+                params = params + "&tipo_conta_id="+contas.getString(contas.getColumnIndex(AlgumDBContract.ContasEntry.COLUMN_TIPO_CONTA_ID));
+                params = params + "&usuario_id="+contas.getString(contas.getColumnIndex(AlgumDBContract.ContasEntry.COLUMN_USUARIO_ID));
+
+                if(contas.getInt(contas.getColumnIndex(AlgumDBContract.ContasEntry.COLUMN_CONTA_ID))> 0){
+                    params = params + "&id="+contas.getString(contas.getColumnIndex(AlgumDBContract.ContasEntry.COLUMN_CONTA_ID));
+                    ContasJsonStr = callServiceGrava(CONTA_BASE_URL + "/" + contas.getString(contas.getColumnIndex(AlgumDBContract.ContasEntry.COLUMN_CONTA_ID)), params);
+                }else{
+                    ContasJsonStr = callServiceGrava(CONTA_BASE_URL, params);
+                }
+
+
+                JSONObject conta = new JSONObject(ContasJsonStr).getJSONObject("Conta");
+
+                String mSelectionClause = AlgumDBContract.ContasEntry.COLUMN_ID + " = ? ";
+                String[] mSelectionArgs = {contas.getString(contas.getColumnIndex(AlgumDBContract.ContasEntry.COLUMN_ID))};
+
+                ContentValues values = new ContentValues();
+                values.put(AlgumDBContract.ContasEntry.COLUMN_CONTA_ID, conta.getInt("id"));
+                values.put(AlgumDBContract.ContasEntry.COLUMN_ALTERADO, 0);
+
+                getContext().getContentResolver().update(AlgumDBContract.ContasEntry.CONTENT_URI,values,mSelectionClause,mSelectionArgs);
+
+                contas.moveToNext();
+            }
+            contas.close();
+            //RECEBE AS DO SERVIDOR
+            ContasJsonStr = callService(CONTA_BASE_URL);
+
+            JSONArray contasArray = new JSONArray(ContasJsonStr);
+
+            for(int i = 0; i < contasArray.length(); i++){
+
+                JSONObject contaJson = contasArray.getJSONObject(i);
+                JSONObject conta = contaJson.getJSONObject("Conta");
+                JSONObject contaUsuario = contaJson.getJSONObject("ContaUsuario");
+
+                String mSelectionClause = AlgumDBContract.ContasEntry.COLUMN_CONTA_ID + " = ? ";
+                String[] mSelectionArgs = {conta.getString("id")};
+                Cursor cursor = getContext().getContentResolver().query(AlgumDBContract.ContasEntry.buildContaUsuarioUri(usuarioId), null, mSelectionClause, mSelectionArgs, null);
+
+                ContentValues contasValues = new ContentValues();
+                contasValues.put(AlgumDBContract.ContasEntry.COLUMN_NOME, conta.getString("nome"));
+                contasValues.put(AlgumDBContract.ContasEntry.COLUMN_CONTA_ID, conta.getInt("id"));
+                contasValues.put(AlgumDBContract.ContasEntry.COLUMN_TIPO_CONTA_ID, conta.getInt("tipo_conta_id"));
+                contasValues.put(AlgumDBContract.ContasEntry.COLUMN_USUARIO_ID, contaUsuario.getInt("usuario_id"));
+                contasValues.put(AlgumDBContract.ContasEntry.COLUMN_SALDO_INICIAL, conta.getInt("saldo_inicial"));
+                contasValues.put(AlgumDBContract.ContasEntry.COLUMN_SALDO, conta.getInt("saldo"));
+
+                if(cursor.getCount() < 1){
+
+                    getContext().getContentResolver().insert(AlgumDBContract.ContasEntry.CONTENT_URI, contasValues);
+                }else{
+                    getContext().getContentResolver().update(AlgumDBContract.ContasEntry.CONTENT_URI, contasValues, mSelectionClause,mSelectionArgs);
+                }
+                cursor.close();
+            }
+
 
             Log.d(LOG_TAG, "Finishing sync");
 

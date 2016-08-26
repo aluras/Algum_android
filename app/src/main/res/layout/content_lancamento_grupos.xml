@@ -10,74 +10,83 @@
     tools:context="br.com.algum.algum_android.LancamentoContasActivity"
     android:id="@+id/content_main">
 
-    <RelativeLayout
+
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/botoesGrupos">
+        android:layout_height="match_parent">
 
-        <TextView
-            android:layout_width="wrap_content"
+        <RelativeLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/txtTipoLancamento"
-            android:layout_below="@+id/linearLayout"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true" />
+            android:id="@+id/botoesGrupos">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/txtConta"
-            android:layout_below="@+id/txtTipoLancamento"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/txtTipoLancamento"
+                android:layout_below="@+id/linearLayout"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/contas"
-            android:id="@+id/txtContaOrigem"
-            android:layout_below="@+id/txtConta"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
-            android:padding="5dp" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/txtConta"
+                android:layout_below="@+id/txtTipoLancamento"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true" />
 
-        <GridView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/gridViewGrupos"
-            android:layout_below="@+id/txtContaOrigem"
-            android:columnWidth="100dp"
-            android:numColumns="auto_fit"
-            android:paddingLeft="5dp"
-            android:paddingRight="5dp"
-            android:horizontalSpacing="4dp"
-            android:verticalSpacing="4dp" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/contaDestino"
-            android:id="@+id/txtContaDestino"
-            android:layout_below="@+id/gridViewGrupos"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
-            android:padding="5dp"
-            android:visibility="gone"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/contas"
+                android:id="@+id/txtContaOrigem"
+                android:layout_below="@+id/txtConta"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:padding="5dp" />
 
-        <GridView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/gridViewContaDestino"
-            android:layout_below="@+id/txtContaDestino"
-            android:columnWidth="80dp"
-            android:numColumns="auto_fit"
-            android:paddingLeft="5dp"
-            android:paddingRight="5dp"
-            android:horizontalSpacing="4dp"
-            android:verticalSpacing="4dp"
-            android:visibility="gone"/>
+            <GridView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/gridViewGrupos"
+                android:layout_below="@+id/txtContaOrigem"
+                android:columnWidth="100dp"
+                android:numColumns="auto_fit"
+                android:paddingLeft="5dp"
+                android:paddingRight="5dp"
+                android:horizontalSpacing="4dp"
+                android:verticalSpacing="4dp" />
 
-    </RelativeLayout>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/contaDestino"
+                android:id="@+id/txtContaDestino"
+                android:layout_below="@+id/gridViewGrupos"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:padding="5dp"
+                android:visibility="gone"/>
+
+            <GridView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/gridViewContaDestino"
+                android:layout_below="@+id/txtContaDestino"
+                android:columnWidth="100dp"
+                android:numColumns="auto_fit"
+                android:paddingLeft="5dp"
+                android:paddingRight="5dp"
+                android:horizontalSpacing="4dp"
+                android:verticalSpacing="4dp"
+                android:visibility="gone"/>
+
+
+
+        </RelativeLayout>
+    </ScrollView>
 
     <LinearLayout
         android:orientation="vertical"

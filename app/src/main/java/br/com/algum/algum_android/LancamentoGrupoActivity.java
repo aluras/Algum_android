@@ -11,6 +11,7 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.GridView;
 import android.widget.TextView;
 
@@ -128,6 +129,10 @@ public class LancamentoGrupoActivity extends BaseActivity
         mContasAdapter.notifyDataSetChanged();
         mContasAdapterDestino.swapCursor(data);
         mContasAdapterDestino.notifyDataSetChanged();
+
+
+        setGridViewHeightBasedOnChildren((GridView) findViewById(R.id.gridViewGrupos));
+        setGridViewHeightBasedOnChildren((GridView) findViewById(R.id.gridViewContaDestino));
     }
 
     @Override
@@ -157,5 +162,26 @@ public class LancamentoGrupoActivity extends BaseActivity
             lancamentoValorIntent.putExtra("idContaDestino",idContaDestino);
             this.startActivity(lancamentoValorIntent);
         }
+    }
+
+    public void setGridViewHeightBasedOnChildren(GridView gridView) {
+        ContaAdapter contaAdapter = (ContaAdapter) gridView.getAdapter();
+        if (contaAdapter == null) {
+            // pre-condition
+            return;
+        }
+
+        int totalHeight = 0;
+        for (int i = 0; i < contaAdapter.getCount(); i++) {
+            View listItem = contaAdapter.getView(i, null, gridView);
+            listItem.measure(0, 0);
+            totalHeight += listItem.getMeasuredHeight();
+        }
+
+        ViewGroup.LayoutParams params = gridView.getLayoutParams();
+        params.height = (totalHeight + (gridView.getCount() - 1))*2;
+        params.height = 824;
+        gridView.setLayoutParams(params);
+        gridView.requestLayout();
     }
 }
