@@ -19,6 +19,7 @@ import android.widget.SimpleCursorAdapter;
 import android.widget.Spinner;
 
 import br.com.algum.algum_android.data.AlgumDBContract;
+import br.com.algum.algum_android.utils.Controle;
 
 public class ContasEditActivity extends BaseActivity
         implements NavigationView.OnNavigationItemSelectedListener, LoaderManager.LoaderCallbacks<Cursor> {
@@ -160,7 +161,7 @@ public class ContasEditActivity extends BaseActivity
             getContentResolver().insert(AlgumDBContract.ContasEntry.CONTENT_URI, values);
         }
 
-        showMessage("Conta registrada.");
+        Controle.showMessage(this,"Conta registrada.");
         Intent intent = new Intent(this, ContasActivity .class);
         startActivity(intent);
     }

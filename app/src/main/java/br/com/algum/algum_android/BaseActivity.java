@@ -16,9 +16,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
@@ -26,6 +24,7 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 
 import br.com.algum.algum_android.data.AlgumDBContract;
+import br.com.algum.algum_android.sync.AlgumSyncTask;
 
 public abstract class BaseActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,GoogleApiClient.OnConnectionFailedListener {
@@ -132,16 +131,9 @@ public abstract class BaseActivity extends AppCompatActivity
         }
         if (id == R.id.action_refresh){
 
-            account = email;
+            AlgumSyncTask task = new AlgumSyncTask(this);
+            task.execute("");
 
-            Account newAccount = new Account(
-                    account, getString(R.string.sync_account_type));
-
-            Bundle bundle = new Bundle();
-            bundle.putBoolean(ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
-            bundle.putBoolean(ContentResolver.SYNC_EXTRAS_MANUAL, true);
-
-            ContentResolver.requestSync(newAccount, AUTHORITY, bundle);
         }
 
         return super.onOptionsItemSelected(item);
@@ -240,16 +232,4 @@ public abstract class BaseActivity extends AppCompatActivity
         Log.d(TAG, "onConnectionFailed:" + connectionResult);
     }
 
-    public void showMessage(String message){
-
-        Toast toast = new Toast(getApplicationContext());
-        View layout = getLayoutInflater().inflate(R.layout.toast,(ViewGroup) findViewById(R.id.toast_layout_root));
-        TextView text = (TextView) layout.findViewById(R.id.toastText);
-        text.setText(message);
-        text.setTextColor(getResources().getColor(R.color.colorBack));
-        toast.setView(layout);
-        toast.setDuration(Toast.LENGTH_LONG);
-        toast.show();
-
-    }
 }

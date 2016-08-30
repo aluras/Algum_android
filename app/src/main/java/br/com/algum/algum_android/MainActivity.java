@@ -2,6 +2,7 @@ package br.com.algum.algum_android;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
+import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
@@ -37,6 +38,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 import br.com.algum.algum_android.data.AlgumDBContract;
+import br.com.algum.algum_android.sync.AlgumSyncTask;
 
 
 public class MainActivity extends AppCompatActivity implements
@@ -48,6 +50,7 @@ public class MainActivity extends AppCompatActivity implements
     private static final int RC_GET_TOKEN = 9002;
 
     private Context mContext;
+    private Activity mActivity;
 
     private String retorno;
 
@@ -85,6 +88,7 @@ public class MainActivity extends AppCompatActivity implements
         signInButton.setScopes(gso.getScopeArray());
 
         mContext = this;
+        mActivity = this;
 
         //mAccount = CreateSyncAccount(mContext);
 
@@ -241,7 +245,7 @@ public class MainActivity extends AppCompatActivity implements
 
             ContentResolver.setSyncAutomatically(newAccount, AUTHORITY, true);
 
-            ContentResolver.addPeriodicSync(newAccount, AUTHORITY, new Bundle(), 20 * 60);
+            ContentResolver.addPeriodicSync(newAccount, AUTHORITY, new Bundle(), 60 * 60);
 
             return newAccount;
         }
@@ -402,16 +406,20 @@ public class MainActivity extends AppCompatActivity implements
                 View loading = (View) findViewById(R.id.loadingPanel);
                 loading.setVisibility(View.GONE);
             }else{
+
                 SharedPreferences sharedPref = getSharedPreferences(getString(R.string.userInfo), Context.MODE_PRIVATE);
                 account = sharedPref.getString(getString(R.string.emailUsuario), "");
 
                 mAccount = CreateSyncAccount(mContext);
-
+                /*
                 Bundle bundle = new Bundle();
                 bundle.putBoolean(ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
                 bundle.putBoolean(ContentResolver.SYNC_EXTRAS_MANUAL, true);
 
                 ContentResolver.requestSync(mAccount, AUTHORITY, bundle);
+                */
+                AlgumSyncTask task = new AlgumSyncTask(mActivity);
+                task.execute("");
 
                 Intent intent = new Intent(mContext,LancamentoContasActivity.class);
                 startActivity(intent);

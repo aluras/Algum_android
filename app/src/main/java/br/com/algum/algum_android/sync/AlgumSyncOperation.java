@@ -1,24 +1,14 @@
 package br.com.algum.algum_android.sync;
 
-import android.accounts.Account;
-import android.content.AbstractThreadedSyncAdapter;
-import android.content.ContentProviderClient;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.content.SyncResult;
 import android.database.Cursor;
 import android.net.Uri;
-import android.os.Bundle;
 import android.util.Log;
 
-import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.OptionalPendingResult;
-import com.google.android.gms.common.api.ResultCallback;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -42,11 +32,14 @@ import br.com.algum.algum_android.data.AlgumDBContract;
 import br.com.algum.algum_android.utils.Controle;
 
 /**
- * Created by sn1007071 on 28/03/2016.
+ * Created by sn1007071 on 29/08/2016.
  */
-public class AlgumSyncAdapter extends AbstractThreadedSyncAdapter {
+public class AlgumSyncOperation {
 
     public final String LOG_TAG = AlgumSyncAdapter.class.getSimpleName();
+
+    private Context mContext;
+
     private String tok;
 
     private int usuarioId;
@@ -56,79 +49,31 @@ public class AlgumSyncAdapter extends AbstractThreadedSyncAdapter {
     private SimpleDateFormat dateTimeFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
 
 
-    public AlgumSyncAdapter(Context context, boolean autoInitialize) {
-        super(context, autoInitialize);
-    }
+    public AlgumSyncOperation(Context mContext,GoogleSignInResult googleSignInResult) {
+        this.mContext = mContext;
 
-
-    @Override
-    public void onPerformSync(Account account, Bundle extras, String authority, ContentProviderClient provider, final SyncResult syncResult) {
-
-        SharedPreferences sharedPref = getContext().getSharedPreferences(getContext().getString(R.string.userInfo), Context.MODE_PRIVATE);
-
-        if (!sharedPref.contains(getContext().getString(R.string.idUsuario))){
-            Log.d(LOG_TAG, "Cancel Sync - No user data");
-            return;
-        }
-
-        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken(getContext().getString(R.string.algum_server_client_id))
-                .requestEmail()
-                .build();
-
-        GoogleApiClient mGoogleApiClient = new GoogleApiClient.Builder(getContext())
-                .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
-                .build();
-
-        mGoogleApiClient.connect();
-
-        OptionalPendingResult<GoogleSignInResult> opr = Auth.GoogleSignInApi.silentSignIn(mGoogleApiClient);
-
-        if (opr.isDone()) {
-
-            GoogleSignInResult result = opr.get();
-            AlgumSyncOperation operations = new AlgumSyncOperation(getContext(),result);
-            operations.performSync();
-
-        } else {
-            opr.setResultCallback(new ResultCallback<GoogleSignInResult>() {
-                @Override
-                public void onResult(GoogleSignInResult googleSignInResult) {
-                    syncResult.delayUntil = 10;
-                    //performSync(mAccount,mExtras,mAuthority,mProvider,mSsyncResult,googleSignInResult);
-                }
-            });
-        }
-    }
-
-    public void performSync(Account account, Bundle extras, String authority, ContentProviderClient provider, SyncResult syncResult,GoogleSignInResult googleSignInResult ) {
-
-        SharedPreferences sharedPref = getContext().getSharedPreferences(getContext().getString(R.string.userInfo), Context.MODE_PRIVATE);
-        usuarioId = sharedPref.getInt(getContext().getString(R.string.idUsuario), 0);
+        SharedPreferences sharedPref = mContext.getSharedPreferences(mContext.getString(R.string.userInfo), Context.MODE_PRIVATE);
+        usuarioId = sharedPref.getInt(mContext.getString(R.string.idUsuario), 0);
 
         if (googleSignInResult.isSuccess()) {
             GoogleSignInAccount acct = googleSignInResult.getSignInAccount();
             tok = acct.getIdToken();
         } else {
             SharedPreferences.Editor editor = sharedPref.edit();
-            editor.remove(getContext().getString(R.string.emailUsuario));
+            editor.remove(mContext.getString(R.string.emailUsuario));
             editor.commit();
             return;
         }
+    }
 
-        // Will contain the raw JSON response as a string.
+    public void syncTipoConta(){
         String TipoContasJsonStr = null;
-        String ContasJsonStr = null;
-        String GruposJsonStr = null;
-        String LancamentosJsonStr = null;
-
-        String format = "json";
 
         try {
 
             Log.d(LOG_TAG, "Starting sync Tipo Contas");
             //Atualiza Contas
-            final String TIPO_CONTA_BASE_URL = getContext().getString(R.string.WSurl) + "tipo_contas";
+            final String TIPO_CONTA_BASE_URL = mContext.getString(R.string.WSurl) + "tipo_contas";
             TipoContasJsonStr = callService(TIPO_CONTA_BASE_URL);
 
             JSONArray tipoContasArray = new JSONArray(TipoContasJsonStr);
@@ -140,24 +85,33 @@ public class AlgumSyncAdapter extends AbstractThreadedSyncAdapter {
 
                 String mSelectionClause = AlgumDBContract.TipoContaEntry.COLUMN_ID + " = ? ";
                 String[] mSelectionArgs = {tipoConta.getString("id")};
-                Cursor cursor = getContext().getContentResolver().query(AlgumDBContract.TipoContaEntry.CONTENT_URI, null, mSelectionClause, mSelectionArgs, null);
+                Cursor cursor = mContext.getContentResolver().query(AlgumDBContract.TipoContaEntry.CONTENT_URI, null, mSelectionClause, mSelectionArgs, null);
 
                 ContentValues tipoContasValues = new ContentValues();
                 tipoContasValues.put(AlgumDBContract.TipoContaEntry.COLUMN_ID, tipoConta.getInt("id"));
                 tipoContasValues.put(AlgumDBContract.TipoContaEntry.COLUMN_DESCRICAO, tipoConta.getString("descricao"));
 
                 if(cursor.getCount() < 1){
-                    getContext().getContentResolver().insert(AlgumDBContract.TipoContaEntry.CONTENT_URI, tipoContasValues);
+                    mContext.getContentResolver().insert(AlgumDBContract.TipoContaEntry.CONTENT_URI, tipoContasValues);
                 }else{
-                    getContext().getContentResolver().update(AlgumDBContract.TipoContaEntry.CONTENT_URI, tipoContasValues, mSelectionClause,mSelectionArgs);
+                    mContext.getContentResolver().update(AlgumDBContract.TipoContaEntry.CONTENT_URI, tipoContasValues, mSelectionClause,mSelectionArgs);
                 }
                 cursor.close();
             }
+        }catch (JSONException e) {
+            Controle.gravaLog(mContext,dateTimeFormat.format(new Date()) + " - " + e.toString() + e.getMessage(),usuarioId);
+            Log.e(LOG_TAG, "Error ", e);
+        }
 
+    }
 
+    public void syncGrupos(){
+        String GruposJsonStr = null;
+
+        try{
             Log.d(LOG_TAG, "Starting sync Grupos");
             //Atualiza Grupos
-            final String GRUPO_BASE_URL = getContext().getString(R.string.WSurl) + "grupos";
+            final String GRUPO_BASE_URL = mContext.getString(R.string.WSurl) + "grupos";
             GruposJsonStr = callService(GRUPO_BASE_URL);
 
             JSONArray gruposArray = new JSONArray(GruposJsonStr);
@@ -169,7 +123,7 @@ public class AlgumSyncAdapter extends AbstractThreadedSyncAdapter {
 
                 String mSelectionClause = AlgumDBContract.GruposEntry.COLUMN_GRUPO_ID + " = ? ";
                 String[] mSelectionArgs = {grupo.getString("id")};
-                Cursor cursor = getContext().getContentResolver().query(AlgumDBContract.GruposEntry.CONTENT_URI, null, mSelectionClause, mSelectionArgs, null);
+                Cursor cursor = mContext.getContentResolver().query(AlgumDBContract.GruposEntry.CONTENT_URI, null, mSelectionClause, mSelectionArgs, null);
 
                 ContentValues gruposValues = new ContentValues();
                 gruposValues.put(AlgumDBContract.GruposEntry.COLUMN_ID, grupo.getInt("id"));
@@ -178,22 +132,31 @@ public class AlgumSyncAdapter extends AbstractThreadedSyncAdapter {
                 gruposValues.put(AlgumDBContract.GruposEntry.COLUMN_TIPO_ID, grupo.getInt("id_tipo_grupo"));
 
                 if(cursor.getCount() < 1){
-                    getContext().getContentResolver().insert(AlgumDBContract.GruposEntry.CONTENT_URI, gruposValues);
+                    mContext.getContentResolver().insert(AlgumDBContract.GruposEntry.CONTENT_URI, gruposValues);
                 }else{
-                    getContext().getContentResolver().update(AlgumDBContract.GruposEntry.CONTENT_URI, gruposValues, mSelectionClause, mSelectionArgs);
+                    mContext.getContentResolver().update(AlgumDBContract.GruposEntry.CONTENT_URI, gruposValues, mSelectionClause, mSelectionArgs);
                 }
                 cursor.close();
             }
+        }catch (JSONException e) {
+            Controle.gravaLog(mContext,dateTimeFormat.format(new Date()) + " - " + e.toString() + e.getMessage(),usuarioId);
+            Log.e(LOG_TAG, "Error ", e);
+        }
+    }
 
+    public void syncLancamentos(){
 
+        String LancamentosJsonStr = null;
+
+        try{
             Log.d(LOG_TAG, "Starting sync Lancamentos");
             //Atualiza Lançamentos
-            final String LANCAMENTO_BASE_URL = getContext().getString(R.string.WSurl) + "lancamentos";
+            final String LANCAMENTO_BASE_URL = mContext.getString(R.string.WSurl) + "lancamentos";
 
             // EXCLUI LANCAMENTOS
             String[] projectionDelete = {AlgumDBContract.LancamentoEntry.TABLE_NAME+".*"};
             String selectionDelete = AlgumDBContract.LancamentoEntry.COLUMN_EXCLUIDO + " = 1 ";
-            Cursor lancamentosDelete = getContext().getContentResolver().query(AlgumDBContract.LancamentoEntry.CONTENT_URI,projectionDelete,selectionDelete,null,null);
+            Cursor lancamentosDelete = mContext.getContentResolver().query(AlgumDBContract.LancamentoEntry.CONTENT_URI,projectionDelete,selectionDelete,null,null);
 
             lancamentosDelete.moveToFirst();
             while(lancamentosDelete.isAfterLast() == false){
@@ -204,7 +167,7 @@ public class AlgumSyncAdapter extends AbstractThreadedSyncAdapter {
 
                 String selection = AlgumDBContract.LancamentoEntry.COLUMN_ID + " = ? ";
                 String[] selectionArgs = {lancamentosDelete.getString(lancamentosDelete.getColumnIndex(AlgumDBContract.LancamentoEntry.COLUMN_ID))};
-                getContext().getContentResolver().delete(AlgumDBContract.LancamentoEntry.CONTENT_URI, selection,selectionArgs);
+                mContext.getContentResolver().delete(AlgumDBContract.LancamentoEntry.CONTENT_URI, selection,selectionArgs);
 
                 lancamentosDelete.moveToNext();
             }
@@ -214,7 +177,7 @@ public class AlgumSyncAdapter extends AbstractThreadedSyncAdapter {
             String projection[] = {AlgumDBContract.LancamentoEntry.TABLE_NAME+".*"};
             String selection = AlgumDBContract.LancamentoEntry.COLUMN_LANCAMENTO_ID + " IS NULL ";
             String sortOrder = AlgumDBContract.LancamentoEntry.COLUMN_DATA;
-            Cursor lancamentos = getContext().getContentResolver().query(AlgumDBContract.LancamentoEntry.buildLancamentoUsuarioUri(usuarioId),projection,selection,null,sortOrder);
+            Cursor lancamentos = mContext.getContentResolver().query(AlgumDBContract.LancamentoEntry.buildLancamentoUsuarioUri(usuarioId),projection,selection,null,sortOrder);
 
             lancamentos.moveToFirst();
             while(lancamentos.isAfterLast() == false){
@@ -236,7 +199,7 @@ public class AlgumSyncAdapter extends AbstractThreadedSyncAdapter {
                 ContentValues values = new ContentValues();
                 values.put(AlgumDBContract.LancamentoEntry.COLUMN_LANCAMENTO_ID, lancamento.getInt("id"));
 
-                getContext().getContentResolver().update(AlgumDBContract.LancamentoEntry.CONTENT_URI,values,mSelectionClause,mSelectionArgs);
+                mContext.getContentResolver().update(AlgumDBContract.LancamentoEntry.CONTENT_URI,values,mSelectionClause,mSelectionArgs);
 
                 lancamentos.moveToNext();
             }
@@ -252,7 +215,7 @@ public class AlgumSyncAdapter extends AbstractThreadedSyncAdapter {
 
                 String mSelectionClause = AlgumDBContract.LancamentoEntry.COLUMN_LANCAMENTO_ID + " = ? ";
                 String[] mSelectionArgs = {lancamento.getString("id")};
-                Cursor cursor = getContext().getContentResolver().query(AlgumDBContract.LancamentoEntry.buildLancamentoUsuarioUri(usuarioId), null, mSelectionClause, mSelectionArgs, null);
+                Cursor cursor = mContext.getContentResolver().query(AlgumDBContract.LancamentoEntry.buildLancamentoUsuarioUri(usuarioId), null, mSelectionClause, mSelectionArgs, null);
 
                 if(cursor.getCount() < 1){
                     SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
@@ -268,24 +231,35 @@ public class AlgumSyncAdapter extends AbstractThreadedSyncAdapter {
                     lancamentoValues.put(AlgumDBContract.LancamentoEntry.COLUMN_USUARIO_ID, lancamento.getString("usuario_id"));
                     lancamentoValues.put(AlgumDBContract.LancamentoEntry.COLUMN_EXCLUIDO, 0);
 
-                    getContext().getContentResolver().insert(AlgumDBContract.LancamentoEntry.CONTENT_URI, lancamentoValues);
+                    mContext.getContentResolver().insert(AlgumDBContract.LancamentoEntry.CONTENT_URI, lancamentoValues);
                 }
                 cursor.close();
             }
+        }catch (JSONException e) {
+            Controle.gravaLog(mContext,dateTimeFormat.format(new Date()) + " - " + e.toString() + e.getMessage(),usuarioId);
+            Log.e(LOG_TAG, "Error ", e);
+        }catch (ParseException e) {
+            Controle.gravaLog(mContext,dateTimeFormat.format(new Date()) + " - " + e.toString() + e.getMessage(),usuarioId);
+            Log.e(LOG_TAG, "Error ", e);
+        }
+    }
 
+    public void syncContas(){
+        String ContasJsonStr = null;
+
+        try{
             Log.d(LOG_TAG, "Starting sync Contas");
             //Atualiza Contas
-            final String CONTA_BASE_URL = getContext().getString(R.string.WSurl) + "contas";
+            final String CONTA_BASE_URL = mContext.getString(R.string.WSurl) + "contas";
             // -- ENVIA OS NOVOS
             String[] projectionContasAlteradas = {AlgumDBContract.ContasEntry.TABLE_NAME+".*"};
             String selectionContasAlteradas = AlgumDBContract.ContasEntry.COLUMN_ALTERADO + " = 1 ";
-            Cursor contas = getContext().getContentResolver().query(AlgumDBContract.ContasEntry.buildContaUsuarioUri(usuarioId),projectionContasAlteradas,selectionContasAlteradas,null,null);
+            Cursor contas = mContext.getContentResolver().query(AlgumDBContract.ContasEntry.buildContaUsuarioUri(usuarioId),projectionContasAlteradas,selectionContasAlteradas,null,null);
 
             contas.moveToFirst();
             while(contas.isAfterLast() == false){
                 String params = "nome="+contas.getString(contas.getColumnIndex(AlgumDBContract.ContasEntry.COLUMN_NOME));
                 params = params + "&saldo_inicial="+contas.getString(contas.getColumnIndex(AlgumDBContract.ContasEntry.COLUMN_SALDO_INICIAL));
-                params = params + "&saldo="+contas.getString(contas.getColumnIndex(AlgumDBContract.ContasEntry.COLUMN_SALDO));
                 params = params + "&tipo_conta_id="+contas.getString(contas.getColumnIndex(AlgumDBContract.ContasEntry.COLUMN_TIPO_CONTA_ID));
                 params = params + "&usuario_id="+contas.getString(contas.getColumnIndex(AlgumDBContract.ContasEntry.COLUMN_USUARIO_ID));
 
@@ -306,7 +280,7 @@ public class AlgumSyncAdapter extends AbstractThreadedSyncAdapter {
                 values.put(AlgumDBContract.ContasEntry.COLUMN_CONTA_ID, conta.getInt("id"));
                 values.put(AlgumDBContract.ContasEntry.COLUMN_ALTERADO, 0);
 
-                getContext().getContentResolver().update(AlgumDBContract.ContasEntry.CONTENT_URI,values,mSelectionClause,mSelectionArgs);
+                mContext.getContentResolver().update(AlgumDBContract.ContasEntry.CONTENT_URI,values,mSelectionClause,mSelectionArgs);
 
                 contas.moveToNext();
             }
@@ -324,43 +298,48 @@ public class AlgumSyncAdapter extends AbstractThreadedSyncAdapter {
 
                 String mSelectionClause = AlgumDBContract.ContasEntry.COLUMN_CONTA_ID + " = ? ";
                 String[] mSelectionArgs = {conta.getString("id")};
-                Cursor cursor = getContext().getContentResolver().query(AlgumDBContract.ContasEntry.buildContaUsuarioUri(usuarioId), null, mSelectionClause, mSelectionArgs, null);
+                Cursor cursor = mContext.getContentResolver().query(AlgumDBContract.ContasEntry.buildContaUsuarioUri(usuarioId), null, mSelectionClause, mSelectionArgs, null);
 
                 ContentValues contasValues = new ContentValues();
                 contasValues.put(AlgumDBContract.ContasEntry.COLUMN_NOME, conta.getString("nome"));
                 contasValues.put(AlgumDBContract.ContasEntry.COLUMN_CONTA_ID, conta.getInt("id"));
                 contasValues.put(AlgumDBContract.ContasEntry.COLUMN_TIPO_CONTA_ID, conta.getInt("tipo_conta_id"));
                 contasValues.put(AlgumDBContract.ContasEntry.COLUMN_USUARIO_ID, contaUsuario.getInt("usuario_id"));
-                contasValues.put(AlgumDBContract.ContasEntry.COLUMN_SALDO_INICIAL, conta.getInt("saldo_inicial"));
-                contasValues.put(AlgumDBContract.ContasEntry.COLUMN_SALDO, conta.getInt("saldo"));
+                contasValues.put(AlgumDBContract.ContasEntry.COLUMN_SALDO_INICIAL, conta.getString("saldo_inicial"));
+                contasValues.put(AlgumDBContract.ContasEntry.COLUMN_SALDO, conta.getString("saldo"));
 
                 if(cursor.getCount() < 1){
 
-                    getContext().getContentResolver().insert(AlgumDBContract.ContasEntry.CONTENT_URI, contasValues);
+                    mContext.getContentResolver().insert(AlgumDBContract.ContasEntry.CONTENT_URI, contasValues);
                 }else{
-                    getContext().getContentResolver().update(AlgumDBContract.ContasEntry.CONTENT_URI, contasValues, mSelectionClause,mSelectionArgs);
+                    mContext.getContentResolver().update(AlgumDBContract.ContasEntry.CONTENT_URI, contasValues, mSelectionClause,mSelectionArgs);
                 }
                 cursor.close();
             }
 
-
-            Log.d(LOG_TAG, "Finishing sync");
-
-            SharedPreferences.Editor editor = sharedPref.edit();
-            editor.putString(getContext().getString(R.string.dataSync), dateFormat.format(new Date()));
-            editor.commit();
-
-            Controle.gravaLog(getContext(), dateTimeFormat.format(new Date()) + " Sincronização concluída.", usuarioId);
-
-
-
         }catch (JSONException e) {
-            Controle.gravaLog(getContext(),dateTimeFormat.format(new Date()) + " - " + e.toString() + e.getMessage(),usuarioId);
-            Log.e(LOG_TAG, "Error ", e);
-        } catch (ParseException e) {
-            Controle.gravaLog(getContext(),dateTimeFormat.format(new Date()) + " - " + e.toString() + e.getMessage(),usuarioId);
+            Controle.gravaLog(mContext, dateTimeFormat.format(new Date()) + " - " + e.toString() + e.getMessage(), usuarioId);
             Log.e(LOG_TAG, "Error ", e);
         }
+    }
+
+    public void performSync() {
+
+        Log.d(LOG_TAG, "Starting sync");
+
+        syncTipoConta();
+        syncGrupos();
+        syncLancamentos();
+        syncContas();
+
+        Log.d(LOG_TAG, "Finishing sync");
+
+        SharedPreferences sharedPref = mContext.getSharedPreferences(mContext.getString(R.string.userInfo), Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putString(mContext.getString(R.string.dataSync), dateFormat.format(new Date()));
+        editor.commit();
+
+        Controle.gravaLog(mContext, dateTimeFormat.format(new Date()) + " Sincronização concluída.", usuarioId);
 
     }
 
@@ -402,13 +381,13 @@ public class AlgumSyncAdapter extends AbstractThreadedSyncAdapter {
             }
             return buffer.toString();
         }catch (IOException e) {
-            Controle.gravaLog(getContext(),dateTimeFormat.format(new Date()) + " - " + e.toString() + e.getMessage(),usuarioId);
+            Controle.gravaLog(mContext, dateTimeFormat.format(new Date()) + " - " + e.toString() + e.getMessage(), usuarioId);
             Log.e(LOG_TAG, "Error ", e);
             // If the code didn't successfully get the weather data, there's no point in attempting
             // to parse it.
             return "";
         }catch (Exception e){
-            Controle.gravaLog(getContext(),dateTimeFormat.format(new Date()) + " - " + e.toString() + e.getMessage(),usuarioId);
+            Controle.gravaLog(mContext,dateTimeFormat.format(new Date()) + " - " + e.toString() + e.getMessage(),usuarioId);
             Log.e(LOG_TAG, "Error ", e);
             // If the code didn't successfully get the weather data, there's no point in attempting
             // to parse it.
@@ -472,7 +451,7 @@ public class AlgumSyncAdapter extends AbstractThreadedSyncAdapter {
             }
             return buffer.toString();
         }catch (IOException e) {
-            Controle.gravaLog(getContext(),dateTimeFormat.format(new Date()) + " - " + e.toString() + e.getMessage(),usuarioId);
+            Controle.gravaLog(mContext,dateTimeFormat.format(new Date()) + " - " + e.toString() + e.getMessage(),usuarioId);
             Log.e(LOG_TAG, "Error ", e);
             // If the code didn't successfully get the weather data, there's no point in attempting
             // to parse it.
@@ -513,10 +492,10 @@ public class AlgumSyncAdapter extends AbstractThreadedSyncAdapter {
 
 
         }catch (IOException e) {
-            Controle.gravaLog(getContext(), dateTimeFormat.format(new Date()) + " - " + e.toString() + e.getMessage(), usuarioId);
+            Controle.gravaLog(mContext, dateTimeFormat.format(new Date()) + " - " + e.toString() + e.getMessage(), usuarioId);
             Log.e(LOG_TAG, "Error ", e);
         } catch (Exception e){
-            Controle.gravaLog(getContext(), dateTimeFormat.format(new Date()) + " - " + e.toString() + e.getMessage(), usuarioId);
+            Controle.gravaLog(mContext, dateTimeFormat.format(new Date()) + " - " + e.toString() + e.getMessage(), usuarioId);
             Log.e(LOG_TAG, "Error ", e);
 
         }finally {

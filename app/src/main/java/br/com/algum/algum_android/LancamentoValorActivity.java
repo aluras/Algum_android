@@ -22,6 +22,7 @@ import java.util.Calendar;
 import java.util.Date;
 
 import br.com.algum.algum_android.data.AlgumDBContract;
+import br.com.algum.algum_android.utils.Controle;
 
 public class LancamentoValorActivity extends BaseActivity
         implements NavigationView.OnNavigationItemSelectedListener,View.OnClickListener {
@@ -163,20 +164,20 @@ public class LancamentoValorActivity extends BaseActivity
 
                 getContentResolver().update(AlgumDBContract.ContasEntry.CONTENT_SALDO_URI,saldoValue,null,null);
 
-                showMessage("Lançamento registrado.");
+                Controle.showMessage(this,"Lançamento registrado.");
                 Intent intent = new Intent(this, LancamentoContasActivity.class);
                 startActivity(intent);
 
             }
         }catch (NumberFormatException exception) {
-            showMessage("Erro: Valor inválido.");
+            Controle.showMessage(this,"Erro: Valor inválido.");
             TextView txtValor = (TextView) findViewById(R.id.txtValor);
             if(txtValor.requestFocus()) {
                 getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
             }
 
         }catch (Exception exception) {
-            showMessage("Erro: " + exception.getMessage());
+            Controle.showMessage(this,"Erro: " + exception.getMessage());
             Log.e(LOG_TAG, "Error ", exception);
 
         }

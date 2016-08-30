@@ -46,6 +46,7 @@
                 android:gravity="center"
                 android:textColor="@color/texto_tipo"
                 android:background="@drawable/rouded_corner"
+                android:textStyle="bold"
                 android:layout_marginRight="2dp"
                 android:layout_marginLeft="2dp" />
 
@@ -58,6 +59,7 @@
                 android:gravity="center"
                 android:textColor="@color/texto_tipo"
                 android:background="@drawable/rouded_corner"
+                android:textStyle="bold"
                 android:layout_marginLeft="2dp"
                 android:layout_marginRight="5dp" />
         </LinearLayout>
