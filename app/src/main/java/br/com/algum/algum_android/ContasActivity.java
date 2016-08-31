@@ -47,6 +47,7 @@ public class ContasActivity extends BaseActivity
         String[] projection =
                 {
                         AlgumDBContract.ContasEntry.TABLE_NAME+"."+ AlgumDBContract.ContasEntry.COLUMN_ID
+                        ,AlgumDBContract.ContasEntry.TABLE_NAME+"."+ AlgumDBContract.ContasEntry.COLUMN_CONTA_ID
                         , AlgumDBContract.ContasEntry.TABLE_NAME+"."+ AlgumDBContract.ContasEntry.COLUMN_NOME
                         , AlgumDBContract.ContasEntry.TABLE_NAME+"."+ AlgumDBContract.ContasEntry.COLUMN_SALDO
                         , AlgumDBContract.TipoContaEntry.TABLE_NAME+"."+ AlgumDBContract.TipoContaEntry.COLUMN_DESCRICAO

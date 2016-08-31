@@ -7,9 +7,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CursorAdapter;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import br.com.algum.algum_android.ContasEditActivity;
+import br.com.algum.algum_android.ExtratoActivity;
 import br.com.algum.algum_android.R;
 import br.com.algum.algum_android.data.AlgumDBContract;
 
@@ -37,10 +39,14 @@ public class ConfigContaAdapter extends CursorAdapter {
     @Override
     public void bindView(View view, final Context context, Cursor cursor) {
 
+        View vwBtns = view.findViewById(R.id.vwBtns);
+        vwBtns.setVisibility(View.GONE);
+
         final String txtNome = cursor.getString(cursor.getColumnIndex(AlgumDBContract.ContasEntry.COLUMN_NOME));
         final String txtTipo = cursor.getString(cursor.getColumnIndex(AlgumDBContract.TipoContaEntry.COLUMN_DESCRICAO));
         final Float txtSaldo = cursor.getFloat(cursor.getColumnIndex(AlgumDBContract.ContasEntry.COLUMN_SALDO));
         final int idConta = cursor.getInt(cursor.getColumnIndex(AlgumDBContract.ContasEntry.COLUMN_ID));
+        final int idConta2 = cursor.getInt(cursor.getColumnIndex(AlgumDBContract.ContasEntry.COLUMN_CONTA_ID));
 
         final ContaHolder holder = (ContaHolder) view.getTag();
 
@@ -57,12 +63,41 @@ public class ConfigContaAdapter extends CursorAdapter {
         view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                View vwBtns = view.findViewById(R.id.vwBtns);
+                if(vwBtns.getVisibility() == View.GONE){
+                    vwBtns.setVisibility(View.VISIBLE);
+                }else{
+                    vwBtns.setVisibility(View.GONE);
+                }
+            }
+        });
+
+        ImageButton btnEdit = (ImageButton) view.findViewById(R.id.btnEdit);
+
+        btnEdit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
                 Intent intent = new Intent();
                 intent = new Intent(context, ContasEditActivity.class);
-                intent.putExtra("idConta",idConta);
+                intent.putExtra("idConta", idConta);
                 context.startActivity(intent);
             }
         });
+
+
+        ImageButton btnExtrato = (ImageButton) view.findViewById(R.id.btnExtrato);
+
+        btnExtrato.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent();
+                intent = new Intent(context, ExtratoActivity.class);
+                intent.putExtra("idConta",idConta2);
+                context.startActivity(intent);
+            }
+        });
+
+
 
 
     }

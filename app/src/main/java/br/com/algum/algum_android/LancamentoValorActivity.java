@@ -106,13 +106,6 @@ public class LancamentoValorActivity extends BaseActivity
 
     }
 
-    @Override
-    protected void onRestart() {
-        super.onRestart();
-        Intent intent = new Intent(this,MainActivity.class);
-        startActivity(intent);
-    }
-
     protected void gravar() {
         try {
             TextView valor = (TextView) findViewById(R.id.txtValor);
