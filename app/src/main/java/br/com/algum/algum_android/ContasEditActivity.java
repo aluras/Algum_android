@@ -70,7 +70,7 @@ public class ContasEditActivity extends BaseActivity
         if(cConta.getCount() > 0) {
             cConta.moveToFirst();
             editText2.setText(cConta.getString(cConta.getColumnIndex(AlgumDBContract.ContasEntry.COLUMN_NOME)));
-            editText3.setText(String.format("%.2f", cConta.getFloat(cConta.getColumnIndex(AlgumDBContract.ContasEntry.COLUMN_SALDO_INICIAL))));
+            editText3.setText(String.format("%.2f", cConta.getFloat(cConta.getColumnIndex(AlgumDBContract.ContasEntry.COLUMN_SALDO))));
             idTipoConta = cConta.getInt(cConta.getColumnIndex(AlgumDBContract.ContasEntry.COLUMN_TIPO_CONTA_ID));
 
         }
@@ -140,28 +140,29 @@ public class ContasEditActivity extends BaseActivity
     protected void gravar(){
 
         String nome = editText2.getText().toString();
-        Float saldoInicial = Float.parseFloat(editText3.getText().toString().replace(',', '.'));
+        Float saldoAtual = Float.parseFloat(editText3.getText().toString().replace(',', '.'));
         Cursor obj = (Cursor) spinner.getSelectedItem();
         int idTipoConta = obj.getInt(obj.getColumnIndex(AlgumDBContract.TipoContaEntry.COLUMN_ID));
 
 
         ContentValues values = new ContentValues();
         values.put(AlgumDBContract.ContasEntry.COLUMN_NOME,nome);
-        values.put(AlgumDBContract.ContasEntry.COLUMN_SALDO_INICIAL,saldoInicial);
+        values.put(AlgumDBContract.ContasEntry.COLUMN_SALDO,saldoAtual);
         values.put(AlgumDBContract.ContasEntry.COLUMN_TIPO_CONTA_ID,idTipoConta);
-        values.put(AlgumDBContract.ContasEntry.COLUMN_ALTERADO,1);
+        values.put(AlgumDBContract.ContasEntry.COLUMN_ALTERADO, 1);
 
         if(idConta > 0){
             String mSelectionClause = AlgumDBContract.ContasEntry.COLUMN_ID + " = ? ";
             String[] mSelectionArgs = {Integer.toString(idConta)};
             getContentResolver().update(AlgumDBContract.ContasEntry.CONTENT_URI, values, mSelectionClause,mSelectionArgs);
         }else{
-            values.put(AlgumDBContract.ContasEntry.COLUMN_SALDO,0);
+            values.put(AlgumDBContract.ContasEntry.COLUMN_SALDO_INICIAL,saldoAtual);
             values.put(AlgumDBContract.ContasEntry.COLUMN_USUARIO_ID,idUsuario);
             getContentResolver().insert(AlgumDBContract.ContasEntry.CONTENT_URI, values);
         }
 
         Controle.showMessage(this,"Conta registrada.");
+        Controle.syncData(this);
         Intent intent = new Intent(this, ContasActivity .class);
         startActivity(intent);
     }

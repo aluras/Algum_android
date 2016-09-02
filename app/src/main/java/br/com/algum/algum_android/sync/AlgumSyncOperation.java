@@ -259,7 +259,7 @@ public class AlgumSyncOperation {
             contas.moveToFirst();
             while(contas.isAfterLast() == false){
                 String params = "nome="+contas.getString(contas.getColumnIndex(AlgumDBContract.ContasEntry.COLUMN_NOME));
-                params = params + "&saldo_inicial="+contas.getString(contas.getColumnIndex(AlgumDBContract.ContasEntry.COLUMN_SALDO_INICIAL));
+                params = params + "&saldo="+contas.getString(contas.getColumnIndex(AlgumDBContract.ContasEntry.COLUMN_SALDO));
                 params = params + "&tipo_conta_id="+contas.getString(contas.getColumnIndex(AlgumDBContract.ContasEntry.COLUMN_TIPO_CONTA_ID));
                 params = params + "&usuario_id="+contas.getString(contas.getColumnIndex(AlgumDBContract.ContasEntry.COLUMN_USUARIO_ID));
 

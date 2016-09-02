@@ -152,12 +152,13 @@ public class LancamentoValorActivity extends BaseActivity
 
                 getContentResolver().insert(AlgumDBContract.LancamentoEntry.CONTENT_URI, lancamentoValues);
 
-                saldoValue.put(AlgumDBContract.LancamentoEntry.COLUMN_VALOR,nValor);
+                saldoValue.put(AlgumDBContract.LancamentoEntry.COLUMN_VALOR, nValor);
                 saldoValue.put(AlgumDBContract.ContasEntry.COLUMN_CONTA_ID, idContaOrigem);
 
-                getContentResolver().update(AlgumDBContract.ContasEntry.CONTENT_SALDO_URI,saldoValue,null,null);
+                getContentResolver().update(AlgumDBContract.ContasEntry.CONTENT_SALDO_URI, saldoValue, null, null);
 
-                Controle.showMessage(this,"Lançamento registrado.");
+                Controle.showMessage(this, "Lançamento registrado.");
+                Controle.syncData(this);
                 Intent intent = new Intent(this, LancamentoContasActivity.class);
                 startActivity(intent);
 

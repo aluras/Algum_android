@@ -410,7 +410,7 @@ public class MainActivity extends AppCompatActivity implements
                 SharedPreferences sharedPref = getSharedPreferences(getString(R.string.userInfo), Context.MODE_PRIVATE);
                 account = sharedPref.getString(getString(R.string.emailUsuario), "");
 
-                mAccount = CreateSyncAccount(mContext);
+                //mAccount = CreateSyncAccount(mContext);
                 /*
                 Bundle bundle = new Bundle();
                 bundle.putBoolean(ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
@@ -421,8 +421,6 @@ public class MainActivity extends AppCompatActivity implements
                 AlgumSyncTask task = new AlgumSyncTask(mActivity);
                 task.execute("");
 
-                Intent intent = new Intent(mContext,LancamentoContasActivity.class);
-                startActivity(intent);
             }
 
         }

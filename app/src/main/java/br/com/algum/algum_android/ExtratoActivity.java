@@ -72,6 +72,10 @@ public class ExtratoActivity extends BaseActivity
 
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(dataExtrato);
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE,0);
+        calendar.set(Calendar.SECOND,0);
+        calendar.set(Calendar.MILLISECOND,0);
         calendar.set(Calendar.DAY_OF_MONTH,1);
         Date dataInicio = calendar.getTime();
         calendar.set(Calendar.DAY_OF_MONTH, calendar.getActualMaximum(Calendar.DAY_OF_MONTH));
@@ -144,7 +148,7 @@ public class ExtratoActivity extends BaseActivity
                         getSupportLoaderManager().restartLoader(0,null,ExtratoActivity.this);
                         TextView txtMes = (TextView) findViewById(R.id.textView3);
                         SimpleDateFormat format = new SimpleDateFormat("MM/yyyy");
-                        txtMes.setText("Mês: "+format.format(dataExtrato));
+                        txtMes.setText("Mês: " + format.format(dataExtrato));
                     }
                 });
 

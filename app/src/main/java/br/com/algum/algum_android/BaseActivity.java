@@ -37,8 +37,6 @@ public abstract class BaseActivity extends AppCompatActivity
 
     // The authority for the sync adapter's content provider
     public static final String AUTHORITY = BuildConfig.APPLICATION_ID + ".provider";
-    // An account type, in the form of a domain name
-    public static final String ACCOUNT_TYPE = "algum.com.br";
     // The account name
     public static String account;
 
@@ -159,7 +157,7 @@ public abstract class BaseActivity extends AppCompatActivity
             account = email;
 
             Account newAccount = new Account(
-                    account, ACCOUNT_TYPE);
+                    account, getString(R.string.sync_account_type));
 
             Bundle bundle = new Bundle();
             bundle.putBoolean(ContentResolver.SYNC_EXTRAS_EXPEDITED, true);

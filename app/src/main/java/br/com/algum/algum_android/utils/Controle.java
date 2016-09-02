@@ -12,6 +12,7 @@ import java.util.Date;
 
 import br.com.algum.algum_android.R;
 import br.com.algum.algum_android.data.AlgumDBContract;
+import br.com.algum.algum_android.sync.AlgumSyncTask;
 
 /**
  * Created by sn1007071 on 08/08/2016.
@@ -43,4 +44,10 @@ public class Controle {
         toast.show();
 
     }
+
+    public static void syncData(Context context){
+        AlgumSyncTask task = new AlgumSyncTask(context);
+        task.execute("");
+    }
+
 }

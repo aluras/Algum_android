@@ -17,6 +17,7 @@ import java.util.Date;
 
 import br.com.algum.algum_android.R;
 import br.com.algum.algum_android.data.AlgumDBContract;
+import br.com.algum.algum_android.utils.Controle;
 
 /**
  * Created by sn1007071 on 10/03/2016.
@@ -108,13 +109,14 @@ public class ExtratoAdapter extends CursorAdapter {
                                 lancamentoValues.put(AlgumDBContract.LancamentoEntry.COLUMN_EXCLUIDO, 1);
                                 String selection = AlgumDBContract.LancamentoEntry.COLUMN_ID + " = ? ";
                                 String[] selectionArgs = {Integer.toString(idLancamento)};
-                                context.getContentResolver().update(AlgumDBContract.LancamentoEntry.CONTENT_URI, lancamentoValues,selection,selectionArgs);
+                                context.getContentResolver().update(AlgumDBContract.LancamentoEntry.CONTENT_URI, lancamentoValues, selection, selectionArgs);
 
                                 ContentValues saldoValue = new ContentValues();
                                 saldoValue.put(AlgumDBContract.LancamentoEntry.COLUMN_VALOR,-txtValor);
                                 saldoValue.put(AlgumDBContract.ContasEntry.COLUMN_CONTA_ID, idConta);
 
                                 context.getContentResolver().update(AlgumDBContract.ContasEntry.CONTENT_SALDO_URI, saldoValue, null, null);
+                                Controle.syncData(context);
 
                             }
                         })
