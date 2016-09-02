@@ -41,7 +41,8 @@ public class AlgumDbHelper extends SQLiteOpenHelper {
 
         final String SQL_CREATE_USUARIO_TABLE = "CREATE TABLE " + AlgumDBContract.UsuariosEntry.TABLE_NAME + " (" +
                 AlgumDBContract.UsuariosEntry.COLUMN_ID + " INTEGER PRIMARY KEY," +
-                AlgumDBContract.UsuariosEntry.COLUMN_EMAIL + " TEXT NOT NULL)";
+                AlgumDBContract.UsuariosEntry.COLUMN_EMAIL + " TEXT NOT NULL," +
+                AlgumDBContract.UsuariosEntry.COLUMN_DATA_SYNC + " INT)";
 
         db.execSQL(SQL_CREATE_USUARIO_TABLE);
 

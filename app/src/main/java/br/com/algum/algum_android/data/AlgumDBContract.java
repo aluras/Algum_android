@@ -111,6 +111,7 @@ public class AlgumDBContract {
 
         public static final String COLUMN_ID = "_id";
         public static final String COLUMN_EMAIL = "email";
+        public static final String COLUMN_DATA_SYNC = "data";
 
         public static Uri buildUsuarioUri(long id) {
             return ContentUris.withAppendedId(CONTENT_URI, id);

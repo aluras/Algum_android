@@ -58,7 +58,7 @@
             android:ems="10"
             android:id="@+id/editText3"
             android:gravity="right"
-            android:digits="1234567890," />
+            android:digits="1234567890,-" />
 
         <Button
             android:layout_width="fill_parent"

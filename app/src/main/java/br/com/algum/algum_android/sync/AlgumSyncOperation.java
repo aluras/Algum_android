@@ -323,14 +323,36 @@ public class AlgumSyncOperation {
         }
     }
 
+    public void atualizaUsuario(){
+        Log.d(LOG_TAG, "Starting update User");
+
+        final String CONTA_BASE_URL = mContext.getString(R.string.WSurl) + "usuarios";
+
+        String projection[] = {AlgumDBContract.UsuariosEntry.TABLE_NAME+".*"};
+        String selection = AlgumDBContract.UsuariosEntry.COLUMN_ID + " = " + usuarioId;
+        Cursor usuarios = mContext.getContentResolver().query(AlgumDBContract.UsuariosEntry.CONTENT_URI,projection,selection,null,null);
+        usuarios.moveToFirst();
+
+        SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
+        String params = "id="+usuarioId;
+        params = params + "&sincronizado="+format.format(new Date(usuarios.getLong(usuarios.getColumnIndex(AlgumDBContract.UsuariosEntry.COLUMN_DATA_SYNC))));
+
+        callServiceGrava(CONTA_BASE_URL+ "/" +usuarioId,params);
+
+    }
+
+
+
     public void performSync() {
 
         Log.d(LOG_TAG, "Starting sync");
 
+        atualizaUsuario();
         syncTipoConta();
         syncGrupos();
         syncLancamentos();
         syncContas();
+        //atualizaDataSync();
 
         Log.d(LOG_TAG, "Finishing sync");
 
