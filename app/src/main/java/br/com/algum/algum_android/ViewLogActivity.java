@@ -1,5 +1,6 @@
 package br.com.algum.algum_android;
 
+import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -65,5 +66,11 @@ public class ViewLogActivity extends AppCompatActivity
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
         dataAdapter.swapCursor(null);
+    }
+
+    @Override
+    public void onBackPressed() {
+        Intent intent = new Intent(this, LancamentoContasActivity.class);
+        startActivity(intent);
     }
 }

@@ -5,8 +5,8 @@
 
     <string name="sync_account_type">debug.algum.com.br</string>
     <string name="content_authority">br.com.algum.algum_android.debug.provider</string>
-    <!--<string name="WSurl">http://services.algum.com.br/</string>-->
-    <string name="WSurl">http://10.190.236.51:81/Algum_php/</string>
+    <string name="WSurl">http://services.algum.com.br/</string>
+    <!--<string name="WSurl">http://10.190.236.51:81/Algum_php/</string>-->
     <!--<string name="WSurl">http://192.168.0.6:81/Algum_php/</string>-->
 
 </resources>

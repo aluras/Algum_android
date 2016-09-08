@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -189,7 +190,7 @@ public abstract class BaseActivity extends AppCompatActivity
 
                 @Override
                 public void onConnected(Bundle arg0) {
-                    Auth.GoogleSignInApi.revokeAccess(mGoogleApiClient);
+                    Auth.GoogleSignInApi.signOut(mGoogleApiClient);
                 }
             });
 
@@ -224,7 +225,7 @@ public abstract class BaseActivity extends AppCompatActivity
     }
 
     @Override
-    public void onConnectionFailed(ConnectionResult connectionResult) {
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
         // An unresolvable error has occurred and Google APIs (including Sign-In) will not
         // be available.
         Log.d(TAG, "onConnectionFailed:" + connectionResult);

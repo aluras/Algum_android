@@ -19,6 +19,7 @@ import android.widget.SimpleCursorAdapter;
 import android.widget.Spinner;
 
 import br.com.algum.algum_android.data.AlgumDBContract;
+import br.com.algum.algum_android.sync.AlgumEditTask;
 import br.com.algum.algum_android.utils.Controle;
 
 public class ContasEditActivity extends BaseActivity
@@ -161,8 +162,10 @@ public class ContasEditActivity extends BaseActivity
             getContentResolver().insert(AlgumDBContract.ContasEntry.CONTENT_URI, values);
         }
 
-        Controle.showMessage(this,"Conta registrada.");
-        Controle.syncData(this);
+        Controle.showMessage(this, "Conta registrada.");
+        AlgumEditTask task = new AlgumEditTask(this);
+        task.execute("");
+
         Intent intent = new Intent(this, ContasActivity .class);
         startActivity(intent);
     }

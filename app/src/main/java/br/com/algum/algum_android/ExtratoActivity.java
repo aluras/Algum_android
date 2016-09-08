@@ -73,7 +73,7 @@ public class ExtratoActivity extends BaseActivity
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(dataExtrato);
         calendar.set(Calendar.HOUR_OF_DAY, 0);
-        calendar.set(Calendar.MINUTE,0);
+        calendar.set(Calendar.MINUTE, 0);
         calendar.set(Calendar.SECOND,0);
         calendar.set(Calendar.MILLISECOND,0);
         calendar.set(Calendar.DAY_OF_MONTH,1);
@@ -163,5 +163,11 @@ public class ExtratoActivity extends BaseActivity
         if (v == (TextView) findViewById(R.id.textView3)){
             showDialog(MONTH_DIALOG_ID);
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+        Intent intent = new Intent(this, LancamentoContasActivity.class);
+        startActivity(intent);
     }
 }

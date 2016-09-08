@@ -22,6 +22,7 @@ import java.util.Calendar;
 import java.util.Date;
 
 import br.com.algum.algum_android.data.AlgumDBContract;
+import br.com.algum.algum_android.sync.AlgumEditTask;
 import br.com.algum.algum_android.utils.Controle;
 
 public class LancamentoValorActivity extends BaseActivity
@@ -97,6 +98,16 @@ public class LancamentoValorActivity extends BaseActivity
         txtValor.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_DONE) {
+                    gravar();
+                }
+                return false;
+            }
+        });
+
+        txtDetalhe.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 if(actionId== EditorInfo.IME_ACTION_DONE){
                     gravar();
                 }
@@ -158,7 +169,8 @@ public class LancamentoValorActivity extends BaseActivity
                 getContentResolver().update(AlgumDBContract.ContasEntry.CONTENT_SALDO_URI, saldoValue, null, null);
 
                 Controle.showMessage(this, "Lançamento registrado.");
-                Controle.syncData(this);
+                AlgumEditTask task = new AlgumEditTask(this);
+                task.execute("");
                 Intent intent = new Intent(this, LancamentoContasActivity.class);
                 startActivity(intent);
 

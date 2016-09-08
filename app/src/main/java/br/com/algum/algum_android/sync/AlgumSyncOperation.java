@@ -66,12 +66,14 @@ public class AlgumSyncOperation {
         }
     }
 
-    public void syncTipoConta(){
+    public void syncTipoConta() throws Exception{
         String TipoContasJsonStr = null;
 
         try {
 
             Log.d(LOG_TAG, "Starting sync Tipo Contas");
+            //Controle.gravaLog(mContext, "SyncOperations - Atualizar tipo conta", usuarioId);
+
             //Atualiza Contas
             final String TIPO_CONTA_BASE_URL = mContext.getString(R.string.WSurl) + "tipo_contas";
             TipoContasJsonStr = callService(TIPO_CONTA_BASE_URL);
@@ -99,17 +101,20 @@ public class AlgumSyncOperation {
                 cursor.close();
             }
         }catch (JSONException e) {
-            Controle.gravaLog(mContext,dateTimeFormat.format(new Date()) + " - " + e.toString() + e.getMessage(),usuarioId);
+            //Controle.gravaLog(mContext,dateTimeFormat.format(new Date()) + " - " + e.toString() + e.getMessage(),usuarioId);
             Log.e(LOG_TAG, "Error ", e);
+            throw new Exception(e);
         }
 
     }
 
-    public void syncGrupos(){
+    public void syncGrupos()throws Exception{
         String GruposJsonStr = null;
 
         try{
             Log.d(LOG_TAG, "Starting sync Grupos");
+            //Controle.gravaLog(mContext, "SyncOperations - Atualizar grupos", usuarioId);
+
             //Atualiza Grupos
             final String GRUPO_BASE_URL = mContext.getString(R.string.WSurl) + "grupos";
             GruposJsonStr = callService(GRUPO_BASE_URL);
@@ -139,40 +144,20 @@ public class AlgumSyncOperation {
                 cursor.close();
             }
         }catch (JSONException e) {
-            Controle.gravaLog(mContext,dateTimeFormat.format(new Date()) + " - " + e.toString() + e.getMessage(),usuarioId);
+            //Controle.gravaLog(mContext,dateTimeFormat.format(new Date()) + " - " + e.toString() + e.getMessage(),usuarioId);
             Log.e(LOG_TAG, "Error ", e);
+            throw new Exception(e);
         }
     }
 
-    public void syncLancamentos(){
+    public void addLancamentos()throws Exception{
 
         String LancamentosJsonStr = null;
+        //Controle.gravaLog(mContext, "SyncOperations - Insere Lancamentos", usuarioId);
+
+        final String LANCAMENTO_BASE_URL = mContext.getString(R.string.WSurl) + "lancamentos";
 
         try{
-            Log.d(LOG_TAG, "Starting sync Lancamentos");
-            //Atualiza Lançamentos
-            final String LANCAMENTO_BASE_URL = mContext.getString(R.string.WSurl) + "lancamentos";
-
-            // EXCLUI LANCAMENTOS
-            String[] projectionDelete = {AlgumDBContract.LancamentoEntry.TABLE_NAME+".*"};
-            String selectionDelete = AlgumDBContract.LancamentoEntry.COLUMN_EXCLUIDO + " = 1 ";
-            Cursor lancamentosDelete = mContext.getContentResolver().query(AlgumDBContract.LancamentoEntry.CONTENT_URI,projectionDelete,selectionDelete,null,null);
-
-            lancamentosDelete.moveToFirst();
-            while(lancamentosDelete.isAfterLast() == false){
-
-                if(lancamentosDelete.getInt(lancamentosDelete.getColumnIndex(AlgumDBContract.LancamentoEntry.COLUMN_LANCAMENTO_ID))>0){
-                    callServiceExclui(LANCAMENTO_BASE_URL+"/"+lancamentosDelete.getString(lancamentosDelete.getColumnIndex(AlgumDBContract.LancamentoEntry.COLUMN_LANCAMENTO_ID)));
-                }
-
-                String selection = AlgumDBContract.LancamentoEntry.COLUMN_ID + " = ? ";
-                String[] selectionArgs = {lancamentosDelete.getString(lancamentosDelete.getColumnIndex(AlgumDBContract.LancamentoEntry.COLUMN_ID))};
-                mContext.getContentResolver().delete(AlgumDBContract.LancamentoEntry.CONTENT_URI, selection,selectionArgs);
-
-                lancamentosDelete.moveToNext();
-            }
-            lancamentosDelete.close();
-
             // -- ENVIA OS NOVOS
             String projection[] = {AlgumDBContract.LancamentoEntry.TABLE_NAME+".*"};
             String selection = AlgumDBContract.LancamentoEntry.COLUMN_LANCAMENTO_ID + " IS NULL ";
@@ -204,6 +189,55 @@ public class AlgumSyncOperation {
                 lancamentos.moveToNext();
             }
             lancamentos.close();
+
+        }catch (JSONException e) {
+            //Controle.gravaLog(mContext, dateTimeFormat.format(new Date()) + " - " + e.toString() + e.getMessage(), usuarioId);
+            Log.e(LOG_TAG, "Error ", e);
+            throw new Exception(e);
+        }
+    }
+
+    public void deleteLancamentos()throws Exception{
+
+        String LancamentosJsonStr = null;
+        //Controle.gravaLog(mContext, "SyncOperations - Exclui Lancamentos", usuarioId);
+
+        final String LANCAMENTO_BASE_URL = mContext.getString(R.string.WSurl) + "lancamentos";
+
+
+        // EXCLUI LANCAMENTOS
+        String[] projectionDelete = {AlgumDBContract.LancamentoEntry.TABLE_NAME+".*"};
+        String selectionDelete = AlgumDBContract.LancamentoEntry.COLUMN_EXCLUIDO + " = 1 ";
+        Cursor lancamentosDelete = mContext.getContentResolver().query(AlgumDBContract.LancamentoEntry.CONTENT_URI,projectionDelete,selectionDelete,null,null);
+
+        lancamentosDelete.moveToFirst();
+        while(lancamentosDelete.isAfterLast() == false){
+
+            if(lancamentosDelete.getInt(lancamentosDelete.getColumnIndex(AlgumDBContract.LancamentoEntry.COLUMN_LANCAMENTO_ID))>0){
+                callServiceExclui(LANCAMENTO_BASE_URL+"/"+lancamentosDelete.getString(lancamentosDelete.getColumnIndex(AlgumDBContract.LancamentoEntry.COLUMN_LANCAMENTO_ID)));
+            }
+
+            String selection = AlgumDBContract.LancamentoEntry.COLUMN_ID + " = ? ";
+            String[] selectionArgs = {lancamentosDelete.getString(lancamentosDelete.getColumnIndex(AlgumDBContract.LancamentoEntry.COLUMN_ID))};
+            mContext.getContentResolver().delete(AlgumDBContract.LancamentoEntry.CONTENT_URI, selection, selectionArgs);
+
+            lancamentosDelete.moveToNext();
+        }
+        lancamentosDelete.close();
+
+    }
+
+    public void syncLancamentos()throws Exception{
+
+        String LancamentosJsonStr = null;
+
+        try{
+            Log.d(LOG_TAG, "Starting sync Lancamentos");
+            //Controle.gravaLog(mContext, "SyncOperations - Atualizar Lancamentos", usuarioId);
+
+            //Atualiza Lançamentos
+            final String LANCAMENTO_BASE_URL = mContext.getString(R.string.WSurl) + "lancamentos";
+
             //-- RECEBE OS QUE NÃO ESTÃO LOCAL
             LancamentosJsonStr = callService(LANCAMENTO_BASE_URL);
             JSONArray lancamentoArray = new JSONArray(LancamentosJsonStr);
@@ -218,39 +252,48 @@ public class AlgumSyncOperation {
                 Cursor cursor = mContext.getContentResolver().query(AlgumDBContract.LancamentoEntry.buildLancamentoUsuarioUri(usuarioId), null, mSelectionClause, mSelectionArgs, null);
 
                 if(cursor.getCount() < 1){
-                    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-                    Long date = dateFormat.parse(lancamento.getString("data")).getTime();
+                    if(lancamento.getInt("excluido")==0){
+                        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+                        Long date = dateFormat.parse(lancamento.getString("data")).getTime();
 
-                    ContentValues lancamentoValues = new ContentValues();
-                    lancamentoValues.put(AlgumDBContract.LancamentoEntry.COLUMN_LANCAMENTO_ID, lancamento.getInt("id"));
-                    lancamentoValues.put(AlgumDBContract.LancamentoEntry.COLUMN_CONTA_ID, lancamento.getInt("conta_id"));
-                    lancamentoValues.put(AlgumDBContract.LancamentoEntry.COLUMN_GRUPO_ID, lancamento.getInt("grupo_id"));
-                    lancamentoValues.put(AlgumDBContract.LancamentoEntry.COLUMN_DATA, date);
-                    lancamentoValues.put(AlgumDBContract.LancamentoEntry.COLUMN_OBSERVACAO, lancamento.getString("observacao"));
-                    lancamentoValues.put(AlgumDBContract.LancamentoEntry.COLUMN_VALOR, lancamento.getString("valor"));
-                    lancamentoValues.put(AlgumDBContract.LancamentoEntry.COLUMN_USUARIO_ID, lancamento.getString("usuario_id"));
-                    lancamentoValues.put(AlgumDBContract.LancamentoEntry.COLUMN_EXCLUIDO, 0);
+                        ContentValues lancamentoValues = new ContentValues();
+                        lancamentoValues.put(AlgumDBContract.LancamentoEntry.COLUMN_LANCAMENTO_ID, lancamento.getInt("id"));
+                        lancamentoValues.put(AlgumDBContract.LancamentoEntry.COLUMN_CONTA_ID, lancamento.getInt("conta_id"));
+                        lancamentoValues.put(AlgumDBContract.LancamentoEntry.COLUMN_GRUPO_ID, lancamento.getInt("grupo_id"));
+                        lancamentoValues.put(AlgumDBContract.LancamentoEntry.COLUMN_DATA, date);
+                        lancamentoValues.put(AlgumDBContract.LancamentoEntry.COLUMN_OBSERVACAO, lancamento.getString("observacao"));
+                        lancamentoValues.put(AlgumDBContract.LancamentoEntry.COLUMN_VALOR, lancamento.getString("valor"));
+                        lancamentoValues.put(AlgumDBContract.LancamentoEntry.COLUMN_USUARIO_ID, lancamento.getString("usuario_id"));
+                        lancamentoValues.put(AlgumDBContract.LancamentoEntry.COLUMN_EXCLUIDO, 0);
 
-                    mContext.getContentResolver().insert(AlgumDBContract.LancamentoEntry.CONTENT_URI, lancamentoValues);
+                        mContext.getContentResolver().insert(AlgumDBContract.LancamentoEntry.CONTENT_URI, lancamentoValues);
+                    }
+                }else{
+                    if(lancamento.getInt("excluido")==1){
+                        String selection = AlgumDBContract.LancamentoEntry.COLUMN_LANCAMENTO_ID + " = ? ";
+                        String[] selectionArgs = {lancamento.getString("id")};
+                        mContext.getContentResolver().delete(AlgumDBContract.LancamentoEntry.CONTENT_URI, selection, selectionArgs);
+                    }
                 }
                 cursor.close();
             }
         }catch (JSONException e) {
             Controle.gravaLog(mContext,dateTimeFormat.format(new Date()) + " - " + e.toString() + e.getMessage(),usuarioId);
             Log.e(LOG_TAG, "Error ", e);
+            throw new Exception(e);
         }catch (ParseException e) {
-            Controle.gravaLog(mContext,dateTimeFormat.format(new Date()) + " - " + e.toString() + e.getMessage(),usuarioId);
+            //Controle.gravaLog(mContext,dateTimeFormat.format(new Date()) + " - " + e.toString() + e.getMessage(),usuarioId);
             Log.e(LOG_TAG, "Error ", e);
+            throw new Exception(e);
         }
     }
 
-    public void syncContas(){
+    public void addContas()throws Exception{
         String ContasJsonStr = null;
+        //Controle.gravaLog(mContext, "SyncOperations - Insere Contas", usuarioId);
 
-        try{
-            Log.d(LOG_TAG, "Starting sync Contas");
-            //Atualiza Contas
-            final String CONTA_BASE_URL = mContext.getString(R.string.WSurl) + "contas";
+        final String CONTA_BASE_URL = mContext.getString(R.string.WSurl) + "contas";
+        try {
             // -- ENVIA OS NOVOS
             String[] projectionContasAlteradas = {AlgumDBContract.ContasEntry.TABLE_NAME+".*"};
             String selectionContasAlteradas = AlgumDBContract.ContasEntry.COLUMN_ALTERADO + " = 1 ";
@@ -285,6 +328,23 @@ public class AlgumSyncOperation {
                 contas.moveToNext();
             }
             contas.close();
+
+        }catch (JSONException e) {
+            //Controle.gravaLog(mContext, dateTimeFormat.format(new Date()) + " - " + e.toString() + e.getMessage(), usuarioId);
+            Log.e(LOG_TAG, "Error ", e);
+            throw new Exception(e);
+        }
+    }
+
+    public void syncContas()throws Exception{
+        String ContasJsonStr = null;
+
+        try{
+            Log.d(LOG_TAG, "Starting sync Contas");
+            //Controle.gravaLog(mContext, "SyncOperations - Atualizar Contas", usuarioId);
+
+            //Atualiza Contas
+            final String CONTA_BASE_URL = mContext.getString(R.string.WSurl) + "contas";
             //RECEBE AS DO SERVIDOR
             ContasJsonStr = callService(CONTA_BASE_URL);
 
@@ -318,13 +378,15 @@ public class AlgumSyncOperation {
             }
 
         }catch (JSONException e) {
-            Controle.gravaLog(mContext, dateTimeFormat.format(new Date()) + " - " + e.toString() + e.getMessage(), usuarioId);
+            //Controle.gravaLog(mContext, dateTimeFormat.format(new Date()) + " - " + e.toString() + e.getMessage(), usuarioId);
             Log.e(LOG_TAG, "Error ", e);
+            throw new Exception(e);
         }
     }
 
-    public void atualizaUsuario(){
+    public void atualizaUsuario()throws Exception{
         Log.d(LOG_TAG, "Starting update User");
+        //Controle.gravaLog(mContext, "SyncOperations - Atualizar usuario (Data Sync)", usuarioId);
 
         final String CONTA_BASE_URL = mContext.getString(R.string.WSurl) + "usuarios";
 
@@ -337,35 +399,83 @@ public class AlgumSyncOperation {
         String params = "id="+usuarioId;
         params = params + "&sincronizado="+format.format(new Date(usuarios.getLong(usuarios.getColumnIndex(AlgumDBContract.UsuariosEntry.COLUMN_DATA_SYNC))));
 
-        callServiceGrava(CONTA_BASE_URL+ "/" +usuarioId,params);
+        callServiceGrava(CONTA_BASE_URL + "/" + usuarioId, params);
 
     }
 
+    public void atualizaDataSync(){
+        //Controle.gravaLog(mContext, "SyncOperations - Atualizar usuario local (Data Sync)", usuarioId);
 
+        Date data = new Date();
 
-    public void performSync() {
+        ContentValues usuarioValues = new ContentValues();
+        usuarioValues.put(AlgumDBContract.UsuariosEntry.COLUMN_ID, usuarioId);
+        usuarioValues.put(AlgumDBContract.UsuariosEntry.COLUMN_DATA_SYNC, data.getTime());
 
-        Log.d(LOG_TAG, "Starting sync");
+        String mSelectionClause = AlgumDBContract.UsuariosEntry.COLUMN_ID + " = ? ";
+        String[] mSelectionArgs = {Integer.toString(usuarioId)};
 
-        atualizaUsuario();
-        syncTipoConta();
-        syncGrupos();
-        syncLancamentos();
-        syncContas();
-        //atualizaDataSync();
-
-        Log.d(LOG_TAG, "Finishing sync");
-
-        SharedPreferences sharedPref = mContext.getSharedPreferences(mContext.getString(R.string.userInfo), Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPref.edit();
-        editor.putString(mContext.getString(R.string.dataSync), dateFormat.format(new Date()));
-        editor.commit();
-
-        Controle.gravaLog(mContext, dateTimeFormat.format(new Date()) + " Sincronização concluída.", usuarioId);
+        mContext.getContentResolver().update(AlgumDBContract.UsuariosEntry.CONTENT_URI, usuarioValues, mSelectionClause, mSelectionArgs);
 
     }
 
-    private String callService(String pUrl){
+    public boolean performSync() {
+
+        try {
+            Log.d(LOG_TAG, "Starting sync");
+
+            atualizaUsuario();
+            syncTipoConta();
+            syncGrupos();
+            syncLancamentos();
+            syncContas();
+            atualizaDataSync();
+
+            Log.d(LOG_TAG, "Finishing sync");
+
+            SharedPreferences sharedPref = mContext.getSharedPreferences(mContext.getString(R.string.userInfo), Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor = sharedPref.edit();
+            editor.putString(mContext.getString(R.string.dataSync), dateFormat.format(new Date()));
+            editor.commit();
+
+            //Controle.gravaLog(mContext, dateTimeFormat.format(new Date()) + " Sincronização concluída.", usuarioId);
+
+        }catch (Exception e){
+            //Controle.gravaLog(mContext,e.getMessage(),usuarioId);
+            Controle.gravaLog(mContext, dateTimeFormat.format(new Date()) + " - " + e.toString() + e.getMessage(), usuarioId);
+            return false;
+        }
+
+        return true;
+    }
+
+    public void performEdit(){
+        try{
+            addContas();
+            deleteLancamentos();
+            addLancamentos();
+
+        }catch (Exception e){
+            Controle.gravaLog(mContext, dateTimeFormat.format(new Date()) + " - " + e.toString() + e.getMessage(), usuarioId);
+        }
+
+    }
+
+    public boolean performSendEdit(){
+        try{
+            performEdit();
+
+            Controle.syncData(mContext);
+
+        }catch (Exception e){
+            Controle.gravaLog(mContext, dateTimeFormat.format(new Date()) + " - " + e.toString() + e.getMessage(), usuarioId);
+            return false;
+        }
+
+        return true;
+    }
+
+    private String callService(String pUrl)throws Exception{
 
         HttpURLConnection urlConnection = null;
         BufferedReader reader = null;
@@ -403,17 +513,11 @@ public class AlgumSyncOperation {
             }
             return buffer.toString();
         }catch (IOException e) {
-            Controle.gravaLog(mContext, dateTimeFormat.format(new Date()) + " - " + e.toString() + e.getMessage(), usuarioId);
+            //Controle.gravaLog(mContext, dateTimeFormat.format(new Date()) + " - " + e.toString() + e.getMessage(), usuarioId);
             Log.e(LOG_TAG, "Error ", e);
             // If the code didn't successfully get the weather data, there's no point in attempting
             // to parse it.
-            return "";
-        }catch (Exception e){
-            Controle.gravaLog(mContext,dateTimeFormat.format(new Date()) + " - " + e.toString() + e.getMessage(),usuarioId);
-            Log.e(LOG_TAG, "Error ", e);
-            // If the code didn't successfully get the weather data, there's no point in attempting
-            // to parse it.
-            return "";
+            throw new Exception(e);
         }
         finally {
             if (urlConnection != null) {
@@ -429,7 +533,7 @@ public class AlgumSyncOperation {
         }
     }
 
-    private String callServiceGrava(String pUrl, String params){
+    private String callServiceGrava(String pUrl, String params)throws Exception{
 
         HttpURLConnection urlConnection = null;
         BufferedReader reader = null;
@@ -473,11 +577,9 @@ public class AlgumSyncOperation {
             }
             return buffer.toString();
         }catch (IOException e) {
-            Controle.gravaLog(mContext,dateTimeFormat.format(new Date()) + " - " + e.toString() + e.getMessage(),usuarioId);
+            //Controle.gravaLog(mContext,dateTimeFormat.format(new Date()) + " - " + e.toString() + e.getMessage(),usuarioId);
             Log.e(LOG_TAG, "Error ", e);
-            // If the code didn't successfully get the weather data, there's no point in attempting
-            // to parse it.
-            return "";
+            throw new Exception(e);
         }finally {
             if (urlConnection != null) {
                 urlConnection.disconnect();
@@ -492,7 +594,7 @@ public class AlgumSyncOperation {
         }
     }
 
-    private void callServiceExclui(String pUrl){
+    private void callServiceExclui(String pUrl) throws Exception{
 
         HttpURLConnection urlConnection = null;
         BufferedReader reader = null;
@@ -514,13 +616,10 @@ public class AlgumSyncOperation {
 
 
         }catch (IOException e) {
-            Controle.gravaLog(mContext, dateTimeFormat.format(new Date()) + " - " + e.toString() + e.getMessage(), usuarioId);
+            //Controle.gravaLog(mContext, dateTimeFormat.format(new Date()) + " - " + e.toString() + e.getMessage(), usuarioId);
             Log.e(LOG_TAG, "Error ", e);
-        } catch (Exception e){
-            Controle.gravaLog(mContext, dateTimeFormat.format(new Date()) + " - " + e.toString() + e.getMessage(), usuarioId);
-            Log.e(LOG_TAG, "Error ", e);
-
-        }finally {
+            throw new Exception(e);
+        } finally {
             if (urlConnection != null) {
                 urlConnection.disconnect();
             }

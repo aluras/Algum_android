@@ -100,4 +100,9 @@ public class ContasActivity extends BaseActivity
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    public void onBackPressed() {
+        Intent intent = new Intent(this, LancamentoContasActivity.class);
+        startActivity(intent);
+    }
 }

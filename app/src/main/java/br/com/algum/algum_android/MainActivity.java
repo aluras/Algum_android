@@ -245,7 +245,7 @@ public class MainActivity extends AppCompatActivity implements
 
             ContentResolver.setSyncAutomatically(newAccount, AUTHORITY, true);
 
-            ContentResolver.addPeriodicSync(newAccount, AUTHORITY, new Bundle(), 60 * 60);
+            ContentResolver.addPeriodicSync(newAccount, AUTHORITY, new Bundle(), 20 * 60);
 
             return newAccount;
         }

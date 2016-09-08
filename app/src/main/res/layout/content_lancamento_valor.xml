@@ -44,44 +44,67 @@
         android:paddingRight="3dp"
         android:paddingTop="10dp">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            android:text="Data:"
-            android:id="@+id/textView54" />
-
-        <TextView
-            android:layout_width="fill_parent"
-            android:layout_height="32dp"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:id="@+id/txtData"
-            android:singleLine="false"
-            android:gravity="right" />
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1px"
-            android:background="#333333"
-            android:layout_marginBottom="3dp">
-        </View>
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            android:text="Valor:"
-            android:id="@+id/textView55"/>
-
-        <EditText
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="numberDecimal"
-            android:ems="10"
-            android:id="@+id/txtValor"
-            android:gravity="right"
-            android:imeOptions="actionDone"
-            android:digits="1234567890," />
+            android:orientation="horizontal">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_weight="1">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:text="Data:"
+                    android:id="@+id/textView54" />
+
+                <TextView
+                    android:layout_width="fill_parent"
+                    android:layout_height="32dp"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:id="@+id/txtData"
+                    android:singleLine="false"
+                    android:paddingTop="2dp"
+                    android:gravity="left" />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="0px"
+                    android:background="#333333"
+                    android:layout_marginBottom="3dp">
+                </View>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_weight="1">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:text="Valor:"
+                    android:id="@+id/textView55"/>
+
+                <EditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="numberDecimal"
+                    android:ems="10"
+                    android:id="@+id/txtValor"
+                    android:gravity="right"
+                    android:maxLines="1"
+                    android:imeOptions="actionDone"
+                    android:digits="1234567890," />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
 
         <TextView
             android:layout_width="wrap_content"
@@ -93,7 +116,9 @@
         <EditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/txtDetalhe" />
+            android:id="@+id/txtDetalhe"
+            android:maxLines="1"
+            android:inputType="textShortMessage"/>
 
         <Button
             android:layout_width="fill_parent"

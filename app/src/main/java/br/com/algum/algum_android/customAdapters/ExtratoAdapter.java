@@ -17,7 +17,7 @@ import java.util.Date;
 
 import br.com.algum.algum_android.R;
 import br.com.algum.algum_android.data.AlgumDBContract;
-import br.com.algum.algum_android.utils.Controle;
+import br.com.algum.algum_android.sync.AlgumEditTask;
 
 /**
  * Created by sn1007071 on 10/03/2016.
@@ -116,7 +116,8 @@ public class ExtratoAdapter extends CursorAdapter {
                                 saldoValue.put(AlgumDBContract.ContasEntry.COLUMN_CONTA_ID, idConta);
 
                                 context.getContentResolver().update(AlgumDBContract.ContasEntry.CONTENT_SALDO_URI, saldoValue, null, null);
-                                Controle.syncData(context);
+                                AlgumEditTask task = new AlgumEditTask(context);
+                                task.execute("");
 
                             }
                         })
