@@ -167,7 +167,12 @@ public class ExtratoActivity extends BaseActivity
 
     @Override
     public void onBackPressed() {
-        Intent intent = new Intent(this, LancamentoContasActivity.class);
+        Intent intent;
+        if(mIdConta == 0){
+            intent = new Intent(this, LancamentoContasActivity.class);
+        }else{
+            intent = new Intent(this, ContasActivity.class);
+        }
         startActivity(intent);
     }
 }

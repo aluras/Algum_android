@@ -134,6 +134,7 @@ public class AlgumDBContract {
         public static final String COLUMN_NOME = "nome";
         public static final String COLUMN_TIPO_ID = "tipo_id";
         public static final String COLUMN_ALTERADO = "alterado";
+        public static final String COLUMN_GASTO = "gasto";
 
         public static Uri buildGrupoUri(long id) {
             return ContentUris.withAppendedId(CONTENT_URI, id);

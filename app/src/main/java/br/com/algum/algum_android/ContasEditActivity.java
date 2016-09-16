@@ -7,10 +7,11 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.design.widget.NavigationView;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -19,11 +20,10 @@ import android.widget.SimpleCursorAdapter;
 import android.widget.Spinner;
 
 import br.com.algum.algum_android.data.AlgumDBContract;
-import br.com.algum.algum_android.sync.AlgumEditTask;
 import br.com.algum.algum_android.utils.Controle;
 
-public class ContasEditActivity extends BaseActivity
-        implements NavigationView.OnNavigationItemSelectedListener, LoaderManager.LoaderCallbacks<Cursor> {
+public class ContasEditActivity extends AppCompatActivity
+        implements  LoaderManager.LoaderCallbacks<Cursor> {
 
     private SimpleCursorAdapter sAdapter;
     private int idConta = 0;
@@ -37,7 +37,11 @@ public class ContasEditActivity extends BaseActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_contas_edit);
-        super.onCreateDrawer();
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        //super.onCreateDrawer();
         SharedPreferences sharedPref = getSharedPreferences(getString(R.string.userInfo), Context.MODE_PRIVATE);
         idUsuario = sharedPref.getInt(getString(R.string.idUsuario), 0);
 
@@ -163,8 +167,7 @@ public class ContasEditActivity extends BaseActivity
         }
 
         Controle.showMessage(this, "Conta registrada.");
-        AlgumEditTask task = new AlgumEditTask(this);
-        task.execute("");
+        Controle.syncData(this);
 
         Intent intent = new Intent(this, ContasActivity .class);
         startActivity(intent);

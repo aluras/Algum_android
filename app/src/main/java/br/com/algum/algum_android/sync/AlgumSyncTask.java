@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
@@ -51,7 +52,7 @@ public class AlgumSyncTask extends AsyncTask<String,Void,String> {
 
         SharedPreferences sharedPref = mContext.getSharedPreferences(mContext.getString(R.string.userInfo), Context.MODE_PRIVATE);
 
-        Controle.gravaLog(mContext, dateTimeFormat.format(new Date()) + "SyncTask iniciada", sharedPref.getInt("idUsuario",0));
+        Controle.gravaLog(mContext, dateTimeFormat.format(new Date()) + "SyncTask iniciada", sharedPref.getInt("idUsuario", 0));
 
         Bundle bundle = new Bundle();
         bundle.putBoolean(ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
@@ -82,7 +83,6 @@ public class AlgumSyncTask extends AsyncTask<String,Void,String> {
             GoogleSignInResult result = opr.get();
             AlgumSyncOperation operations = new AlgumSyncOperation(mContext,result);
             idrNoSilentSignIn = true;
-            operations.performEdit();
             operations.performSync();
 
         } else {
@@ -130,7 +130,9 @@ public class AlgumSyncTask extends AsyncTask<String,Void,String> {
 
             ContentResolver.setSyncAutomatically(newAccount, AUTHORITY, true);
 
-            ContentResolver.addPeriodicSync(newAccount, AUTHORITY, new Bundle(), 60*60);
+            SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
+
+            ContentResolver.addPeriodicSync(newAccount, AUTHORITY, new Bundle(), Integer.parseInt(sharedPref.getString(context.getString(R.string.sync_freq),context.getString(R.string.sync_freq_default))) *60);
 
             return newAccount;
         }

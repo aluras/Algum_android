@@ -1,7 +1,5 @@
 package br.com.algum.algum_android;
 
-import android.accounts.Account;
-import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -24,7 +22,6 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 
-import br.com.algum.algum_android.data.AlgumDBContract;
 import br.com.algum.algum_android.sync.AlgumSyncTask;
 
 public abstract class BaseActivity extends AppCompatActivity
@@ -48,6 +45,16 @@ public abstract class BaseActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
+
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken(getString(R.string.algum_server_client_id))
+                .requestEmail()
+                .build();
+
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .enableAutoManage(this /* FragmentActivity */, this /* OnConnectionFailedListener */)
+                .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
+                .build();
 
     }
 
@@ -126,6 +133,7 @@ public abstract class BaseActivity extends AppCompatActivity
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            startActivity(new Intent(this,SettingsActivity.class));
             return true;
         }
         if (id == R.id.action_refresh){
@@ -157,6 +165,7 @@ public abstract class BaseActivity extends AppCompatActivity
         }else if (id == R.id.nav_exit) {
             account = email;
 
+            /*
             Account newAccount = new Account(
                     account, getString(R.string.sync_account_type));
 
@@ -165,37 +174,19 @@ public abstract class BaseActivity extends AppCompatActivity
             bundle.putBoolean(ContentResolver.SYNC_EXTRAS_MANUAL, true);
 
             ContentResolver.removePeriodicSync(newAccount, AUTHORITY, bundle);
-
-
+*/
+            /*
             getContentResolver().delete(AlgumDBContract.LancamentoEntry.CONTENT_URI, null,null);
             getContentResolver().delete(AlgumDBContract.ContasEntry.CONTENT_URI, null, null);
             getContentResolver().delete(AlgumDBContract.GruposEntry.CONTENT_URI, null,null);
             getContentResolver().delete(AlgumDBContract.UsuariosEntry.CONTENT_URI, null,null);
-
-            getSharedPreferences(getString(R.string.userInfo), Context.MODE_PRIVATE).edit().clear().commit();
-
-            GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                    .requestIdToken(getString(R.string.algum_server_client_id))
-                    .requestEmail()
-                    .build();
-
-            mGoogleApiClient = new GoogleApiClient.Builder(this)
-                    .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
-                    .build();
-
-            mGoogleApiClient.registerConnectionCallbacks(new GoogleApiClient.ConnectionCallbacks() {
-                @Override
-                public void onConnectionSuspended(int cause) {
-                }
-
-                @Override
-                public void onConnected(Bundle arg0) {
-                    Auth.GoogleSignInApi.signOut(mGoogleApiClient);
-                }
-            });
-
-            mGoogleApiClient.connect();
-
+            */
+            SharedPreferences sharedPref = getSharedPreferences(getString(R.string.userInfo), Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor = sharedPref.edit();
+            editor.remove(getString(R.string.emailUsuario));
+            editor.remove(getString(R.string.emailUsuario));
+            editor.commit();
+            Auth.GoogleSignInApi.signOut(mGoogleApiClient);
 
             /*
             googleApiClient.connect();

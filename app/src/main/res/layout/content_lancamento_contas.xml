@@ -35,7 +35,8 @@
                 android:background="@drawable/rouded_corner"
                 android:textStyle="bold"
                 android:layout_marginRight="2dp"
-                android:layout_marginLeft="5dp" />
+                android:layout_marginLeft="5dp"
+                 />
 
             <TextView
                 android:layout_width="fill_parent"

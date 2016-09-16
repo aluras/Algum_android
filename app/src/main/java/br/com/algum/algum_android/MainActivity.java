@@ -12,6 +12,7 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -313,6 +314,8 @@ public class MainActivity extends AppCompatActivity implements
                         usuarioValues.put(AlgumDBContract.UsuariosEntry.COLUMN_DATA_SYNC, 0L);
 
                         getContentResolver().insert(AlgumDBContract.UsuariosEntry.CONTENT_URI, usuarioValues);
+
+                        PreferenceManager.setDefaultValues(mContext, R.xml.preferences, false);
 
                         SharedPreferences sharedPref = getSharedPreferences(getString(R.string.userInfo), Context.MODE_PRIVATE);
                         SharedPreferences.Editor editor = sharedPref.edit();

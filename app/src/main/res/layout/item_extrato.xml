@@ -25,6 +25,7 @@
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:text="Small Text"
+            android:textColor="@color/colorText"
             android:id="@+id/txtGrupo" />
 
         <TextView

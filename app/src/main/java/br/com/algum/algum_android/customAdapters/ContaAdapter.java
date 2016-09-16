@@ -8,10 +8,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import br.com.algum.algum_android.LancamentoGrupoActivity;
 import br.com.algum.algum_android.R;
+import br.com.algum.algum_android.data.AlgumDBContract;
 
 /**
  * Created by sn1007071 on 09/03/2016.
@@ -47,41 +49,48 @@ public class ContaAdapter extends CursorAdapter {
         idGrupo = ((LancamentoGrupoActivity) context).getIdGrupo();
 
         final ContaHolder holder = (ContaHolder) view.getTag();
-        final String nomeConta = cursor.getString(4);
-        final int idConta = cursor.getInt(1);
+        final String nomeConta = cursor.getString(cursor.getColumnIndex(AlgumDBContract.ContasEntry.COLUMN_NOME));
+        final int idConta = cursor.getInt(cursor.getColumnIndex(AlgumDBContract.ContasEntry.COLUMN_CONTA_ID));
+        final Float saldo = cursor.getFloat(cursor.getColumnIndex(AlgumDBContract.ContasEntry.COLUMN_SALDO));
         final Context mContext = context;
 
         holder.txtNome.setText(nomeConta);
+        holder.txtSub.setText(String.format("%.2f", saldo));
+        //holder.txtSub.setVisibility(View.VISIBLE);
 
-        GradientDrawable gd = (GradientDrawable) holder.txtNome.getBackground();
+        GradientDrawable gd = (GradientDrawable) holder.layout.getBackground();
         gd.setColor(context.getResources().getColor(R.color.tile4));
         TextView txt = (TextView)holder.txtNome;
         txt.setTextColor(context.getResources().getColor(R.color.texto_tipo));
 
-        holder.txtNome.setOnClickListener(new View.OnClickListener() {
+        holder.layout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 ViewParent vwParent = view.getParent();
 
-                for(int index=0; index<((ViewGroup)vwParent).getChildCount(); ++index) {
-                    View nextChild = ((ViewGroup)vwParent).getChildAt(index);
+                for (int index = 0; index < ((ViewGroup) vwParent).getChildCount(); ++index) {
+                    View nextChild = ((ViewGroup) vwParent).getChildAt(index);
                     GradientDrawable gdv = (GradientDrawable) nextChild.getBackground();
                     gdv.setColor(mContext.getResources().getColor(R.color.tile4));
                 }
 
                 GradientDrawable gdv = (GradientDrawable) view.getBackground();
                 gdv.setColor(mContext.getResources().getColor(R.color.tile1));
-                ((LancamentoGrupoActivity) mContext).recebeConta(mDestino, idConta, nomeConta, idGrupo, nomeGrupo, idTipoLancamento);
+                ((LancamentoGrupoActivity) mContext).recebeConta(mDestino, idConta, nomeConta, idGrupo, nomeGrupo, idTipoLancamento, saldo);
             }
         });
 
     }
 
     static class ContaHolder {
+        LinearLayout layout;
         TextView txtNome;
+        TextView txtSub;
 
         public ContaHolder(View view) {
             this.txtNome = (TextView) view.findViewById(R.id.textViewTile);
+            this.txtSub = (TextView) view.findViewById(R.id.txtSub);
+            this.layout = (LinearLayout) view.findViewById(R.id.tilesLayout);
         }
     }
 }

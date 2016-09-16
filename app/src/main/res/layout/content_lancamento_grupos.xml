@@ -5,7 +5,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:paddingBottom="@dimen/activity_vertical_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context="br.com.algum.algum_android.LancamentoContasActivity"
     android:id="@+id/content_main">
@@ -20,21 +19,26 @@
             android:layout_height="wrap_content"
             android:id="@+id/botoesGrupos">
 
-            <TextView
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/txtTipoLancamento"
-                android:layout_below="@+id/linearLayout"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentStart="true" />
+                android:paddingTop="@dimen/activity_vertical_margin"
+                android:paddingBottom="@dimen/activity_vertical_margin"
+                android:orientation="horizontal"
+                android:id="@+id/desGrupo"
+                android:paddingLeft="5dp">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/txtTipoLancamento"
+                    android:textColor="@color/colorText" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/txtGastoGrupo"
+                    android:paddingLeft="5dp"/>
+            </LinearLayout>
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/txtConta"
-                android:layout_below="@+id/txtTipoLancamento"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentStart="true" />
 
 
             <TextView
@@ -42,7 +46,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/contas"
                 android:id="@+id/txtContaOrigem"
-                android:layout_below="@+id/txtConta"
+                android:layout_below="@+id/desGrupo"
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentStart="true"
                 android:padding="5dp" />

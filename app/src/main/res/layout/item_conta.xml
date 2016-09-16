@@ -8,6 +8,7 @@
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:id="@+id/txtNome"
+        android:textColor="@color/colorText"
         android:paddingTop="5dp" />
 
     <LinearLayout

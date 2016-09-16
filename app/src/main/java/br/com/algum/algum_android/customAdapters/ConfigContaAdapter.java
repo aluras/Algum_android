@@ -55,7 +55,7 @@ public class ConfigContaAdapter extends CursorAdapter {
         holder.txtSaldo.setText("R$ " + String.format("%.2f", txtSaldo));
 
         if(txtSaldo>=0){
-            holder.txtSaldo.setTextColor(context.getResources().getColor(R.color.receita));
+            holder.txtSaldo.setTextColor(context.getResources().getColor(R.color.colorAccent));
         }else{
             holder.txtSaldo.setTextColor(context.getResources().getColor(R.color.despesa));
         }

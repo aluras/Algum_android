@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SyncResult;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.Log;
 
 import com.google.android.gms.auth.api.Auth;
@@ -35,9 +36,12 @@ public class AlgumSyncAdapter extends AbstractThreadedSyncAdapter {
 
     private SimpleDateFormat dateTimeFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
 
+    private GoogleApiClient mGoogleApiClient;
+
 
     public AlgumSyncAdapter(Context context, boolean autoInitialize) {
         super(context, autoInitialize);
+
     }
 
 
@@ -59,7 +63,7 @@ public class AlgumSyncAdapter extends AbstractThreadedSyncAdapter {
                 .requestEmail()
                 .build();
 
-        GoogleApiClient mGoogleApiClient = new GoogleApiClient.Builder(getContext())
+        mGoogleApiClient = new GoogleApiClient.Builder(getContext())
                 .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
                 .build();
 
@@ -76,6 +80,9 @@ public class AlgumSyncAdapter extends AbstractThreadedSyncAdapter {
                 syncResult.stats.numAuthExceptions++;
                 syncResult.fullSyncRequested = true;
             }
+
+            SharedPreferences s = PreferenceManager.getDefaultSharedPreferences(getContext());
+            syncResult.delayUntil = Integer.parseInt(s.getString(getContext().getString(R.string.sync_freq),getContext().getString(R.string.sync_freq_default))) *60;
 
             Controle.gravaLog(getContext(), dateTimeFormat.format(new Date()) + " Sync - Concluida", usuarioId);
 

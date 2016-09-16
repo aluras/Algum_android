@@ -157,6 +157,7 @@ public class AlgumContentProvider extends ContentProvider {
                 break;
             }
             case GRUPOS: {
+
                 retCursor = mDbHelper.getReadableDatabase().query(
                         AlgumDBContract.GruposEntry.TABLE_NAME,
                         projection,
@@ -165,6 +166,7 @@ public class AlgumContentProvider extends ContentProvider {
                         null,
                         null,sortOrder
                 );
+
                 break;
             }
             case LANCAMENTOS: {
@@ -310,6 +312,10 @@ public class AlgumContentProvider extends ContentProvider {
             }
             case USUARIOS: {
                 _id = mDbHelper.getWritableDatabase().delete(AlgumDBContract.UsuariosEntry.TABLE_NAME, selection, selectionArgs);
+                break;
+            }
+            case LOG: {
+                _id = mDbHelper.getWritableDatabase().delete(AlgumDBContract.LogEntry.TABLE_NAME, selection, selectionArgs);
                 break;
             }
             default:

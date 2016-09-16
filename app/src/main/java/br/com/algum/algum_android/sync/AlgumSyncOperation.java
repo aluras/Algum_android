@@ -425,6 +425,9 @@ public class AlgumSyncOperation {
             Log.d(LOG_TAG, "Starting sync");
 
             atualizaUsuario();
+            addContas();
+            deleteLancamentos();
+            addLancamentos();
             syncTipoConta();
             syncGrupos();
             syncLancamentos();
@@ -442,32 +445,6 @@ public class AlgumSyncOperation {
 
         }catch (Exception e){
             //Controle.gravaLog(mContext,e.getMessage(),usuarioId);
-            Controle.gravaLog(mContext, dateTimeFormat.format(new Date()) + " - " + e.toString() + e.getMessage(), usuarioId);
-            return false;
-        }
-
-        return true;
-    }
-
-    public void performEdit(){
-        try{
-            addContas();
-            deleteLancamentos();
-            addLancamentos();
-
-        }catch (Exception e){
-            Controle.gravaLog(mContext, dateTimeFormat.format(new Date()) + " - " + e.toString() + e.getMessage(), usuarioId);
-        }
-
-    }
-
-    public boolean performSendEdit(){
-        try{
-            performEdit();
-
-            Controle.syncData(mContext);
-
-        }catch (Exception e){
             Controle.gravaLog(mContext, dateTimeFormat.format(new Date()) + " - " + e.toString() + e.getMessage(), usuarioId);
             return false;
         }

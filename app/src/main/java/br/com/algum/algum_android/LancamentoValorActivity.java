@@ -7,7 +7,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.support.design.widget.NavigationView;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
@@ -15,6 +16,7 @@ import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.DatePicker;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.text.SimpleDateFormat;
@@ -22,17 +24,18 @@ import java.util.Calendar;
 import java.util.Date;
 
 import br.com.algum.algum_android.data.AlgumDBContract;
-import br.com.algum.algum_android.sync.AlgumEditTask;
 import br.com.algum.algum_android.utils.Controle;
 
-public class LancamentoValorActivity extends BaseActivity
-        implements NavigationView.OnNavigationItemSelectedListener,View.OnClickListener {
+public class LancamentoValorActivity extends AppCompatActivity
+        implements View.OnClickListener {
 
     private final String LOG_TAG = LancamentoValorActivity.class.getSimpleName();
     static final int DATE_DIALOG_ID = 0;
 
     private int idTipoLancamento = 1;
     private int idGrupo = 0;
+    private float valorGasto = 0;
+    private float saldo = 0;
     private int idContaOrigem = 0;
     private int idContaDestino = 0;
 
@@ -40,7 +43,11 @@ public class LancamentoValorActivity extends BaseActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_lancamento_valor);
-        super.onCreateDrawer();
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        //super.onCreateDrawer();
 
         Intent intent = getIntent();
 
@@ -48,27 +55,47 @@ public class LancamentoValorActivity extends BaseActivity
         idGrupo = intent.getIntExtra("idGrupo",0);
         idContaOrigem = intent.getIntExtra("idContaOrigem",0);
         idContaDestino = intent.getIntExtra("idContaDestino",0);
+        valorGasto = intent.getFloatExtra("valorGastoGrupo",0);
+        saldo = intent.getFloatExtra("saldoConta",0);
 
+        TextView txtTipoLancamento = (TextView) findViewById(R.id.txtTipoLancamento);
+        TextView txtGasto = (TextView) findViewById(R.id.txtGastoGrupo);
+        txtTipoLancamento.setText(intent.getStringExtra("nomeGrupo"));
+        txtGasto.setText("(R$ " + String.format("%.2f", valorGasto) + " no mês)");
+        if(valorGasto>0){
+            txtGasto.setTextColor(getResources().getColor(R.color.colorAccent));
+        }else if(valorGasto<0){
+            txtGasto.setTextColor(getResources().getColor(R.color.despesa));
+        }
+        RelativeLayout botoesValores = (RelativeLayout) findViewById(R.id.botoesValores);
         String tipoLancamento = "";
         switch (idTipoLancamento){
             case 1:
                 tipoLancamento = getString(R.string.despesa);
+                botoesValores.setBackgroundColor(getResources().getColor(R.color.despesaDisable));
                 break;
             case 2:
                 tipoLancamento = getString(R.string.receita);
+                botoesValores.setBackgroundColor(getResources().getColor(R.color.receitaDisable));
                 break;
             case 3:
+                txtGasto.setVisibility(View.INVISIBLE);
                 tipoLancamento = getString(R.string.transferencia);
+                botoesValores.setBackgroundColor(getResources().getColor(R.color.transferenciaDisable));
                 break;
         }
 
-        TextView txtTipoLancamento = (TextView) findViewById(R.id.txtTipoLancamento);
-        txtTipoLancamento.setText(tipoLancamento + " - " + intent.getStringExtra("nomeGrupo"));
-
         TextView txtConta = (TextView) findViewById(R.id.txtConta);
+        TextView txtSaldo = (TextView) findViewById(R.id.txtSaldoConta);
         if(idTipoLancamento == 3){
             txtConta.setText("Conta: " + intent.getStringExtra("nomeContaOrigem") + " -> " + intent.getStringExtra("nomeContaDestino"));
         }else{
+            txtSaldo.setText("(saldo: R$ "+String.format("%.2f", saldo)+")");
+            if(saldo>0){
+                txtSaldo.setTextColor(getResources().getColor(R.color.colorAccent));
+            }else if(valorGasto<0){
+                txtSaldo.setTextColor(getResources().getColor(R.color.despesa));
+            }
             txtConta.setText("Conta: " + intent.getStringExtra("nomeContaOrigem"));
         }
 
@@ -169,8 +196,7 @@ public class LancamentoValorActivity extends BaseActivity
                 getContentResolver().update(AlgumDBContract.ContasEntry.CONTENT_SALDO_URI, saldoValue, null, null);
 
                 Controle.showMessage(this, "Lançamento registrado.");
-                AlgumEditTask task = new AlgumEditTask(this);
-                task.execute("");
+                Controle.syncData(this);
                 Intent intent = new Intent(this, LancamentoContasActivity.class);
                 startActivity(intent);
 

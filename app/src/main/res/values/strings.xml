@@ -64,4 +64,38 @@
     <string name="content_authority">br.com.algum.algum_android.provider</string>
     <string name="WSurl">http://services.algum.com.br/</string>
 
+    <!-- Preferences -->
+    <string name="sync_freq">sync_freq</string>
+    <string name="sync_ativ">sync_ativ</string>
+    <string name="sync_ativ_default">true</string>
+    <string name="sync_freq_title">Frequência</string>
+    <string name="sync_ativ_title">Ativar</string>
+
+    <string name="sync_freq_default">"60"</string>
+    <string name="sync_title">Sincronização</string>
+    <array name="sync_freq_entries">
+        <item>"5 minutos"</item>
+        <item>"15 minutos"</item>
+        <item>"30 minutos"</item>
+        <item>"1 hora"</item>
+        <item>"3 horas"</item>
+        <item>"6 horas"</item>
+        <item>"12 horas"</item>
+    </array>
+    <array name="sync_freq_values">
+        <item>"5"</item>
+        <item>"15"</item>
+        <item>"30"</item>
+        <item>"60"</item>
+        <item>"180"</item>
+        <item>"360"</item>
+        <item>"720"</item>
+    </array>
+
+    <string name="user_title">Dados de usuário</string>
+    <string name="user_remove">user_remove</string>
+    <string name="user_remove_title">Sair e apagar dados do usuário do dispositivo</string>
+    <string name="log_remove">log_remove</string>
+    <string name="log_remove_title">Limpar log Adm</string>
+
 </resources>

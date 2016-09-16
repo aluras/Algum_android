@@ -17,7 +17,7 @@ import java.util.Date;
 
 import br.com.algum.algum_android.R;
 import br.com.algum.algum_android.data.AlgumDBContract;
-import br.com.algum.algum_android.sync.AlgumEditTask;
+import br.com.algum.algum_android.utils.Controle;
 
 /**
  * Created by sn1007071 on 10/03/2016.
@@ -73,7 +73,7 @@ public class ExtratoAdapter extends CursorAdapter {
         holder.txtGrupo.setText(txtGrupo);
         holder.txtValor.setText("R$ " + String.format("%.2f", txtValor));
         if(txtValor>=0){
-            holder.txtValor.setTextColor(context.getResources().getColor(R.color.receita));
+            holder.txtValor.setTextColor(context.getResources().getColor(R.color.colorAccent));
         }else{
             holder.txtValor.setTextColor(context.getResources().getColor(R.color.despesa));
         }
@@ -93,7 +93,7 @@ public class ExtratoAdapter extends CursorAdapter {
                 TextView lancamentoValor = (TextView) detailView.findViewById(R.id.lancamento_valor);
                 lancamentoValor.setText("Valor: R$ " + String.format("%.2f", txtValor));
                 if(txtValor>=0){
-                    lancamentoValor.setTextColor(context.getResources().getColor(R.color.receita));
+                    lancamentoValor.setTextColor(context.getResources().getColor(R.color.colorAccent));
                 }else{
                     lancamentoValor.setTextColor(context.getResources().getColor(R.color.despesa));
                 }
@@ -116,8 +116,7 @@ public class ExtratoAdapter extends CursorAdapter {
                                 saldoValue.put(AlgumDBContract.ContasEntry.COLUMN_CONTA_ID, idConta);
 
                                 context.getContentResolver().update(AlgumDBContract.ContasEntry.CONTENT_SALDO_URI, saldoValue, null, null);
-                                AlgumEditTask task = new AlgumEditTask(context);
-                                task.execute("");
+                                Controle.syncData(context);
 
                             }
                         })

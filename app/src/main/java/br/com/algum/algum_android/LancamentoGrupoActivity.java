@@ -6,20 +6,22 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.design.widget.NavigationView;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.GridView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import br.com.algum.algum_android.customAdapters.ContaAdapter;
 import br.com.algum.algum_android.data.AlgumDBContract;
 
-public class LancamentoGrupoActivity extends BaseActivity
-        implements NavigationView.OnNavigationItemSelectedListener, LoaderManager.LoaderCallbacks<Cursor> {
+public class LancamentoGrupoActivity extends AppCompatActivity
+        implements LoaderManager.LoaderCallbacks<Cursor> {
 
     private final String LOG_TAG = LancamentoGrupoActivity.class.getSimpleName();
 
@@ -29,6 +31,7 @@ public class LancamentoGrupoActivity extends BaseActivity
     private int idTipoLancamento = 1;
     private String nomeGrupo = "";
     private int idGrupo = 0;
+    private float valorGasto = 0;
     private int idContaOrigem = 0;
     private int idContaDestino = 0;
     private String nomeContaOrigem = "";
@@ -50,13 +53,20 @@ public class LancamentoGrupoActivity extends BaseActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_lancamento_grupo);
-        super.onCreateDrawer();
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        //super.onCreateDrawer();
 
         Intent intent = getIntent();
 
         idTipoLancamento = intent.getIntExtra("tipoLancamento", 1);
         nomeGrupo = intent.getStringExtra("nomeGrupo");
-        idGrupo = intent.getIntExtra("idGrupo",0);
+        idGrupo = intent.getIntExtra("idGrupo", 0);
+        valorGasto = intent.getFloatExtra("valorGastoGrupo",0);
+
+
 
         TextView txtContaOrigem = (TextView) findViewById(R.id.txtContaOrigem);
         TextView txtContaDestino = (TextView) findViewById(R.id.txtContaDestino);
@@ -67,24 +77,37 @@ public class LancamentoGrupoActivity extends BaseActivity
         txtContaDestino.setVisibility(View.GONE);
         gridViewContaDestino.setVisibility(View.GONE);
 
+        TextView txtTipoLancamento = (TextView) findViewById(R.id.txtTipoLancamento);
+        TextView txtGasto = (TextView) findViewById(R.id.txtGastoGrupo);
+        txtTipoLancamento.setText(nomeGrupo);
+        txtGasto.setText("(R$ " + String.format("%.2f", valorGasto) + " no mês)");
+        if(valorGasto>0){
+            txtGasto.setTextColor(getResources().getColor(R.color.colorAccent));
+        }else if(valorGasto<0){
+            txtGasto.setTextColor(getResources().getColor(R.color.despesa));
+        }
+        LinearLayout desGrupo = (LinearLayout) findViewById(R.id.desGrupo);
         String tipoLancamento = "";
         switch (idTipoLancamento){
             case 1:
                 tipoLancamento = getString(R.string.despesa);
+                desGrupo.setBackgroundColor(getResources().getColor(R.color.despesaDisable));
                 break;
             case 2:
                 tipoLancamento = getString(R.string.receita);
+                desGrupo.setBackgroundColor(getResources().getColor(R.color.receitaDisable));
                 break;
             case 3:
                 tipoLancamento = getString(R.string.transferencia);
+                desGrupo.setBackgroundColor(getResources().getColor(R.color.transferenciaDisable));
+                txtGasto.setVisibility(View.INVISIBLE);
                 txtContaOrigem.setText(R.string.contaOrigem);
                 txtContaDestino.setVisibility(View.VISIBLE);
                 gridViewContaDestino.setVisibility(View.VISIBLE);
                 break;
         }
 
-        TextView txtTipoLancamento = (TextView) findViewById(R.id.txtTipoLancamento);
-        txtTipoLancamento.setText(tipoLancamento + " - " + nomeGrupo);
+
 
         mContasAdapter = new ContaAdapter(this,null, 0, false);
         mContasAdapterDestino = new ContaAdapter(this,null, 0, true);
@@ -141,7 +164,7 @@ public class LancamentoGrupoActivity extends BaseActivity
         mContasAdapterDestino.swapCursor(null);
     }
 
-    public void recebeConta(boolean destino, int idConta, String nomeConta, int idGrupo, String nomeGrupo, int tipoLancamento){
+    public void recebeConta(boolean destino, int idConta, String nomeConta, int idGrupo, String nomeGrupo, int tipoLancamento, Float saldo){
 
         if (destino){
             idContaDestino = idConta;
@@ -160,6 +183,8 @@ public class LancamentoGrupoActivity extends BaseActivity
             lancamentoValorIntent.putExtra("nomeContaDestino",nomeContaDestino);
             lancamentoValorIntent.putExtra("idContaOrigem",idContaOrigem);
             lancamentoValorIntent.putExtra("idContaDestino",idContaDestino);
+            lancamentoValorIntent.putExtra("valorGastoGrupo",valorGasto);
+            lancamentoValorIntent.putExtra("saldoConta",saldo);
             this.startActivity(lancamentoValorIntent);
         }
     }

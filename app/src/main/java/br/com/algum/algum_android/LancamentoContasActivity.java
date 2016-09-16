@@ -16,6 +16,8 @@ import android.view.View;
 import android.widget.GridView;
 import android.widget.TextView;
 
+import java.util.Calendar;
+
 import br.com.algum.algum_android.customAdapters.GrupoAdapter;
 import br.com.algum.algum_android.data.AlgumDBContract;
 
@@ -134,13 +136,31 @@ public class LancamentoContasActivity extends BaseActivity
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        Calendar c = Calendar.getInstance();
+        c.set(Calendar.DAY_OF_MONTH,1);
+        long inicioMes = c.getTime().getTime();
+        c.set(Calendar.DAY_OF_MONTH,c.getActualMaximum(Calendar.DAY_OF_MONTH));
+        long finaloMes = c.getTime().getTime();
+
         Uri gruposUri = AlgumDBContract.GruposEntry.CONTENT_URI;
         String selection = AlgumDBContract.GruposEntry.COLUMN_TIPO_ID + " = ?";
         String[] selectionArgs = {String.valueOf(tipoLancamento)};
+        String[] projection = {
+                AlgumDBContract.GruposEntry.COLUMN_ID
+                , AlgumDBContract.GruposEntry.COLUMN_NOME
+                , AlgumDBContract.GruposEntry.COLUMN_GRUPO_ID
+                , AlgumDBContract.GruposEntry.COLUMN_TIPO_ID
+                , "(SELECT SUM("+ AlgumDBContract.LancamentoEntry.TABLE_NAME+"."+ AlgumDBContract.LancamentoEntry.COLUMN_VALOR+") "+
+                    "FROM "+ AlgumDBContract.LancamentoEntry.TABLE_NAME+
+                    " WHERE "+ AlgumDBContract.LancamentoEntry.TABLE_NAME+"."+AlgumDBContract.LancamentoEntry.COLUMN_GRUPO_ID+"="+ AlgumDBContract.GruposEntry.TABLE_NAME+"."+ AlgumDBContract.GruposEntry.COLUMN_GRUPO_ID+
+                    " AND "+ AlgumDBContract.LancamentoEntry.TABLE_NAME+"."+AlgumDBContract.LancamentoEntry.COLUMN_DATA +" >= "+Long.toString(inicioMes)+
+                    " AND "+ AlgumDBContract.LancamentoEntry.TABLE_NAME+"."+AlgumDBContract.LancamentoEntry.COLUMN_DATA +" <= "+Long.toString(finaloMes)+
+                    ") AS "+ AlgumDBContract.GruposEntry.COLUMN_GASTO
+        };
         return new CursorLoader(
                 this,
                 gruposUri,
-                null,
+                projection,
                 selection,
                 selectionArgs,
                 null

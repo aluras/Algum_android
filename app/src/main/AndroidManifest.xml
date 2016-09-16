@@ -19,8 +19,8 @@
         android:theme="@style/ThemeOverlay.MyNoTitleActivity">
         <activity
             android:name=".MainActivity"
-            android:screenOrientation="portrait"
-            android:configChanges="keyboardHidden|orientation|screenSize">
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -36,12 +36,14 @@
         <activity
             android:name=".LancamentoGrupoActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
+            android:parentActivityName=".LancamentoContasActivity"
             android:label="@string/title_activity_main"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".LancamentoValorActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
+            android:parentActivityName=".LancamentoGrupoActivity"
             android:label="@string/title_activity_main"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
@@ -62,13 +64,13 @@
             android:label="@string/title_activity_contas"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
-
-        <activity android:name=".ContasEditActivity"
+        <activity
+            android:name=".ContasEditActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:label="@string/title_activity_contas"
+            android:parentActivityName=".ContasActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar"
-            android:parentActivityName=".ContasActivity" />
+            android:theme="@style/AppTheme.NoActionBar" />
 
         <provider
             android:name=".data.AlgumContentProvider"
@@ -98,6 +100,7 @@
                 android:resource="@xml/syncadapter" />
         </service>
 
+        <activity android:name=".SettingsActivity"></activity>
     </application>
 
 </manifest>
