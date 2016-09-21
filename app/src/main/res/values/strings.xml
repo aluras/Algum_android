@@ -31,7 +31,7 @@
 
     <string name="title_activity_main">Lançamento</string>
     <string name="title_activity_contas">Contas</string>
-    <string name="title_activity_grupos">Grupos</string>
+    <string name="title_activity_grupos">Categorias</string>
     <string name="title_activity_edit_grupo">Novo Grupo</string>
     <string name="title_activity_edit_conta">Nova Conta</string>
     <string name="title_activity_lancamento_grupos">Lançamento - Grupos</string>

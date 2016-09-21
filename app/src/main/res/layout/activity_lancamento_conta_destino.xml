@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    tools:context=".LancamentoGruposActivity">
+    tools:context=".LancamentoContaDestinoActivity">
 
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
@@ -21,4 +21,6 @@
 
     </android.support.design.widget.AppBarLayout>
 
- </android.support.design.widget.CoordinatorLayout>
+    <include layout="@layout/content_lancamento_grupos" />
+
+</android.support.design.widget.CoordinatorLayout>

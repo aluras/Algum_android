@@ -11,23 +11,40 @@
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context="com.example.aluras.mockupalgum.ExtratoActivity">
 
-    <TextView
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="@string/extrato"
-        android:id="@+id/textView3"
-        android:textColor="@color/colorText"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
-    
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:id="@+id/llMes">
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_keyboard_arrow_left_black_24dp"
+            android:id="@+id/mesAnterior"
+            android:backgroundTintMode="screen" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="@string/extrato"
+            android:id="@+id/textView3"
+            android:textColor="@color/colorText" />
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_keyboard_arrow_right_black_24dp"
+            android:id="@+id/mesPosterior"
+            android:backgroundTintMode="screen" />
+
+    </LinearLayout>
+
 
     <ListView
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:id="@+id/listLancamentos"
-        android:layout_below="@+id/textView3"
+        android:layout_below="@+id/llMes"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:layout_marginTop="15dp" />

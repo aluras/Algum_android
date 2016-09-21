@@ -17,6 +17,7 @@ import android.support.v4.content.Loader;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.DatePicker;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -35,6 +36,7 @@ public class ExtratoActivity extends BaseActivity
     static final int MONTH_DIALOG_ID = 0;
     private Date dataExtrato;
     private ListView listLancamentos;
+    private DatePicker datePicker;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,10 +59,15 @@ public class ExtratoActivity extends BaseActivity
         listLancamentos.setAdapter(mAdapter);
 
         TextView txtMes = (TextView) findViewById(R.id.textView3);
-        SimpleDateFormat format = new SimpleDateFormat("MM/yyyy");
-
-        txtMes.setText("Mês: "+format.format(dataExtrato));
+        SimpleDateFormat format = new SimpleDateFormat("MMMM/yyyy");
+        txtMes.setText(format.format(dataExtrato));
         txtMes.setOnClickListener(this);
+
+        ImageButton btAnterior = (ImageButton)findViewById(R.id.mesAnterior);
+        btAnterior.setOnClickListener(this);
+
+        ImageButton btPosterior = (ImageButton)findViewById(R.id.mesPosterior);
+        btPosterior.setOnClickListener(this);
 
     }
 
@@ -127,15 +134,13 @@ public class ExtratoActivity extends BaseActivity
 
     @Override
     protected Dialog onCreateDialog(int id) {
-        Calendar calendario = Calendar.getInstance();
-
         switch (id) {
             case MONTH_DIALOG_ID:
                 AlertDialog.Builder dialog = new AlertDialog.Builder(this);
                 dialog.setTitle("Escolha o mês");
                 LayoutInflater li = getLayoutInflater();
                 View v = li.inflate(R.layout.month_picker, null);
-                final DatePicker datePicker = (DatePicker) v.findViewById(R.id.monthPicker);
+                datePicker = (DatePicker) v.findViewById(R.id.monthPicker);
                 datePicker.findViewById(Resources.getSystem().getIdentifier("day", "id", "android")).setVisibility(View.GONE);
                 dialog.setView(v);
                 dialog.setNegativeButton("Cancelar", null);
@@ -147,8 +152,8 @@ public class ExtratoActivity extends BaseActivity
                         dataExtrato = ca.getTime();
                         getSupportLoaderManager().restartLoader(0,null,ExtratoActivity.this);
                         TextView txtMes = (TextView) findViewById(R.id.textView3);
-                        SimpleDateFormat format = new SimpleDateFormat("MM/yyyy");
-                        txtMes.setText("Mês: " + format.format(dataExtrato));
+                        SimpleDateFormat format = new SimpleDateFormat("MMMM/yyyy");
+                        txtMes.setText(format.format(dataExtrato));
                     }
                 });
 
@@ -162,6 +167,29 @@ public class ExtratoActivity extends BaseActivity
     public void onClick(View v) {
         if (v == (TextView) findViewById(R.id.textView3)){
             showDialog(MONTH_DIALOG_ID);
+            Calendar ca = Calendar.getInstance();
+            ca.setTime(dataExtrato);
+            datePicker.updateDate(ca.get(Calendar.YEAR), ca.get(Calendar.MONTH), ca.get(Calendar.DAY_OF_MONTH));
+        }
+        if (v == (ImageButton) findViewById(R.id.mesAnterior)){
+            Calendar ca = Calendar.getInstance();
+            ca.setTime(dataExtrato);
+            ca.add(Calendar.MONTH, -1);
+            dataExtrato = ca.getTime();
+            getSupportLoaderManager().restartLoader(0,null,ExtratoActivity.this);
+            TextView txtMes = (TextView) findViewById(R.id.textView3);
+            SimpleDateFormat format = new SimpleDateFormat("MMMM/yyyy");
+            txtMes.setText(format.format(dataExtrato));
+        }
+        if (v == (ImageButton) findViewById(R.id.mesPosterior)){
+            Calendar ca = Calendar.getInstance();
+            ca.setTime(dataExtrato);
+            ca.add(Calendar.MONTH, 1);
+            dataExtrato = ca.getTime();
+            getSupportLoaderManager().restartLoader(0,null,ExtratoActivity.this);
+            TextView txtMes = (TextView) findViewById(R.id.textView3);
+            SimpleDateFormat format = new SimpleDateFormat("MMMM/yyyy");
+            txtMes.setText(format.format(dataExtrato));
         }
     }
 
@@ -169,7 +197,7 @@ public class ExtratoActivity extends BaseActivity
     public void onBackPressed() {
         Intent intent;
         if(mIdConta == 0){
-            intent = new Intent(this, LancamentoContasActivity.class);
+            intent = new Intent(this, LancamentoGruposActivity.class);
         }else{
             intent = new Intent(this, ContasActivity.class);
         }

@@ -12,6 +12,9 @@
             android:id="@+id/nav_contas"
             android:title="Contas" />
         <item
+            android:id="@+id/nav_grupos"
+            android:title="Categorias" />
+        <item
             android:id="@+id/nav_log"
             android:title="Log - Admin"
             android:visible="false"/>

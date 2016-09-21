@@ -70,7 +70,7 @@ public class ViewLogActivity extends AppCompatActivity
 
     @Override
     public void onBackPressed() {
-        Intent intent = new Intent(this, LancamentoContasActivity.class);
+        Intent intent = new Intent(this, LancamentoGruposActivity.class);
         startActivity(intent);
     }
 }

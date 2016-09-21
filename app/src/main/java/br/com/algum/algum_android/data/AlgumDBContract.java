@@ -24,6 +24,7 @@ public class AlgumDBContract {
     public static final String PATH_SALDO_CONTA = "saldoConta";
     public static final String PATH_USUARIOS = "usuarios";
     public static final String PATH_GRUPOS = "grupos";
+    public static final String PATH_TIPO_GRUPO = "tipoGrupo";
     public static final String PATH_LANCAMENTOS = "lancamentos";
 
     public static final String PATH_LOG = "log";
@@ -98,6 +99,23 @@ public class AlgumDBContract {
 
     }
 
+    public static final class TipoGrupoEntry implements BaseColumns {
+
+        public static final Uri CONTENT_URI =
+                BASE_CONTENT_URI.buildUpon().appendPath(PATH_TIPO_GRUPO).build();
+
+        public static final String CONTENT_TYPE =
+                "vnd.android.cursor.dir/" + CONTENT_AUTHORITY + "/" + PATH_TIPO_GRUPO;
+        public static final String CONTENT_ITEM_TYPE =
+                "vnd.android.cursor.item/" + CONTENT_AUTHORITY + "/" + PATH_TIPO_GRUPO;
+
+        public static final String TABLE_NAME = "tipoGrupo";
+
+        public static final String COLUMN_ID = "_id";
+        public static final String COLUMN_DESCRICAO = "descricao";
+
+    }
+
     public static final class UsuariosEntry implements BaseColumns {
         public static final Uri CONTENT_URI =
                 BASE_CONTENT_URI.buildUpon().appendPath(PATH_USUARIOS).build();
@@ -133,6 +151,7 @@ public class AlgumDBContract {
         public static final String COLUMN_GRUPO_ID = "grupo_id";
         public static final String COLUMN_NOME = "nome";
         public static final String COLUMN_TIPO_ID = "tipo_id";
+        public static final String COLUMN_USUARIO_ID = "usuario_id";
         public static final String COLUMN_ALTERADO = "alterado";
         public static final String COLUMN_GASTO = "gasto";
 

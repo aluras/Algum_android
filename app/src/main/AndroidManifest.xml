@@ -28,23 +28,23 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".LancamentoContasActivity"
+            android:name=".LancamentoGruposActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:label="@string/title_activity_main"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".LancamentoGrupoActivity"
+            android:name=".LancamentoContaOrigemActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
-            android:parentActivityName=".LancamentoContasActivity"
             android:label="@string/title_activity_main"
+            android:parentActivityName=".LancamentoGruposActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".LancamentoValorActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
-            android:parentActivityName=".LancamentoGrupoActivity"
             android:label="@string/title_activity_main"
+            android:parentActivityName=".LancamentoContaOrigemActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
@@ -69,6 +69,23 @@
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:label="@string/title_activity_contas"
             android:parentActivityName=".ContasActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".GruposActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:label="@string/title_activity_grupos"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".GruposEditActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:label="@string/title_activity_grupos"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".LancamentoContaDestinoActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:label="@string/title_activity_main"
+            android:parentActivityName=".LancamentoGruposActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
 
@@ -100,7 +117,8 @@
                 android:resource="@xml/syncadapter" />
         </service>
 
-        <activity android:name=".SettingsActivity"></activity>
+        <activity android:name=".SettingsActivity" />
+
     </application>
 
 </manifest>

@@ -101,7 +101,7 @@ public class MainActivity extends AppCompatActivity implements
         SharedPreferences sharedPref = getSharedPreferences(getString(R.string.userInfo), Context.MODE_PRIVATE);
         if(sharedPref.contains(getString(R.string.emailUsuario))){
 
-            Intent intent = new Intent(mContext,LancamentoContasActivity.class);
+            Intent intent = new Intent(mContext,LancamentoGruposActivity.class);
             startActivity(intent);
             /*
             OptionalPendingResult<GoogleSignInResult> opr = Auth.GoogleSignInApi.silentSignIn(mGoogleApiClient);

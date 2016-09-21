@@ -12,8 +12,8 @@ import android.widget.CursorAdapter;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import br.com.algum.algum_android.LancamentoContasActivity;
-import br.com.algum.algum_android.LancamentoGrupoActivity;
+import br.com.algum.algum_android.LancamentoGruposActivity;
+import br.com.algum.algum_android.LancamentoContaOrigemActivity;
 import br.com.algum.algum_android.R;
 import br.com.algum.algum_android.data.AlgumDBContract;
 
@@ -45,9 +45,9 @@ public class GrupoAdapter extends CursorAdapter {
 
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
-        idTipoLancamento = ((LancamentoContasActivity) context).getTipoLancamento();
-        //nomeConta = ((LancamentoGrupoActivity) context).getNomeConta();
-        //idConta = ((LancamentoGrupoActivity) context).getIdCOnta();
+        idTipoLancamento = ((LancamentoGruposActivity) context).getTipoLancamento();
+        //nomeConta = ((LancamentoContaOrigemActivity) context).getNomeConta();
+        //idConta = ((LancamentoContaOrigemActivity) context).getIdCOnta();
         final String nomeGrupo = cursor.getString(cursor.getColumnIndex(AlgumDBContract.GruposEntry.COLUMN_NOME));
         final int idGrupo = cursor.getInt(cursor.getColumnIndex(AlgumDBContract.GruposEntry.COLUMN_ID));
         final float valorGasto = cursor.getFloat(cursor.getColumnIndex(AlgumDBContract.GruposEntry.COLUMN_GASTO));
@@ -74,7 +74,7 @@ public class GrupoAdapter extends CursorAdapter {
 
                 GradientDrawable gdv = (GradientDrawable) view.getBackground();
                 gdv.setColor(view.getContext().getResources().getColor(R.color.tile1));
-                Intent lancamentoContaIntent = new Intent(view.getContext(), LancamentoGrupoActivity.class);
+                Intent lancamentoContaIntent = new Intent(view.getContext(), LancamentoContaOrigemActivity.class);
                 lancamentoContaIntent.putExtra("tipoLancamento",idTipoLancamento);
                 //lancamentoValorIntent.putExtra("nomeConta",nomeConta);
                 //lancamentoValorIntent.putExtra("idConta",idConta);

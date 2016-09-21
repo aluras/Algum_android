@@ -155,11 +155,13 @@ public abstract class BaseActivity extends AppCompatActivity
         Intent intent = new Intent();
 
         if (id == R.id.nav_lancamento) {
-            intent = new Intent(this, LancamentoContasActivity.class);
+            intent = new Intent(this, LancamentoGruposActivity.class);
         }else if (id == R.id.nav_extrato){
             intent = new Intent(this, ExtratoActivity.class);
         }else if (id == R.id.nav_contas){
             intent = new Intent(this, ContasActivity.class);
+        }else if (id == R.id.nav_grupos){
+            intent = new Intent(this, GruposActivity.class);
         }else if (id == R.id.nav_log){
             intent = new Intent(this, ViewLogActivity.class);
         }else if (id == R.id.nav_exit) {

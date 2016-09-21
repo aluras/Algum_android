@@ -11,6 +11,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
@@ -197,7 +198,7 @@ public class LancamentoValorActivity extends AppCompatActivity
 
                 Controle.showMessage(this, "Lançamento registrado.");
                 Controle.syncData(this);
-                Intent intent = new Intent(this, LancamentoContasActivity.class);
+                Intent intent = new Intent(this, LancamentoGruposActivity.class);
                 startActivity(intent);
 
             }
@@ -252,5 +253,24 @@ public class LancamentoValorActivity extends AppCompatActivity
         if (v == (TextView) findViewById(R.id.txtData)){
             showDialog(DATE_DIALOG_ID);
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+        Intent intent;
+        intent = new Intent(this, LancamentoGruposActivity.class);
+        startActivity(intent);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        if (id == android.R.id.home) {
+            onBackPressed();
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 }

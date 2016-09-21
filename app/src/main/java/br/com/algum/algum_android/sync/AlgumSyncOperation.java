@@ -108,6 +108,45 @@ public class AlgumSyncOperation {
 
     }
 
+    public void syncTipoGrupo() throws Exception{
+        String TipoGruposJsonStr = null;
+
+        try {
+
+            Log.d(LOG_TAG, "Starting sync Tipo Grupos");
+            final String TIPO_GRUPO_BASE_URL = mContext.getString(R.string.WSurl) + "tipo_grupos";
+            TipoGruposJsonStr = callService(TIPO_GRUPO_BASE_URL);
+
+            JSONArray tipoGruposArray = new JSONArray(TipoGruposJsonStr);
+
+            for(int i = 0; i < tipoGruposArray.length(); i++){
+
+                JSONObject tipoGrupoJson = tipoGruposArray.getJSONObject(i);
+                JSONObject tipoGrupo = tipoGrupoJson.getJSONObject("TipoGrupo");
+
+                String mSelectionClause = AlgumDBContract.TipoGrupoEntry.COLUMN_ID + " = ? ";
+                String[] mSelectionArgs = {tipoGrupo.getString("id")};
+                Cursor cursor = mContext.getContentResolver().query(AlgumDBContract.TipoGrupoEntry.CONTENT_URI, null, mSelectionClause, mSelectionArgs, null);
+
+                ContentValues tipoGruposValues = new ContentValues();
+                tipoGruposValues.put(AlgumDBContract.TipoGrupoEntry.COLUMN_ID, tipoGrupo.getInt("id"));
+                tipoGruposValues.put(AlgumDBContract.TipoGrupoEntry.COLUMN_DESCRICAO, tipoGrupo.getString("nome"));
+
+                if(cursor.getCount() < 1){
+                    mContext.getContentResolver().insert(AlgumDBContract.TipoGrupoEntry.CONTENT_URI, tipoGruposValues);
+                }else{
+                    mContext.getContentResolver().update(AlgumDBContract.TipoGrupoEntry.CONTENT_URI, tipoGruposValues, mSelectionClause,mSelectionArgs);
+                }
+                cursor.close();
+            }
+        }catch (JSONException e) {
+            //Controle.gravaLog(mContext,dateTimeFormat.format(new Date()) + " - " + e.toString() + e.getMessage(),usuarioId);
+            Log.e(LOG_TAG, "Error ", e);
+            throw new Exception(e);
+        }
+
+    }
+
     public void syncGrupos()throws Exception{
         String GruposJsonStr = null;
 
@@ -125,15 +164,16 @@ public class AlgumSyncOperation {
 
                 JSONObject grupoJson = gruposArray.getJSONObject(i);
                 JSONObject grupo = grupoJson.getJSONObject("Grupo");
+                JSONObject grupoUsuario = grupoJson.getJSONObject("GrupoUsuario");
 
                 String mSelectionClause = AlgumDBContract.GruposEntry.COLUMN_GRUPO_ID + " = ? ";
                 String[] mSelectionArgs = {grupo.getString("id")};
                 Cursor cursor = mContext.getContentResolver().query(AlgumDBContract.GruposEntry.CONTENT_URI, null, mSelectionClause, mSelectionArgs, null);
 
                 ContentValues gruposValues = new ContentValues();
-                gruposValues.put(AlgumDBContract.GruposEntry.COLUMN_ID, grupo.getInt("id"));
                 gruposValues.put(AlgumDBContract.GruposEntry.COLUMN_NOME, grupo.getString("nome"));
                 gruposValues.put(AlgumDBContract.GruposEntry.COLUMN_GRUPO_ID, grupo.getInt("id"));
+                gruposValues.put(AlgumDBContract.GruposEntry.COLUMN_USUARIO_ID, grupoUsuario.getInt("usuario_id"));
                 gruposValues.put(AlgumDBContract.GruposEntry.COLUMN_TIPO_ID, grupo.getInt("id_tipo_grupo"));
 
                 if(cursor.getCount() < 1){
@@ -153,13 +193,22 @@ public class AlgumSyncOperation {
     public void addLancamentos()throws Exception{
 
         String LancamentosJsonStr = null;
+        Log.d(LOG_TAG, "Starting add Lancamentos");
         //Controle.gravaLog(mContext, "SyncOperations - Insere Lancamentos", usuarioId);
 
         final String LANCAMENTO_BASE_URL = mContext.getString(R.string.WSurl) + "lancamentos";
 
         try{
             // -- ENVIA OS NOVOS
-            String projection[] = {AlgumDBContract.LancamentoEntry.TABLE_NAME+".*"};
+            String projection[] = {
+                    AlgumDBContract.LancamentoEntry.TABLE_NAME+"."+ AlgumDBContract.LancamentoEntry.COLUMN_ID,
+                    AlgumDBContract.LancamentoEntry.TABLE_NAME+"."+ AlgumDBContract.LancamentoEntry.COLUMN_DATA,
+                    AlgumDBContract.LancamentoEntry.TABLE_NAME+"."+ AlgumDBContract.LancamentoEntry.COLUMN_VALOR,
+                    AlgumDBContract.LancamentoEntry.TABLE_NAME+"."+ AlgumDBContract.LancamentoEntry.COLUMN_OBSERVACAO,
+                    AlgumDBContract.LancamentoEntry.TABLE_NAME+"."+ AlgumDBContract.LancamentoEntry.COLUMN_USUARIO_ID,
+                    AlgumDBContract.GruposEntry.TABLE_NAME+"."+ AlgumDBContract.GruposEntry.COLUMN_GRUPO_ID,
+                    AlgumDBContract.ContasEntry.TABLE_NAME+"."+ AlgumDBContract.ContasEntry.COLUMN_CONTA_ID
+                                };
             String selection = AlgumDBContract.LancamentoEntry.COLUMN_LANCAMENTO_ID + " IS NULL ";
             String sortOrder = AlgumDBContract.LancamentoEntry.COLUMN_DATA;
             Cursor lancamentos = mContext.getContentResolver().query(AlgumDBContract.LancamentoEntry.buildLancamentoUsuarioUri(usuarioId),projection,selection,null,sortOrder);
@@ -170,8 +219,8 @@ public class AlgumSyncOperation {
                 String params = "date="+dateFformat.format(new Date(lancamentos.getLong(lancamentos.getColumnIndex(AlgumDBContract.LancamentoEntry.COLUMN_DATA))) );
                 params = params + "&valor="+lancamentos.getString(lancamentos.getColumnIndex(AlgumDBContract.LancamentoEntry.COLUMN_VALOR));
                 params = params + "&observacao="+lancamentos.getString(lancamentos.getColumnIndex(AlgumDBContract.LancamentoEntry.COLUMN_OBSERVACAO));
-                params = params + "&grupo_id="+lancamentos.getString(lancamentos.getColumnIndex(AlgumDBContract.LancamentoEntry.COLUMN_GRUPO_ID));
-                params = params + "&conta_id="+lancamentos.getString(lancamentos.getColumnIndex(AlgumDBContract.LancamentoEntry.COLUMN_CONTA_ID));
+                params = params + "&grupo_id="+lancamentos.getString(lancamentos.getColumnIndex(AlgumDBContract.GruposEntry.COLUMN_GRUPO_ID));
+                params = params + "&conta_id="+lancamentos.getString(lancamentos.getColumnIndex(AlgumDBContract.ContasEntry.COLUMN_CONTA_ID));
                 params = params + "&usuario_id="+lancamentos.getString(lancamentos.getColumnIndex(AlgumDBContract.LancamentoEntry.COLUMN_USUARIO_ID));
 
                 LancamentosJsonStr = callServiceGrava(LANCAMENTO_BASE_URL,params);
@@ -200,6 +249,7 @@ public class AlgumSyncOperation {
     public void deleteLancamentos()throws Exception{
 
         String LancamentosJsonStr = null;
+        Log.d(LOG_TAG, "Starting delete Lancamentos");
         //Controle.gravaLog(mContext, "SyncOperations - Exclui Lancamentos", usuarioId);
 
         final String LANCAMENTO_BASE_URL = mContext.getString(R.string.WSurl) + "lancamentos";
@@ -256,17 +306,34 @@ public class AlgumSyncOperation {
                         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
                         Long date = dateFormat.parse(lancamento.getString("data")).getTime();
 
-                        ContentValues lancamentoValues = new ContentValues();
-                        lancamentoValues.put(AlgumDBContract.LancamentoEntry.COLUMN_LANCAMENTO_ID, lancamento.getInt("id"));
-                        lancamentoValues.put(AlgumDBContract.LancamentoEntry.COLUMN_CONTA_ID, lancamento.getInt("conta_id"));
-                        lancamentoValues.put(AlgumDBContract.LancamentoEntry.COLUMN_GRUPO_ID, lancamento.getInt("grupo_id"));
-                        lancamentoValues.put(AlgumDBContract.LancamentoEntry.COLUMN_DATA, date);
-                        lancamentoValues.put(AlgumDBContract.LancamentoEntry.COLUMN_OBSERVACAO, lancamento.getString("observacao"));
-                        lancamentoValues.put(AlgumDBContract.LancamentoEntry.COLUMN_VALOR, lancamento.getString("valor"));
-                        lancamentoValues.put(AlgumDBContract.LancamentoEntry.COLUMN_USUARIO_ID, lancamento.getString("usuario_id"));
-                        lancamentoValues.put(AlgumDBContract.LancamentoEntry.COLUMN_EXCLUIDO, 0);
+                        String mSelectionClauseGrupo = AlgumDBContract.GruposEntry.COLUMN_GRUPO_ID + " = ? ";
+                        String[] mSelectionArgsGrupo = {lancamento.getString("grupo_id")};
+                        Cursor cursorGrupo = mContext.getContentResolver().query(AlgumDBContract.GruposEntry.CONTENT_URI, null, mSelectionClauseGrupo, mSelectionArgsGrupo, null);
 
-                        mContext.getContentResolver().insert(AlgumDBContract.LancamentoEntry.CONTENT_URI, lancamentoValues);
+                        String mSelectionClauseConta = AlgumDBContract.ContasEntry.COLUMN_CONTA_ID + " = ? ";
+                        String[] mSelectionArgsConta = {lancamento.getString("conta_id")};
+                        Cursor cursorConta = mContext.getContentResolver().query(AlgumDBContract.ContasEntry.buildContaUsuarioUri(usuarioId), null, mSelectionClauseConta, mSelectionArgsConta, null);
+
+                        if(cursorGrupo.getCount() > 0 && cursorConta.getCount() > 0){
+                            cursorGrupo.moveToFirst();
+                            cursorConta.moveToFirst();
+
+                            ContentValues lancamentoValues = new ContentValues();
+                            lancamentoValues.put(AlgumDBContract.LancamentoEntry.COLUMN_LANCAMENTO_ID, lancamento.getInt("id"));
+                            lancamentoValues.put(AlgumDBContract.LancamentoEntry.COLUMN_CONTA_ID, cursorConta.getInt(cursorConta.getColumnIndex(AlgumDBContract.ContasEntry.COLUMN_ID)));
+                            lancamentoValues.put(AlgumDBContract.LancamentoEntry.COLUMN_GRUPO_ID, cursorGrupo.getInt(cursorGrupo.getColumnIndex(AlgumDBContract.GruposEntry.COLUMN_ID)));
+                            lancamentoValues.put(AlgumDBContract.LancamentoEntry.COLUMN_DATA, date);
+                            lancamentoValues.put(AlgumDBContract.LancamentoEntry.COLUMN_OBSERVACAO, lancamento.getString("observacao"));
+                            lancamentoValues.put(AlgumDBContract.LancamentoEntry.COLUMN_VALOR, lancamento.getString("valor"));
+                            lancamentoValues.put(AlgumDBContract.LancamentoEntry.COLUMN_USUARIO_ID, lancamento.getString("usuario_id"));
+                            lancamentoValues.put(AlgumDBContract.LancamentoEntry.COLUMN_EXCLUIDO, 0);
+
+                            mContext.getContentResolver().insert(AlgumDBContract.LancamentoEntry.CONTENT_URI, lancamentoValues);
+                        }
+
+                        cursorConta.close();
+                        cursorGrupo.close();
+
                     }
                 }else{
                     if(lancamento.getInt("excluido")==1){
@@ -290,6 +357,7 @@ public class AlgumSyncOperation {
 
     public void addContas()throws Exception{
         String ContasJsonStr = null;
+        Log.d(LOG_TAG, "Starting add Contas");
         //Controle.gravaLog(mContext, "SyncOperations - Insere Contas", usuarioId);
 
         final String CONTA_BASE_URL = mContext.getString(R.string.WSurl) + "contas";
@@ -328,6 +396,54 @@ public class AlgumSyncOperation {
                 contas.moveToNext();
             }
             contas.close();
+
+        }catch (JSONException e) {
+            //Controle.gravaLog(mContext, dateTimeFormat.format(new Date()) + " - " + e.toString() + e.getMessage(), usuarioId);
+            Log.e(LOG_TAG, "Error ", e);
+            throw new Exception(e);
+        }
+    }
+
+    public void addGrupos()throws Exception{
+        String GruposJsonStr = null;
+        Log.d(LOG_TAG, "Starting add Grupos");
+        //Controle.gravaLog(mContext, "SyncOperations - Insere Contas", usuarioId);
+
+        final String GRUPO_BASE_URL = mContext.getString(R.string.WSurl) + "grupos";
+        try {
+            // -- ENVIA OS NOVOS
+            String[] projectionGruposAlteradas = {AlgumDBContract.GruposEntry.TABLE_NAME+".*"};
+            String selectionGruposAlteradas = AlgumDBContract.GruposEntry.COLUMN_ALTERADO + " = 1 ";
+            Cursor grupos = mContext.getContentResolver().query(AlgumDBContract.GruposEntry.buildGrupoUri(usuarioId),projectionGruposAlteradas,selectionGruposAlteradas,null,null);
+
+            grupos.moveToFirst();
+            while(grupos.isAfterLast() == false){
+                String params = "nome="+grupos.getString(grupos.getColumnIndex(AlgumDBContract.GruposEntry.COLUMN_NOME));
+                params = params + "&id_tipo_grupo="+grupos.getString(grupos.getColumnIndex(AlgumDBContract.GruposEntry.COLUMN_TIPO_ID));
+                params = params + "&usuario_id="+grupos.getString(grupos.getColumnIndex(AlgumDBContract.GruposEntry.COLUMN_USUARIO_ID));
+
+                if(grupos.getInt(grupos.getColumnIndex(AlgumDBContract.GruposEntry.COLUMN_GRUPO_ID))> 0){
+                    params = params + "&id="+grupos.getString(grupos.getColumnIndex(AlgumDBContract.GruposEntry.COLUMN_GRUPO_ID));
+                    GruposJsonStr = callServiceGrava(GRUPO_BASE_URL + "/" + grupos.getString(grupos.getColumnIndex(AlgumDBContract.GruposEntry.COLUMN_GRUPO_ID)), params);
+                }else{
+                    GruposJsonStr = callServiceGrava(GRUPO_BASE_URL, params);
+                }
+
+
+                JSONObject grupo = new JSONObject(GruposJsonStr).getJSONObject("Grupo");
+
+                String mSelectionClause = AlgumDBContract.ContasEntry.COLUMN_ID + " = ? ";
+                String[] mSelectionArgs = {grupos.getString(grupos.getColumnIndex(AlgumDBContract.GruposEntry.COLUMN_ID))};
+
+                ContentValues values = new ContentValues();
+                values.put(AlgumDBContract.GruposEntry.COLUMN_GRUPO_ID, grupo.getInt("id"));
+                values.put(AlgumDBContract.GruposEntry.COLUMN_ALTERADO, 0);
+
+                mContext.getContentResolver().update(AlgumDBContract.GruposEntry.CONTENT_URI,values,mSelectionClause,mSelectionArgs);
+
+                grupos.moveToNext();
+            }
+            grupos.close();
 
         }catch (JSONException e) {
             //Controle.gravaLog(mContext, dateTimeFormat.format(new Date()) + " - " + e.toString() + e.getMessage(), usuarioId);
@@ -426,12 +542,14 @@ public class AlgumSyncOperation {
 
             atualizaUsuario();
             addContas();
+            addGrupos();
             deleteLancamentos();
             addLancamentos();
             syncTipoConta();
+            syncTipoGrupo();
             syncGrupos();
-            syncLancamentos();
             syncContas();
+            syncLancamentos();
             atualizaDataSync();
 
             Log.d(LOG_TAG, "Finishing sync");

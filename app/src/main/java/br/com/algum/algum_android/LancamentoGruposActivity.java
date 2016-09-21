@@ -21,10 +21,10 @@ import java.util.Calendar;
 import br.com.algum.algum_android.customAdapters.GrupoAdapter;
 import br.com.algum.algum_android.data.AlgumDBContract;
 
-public class LancamentoContasActivity extends BaseActivity
+public class LancamentoGruposActivity extends BaseActivity
         implements NavigationView.OnNavigationItemSelectedListener, LoaderCallbacks<Cursor> {
 
-    private final String LOG_TAG = LancamentoContasActivity.class.getSimpleName();
+    private final String LOG_TAG = LancamentoGruposActivity.class.getSimpleName();
 
 
     // An account type, in the form of a domain name
@@ -142,28 +142,32 @@ public class LancamentoContasActivity extends BaseActivity
         c.set(Calendar.DAY_OF_MONTH,c.getActualMaximum(Calendar.DAY_OF_MONTH));
         long finaloMes = c.getTime().getTime();
 
+        //Uri gruposUri = AlgumDBContract.GruposEntry.buildGrupoUri(id_usuario);
         Uri gruposUri = AlgumDBContract.GruposEntry.CONTENT_URI;
         String selection = AlgumDBContract.GruposEntry.COLUMN_TIPO_ID + " = ?";
         String[] selectionArgs = {String.valueOf(tipoLancamento)};
         String[] projection = {
-                AlgumDBContract.GruposEntry.COLUMN_ID
-                , AlgumDBContract.GruposEntry.COLUMN_NOME
-                , AlgumDBContract.GruposEntry.COLUMN_GRUPO_ID
-                , AlgumDBContract.GruposEntry.COLUMN_TIPO_ID
+                AlgumDBContract.GruposEntry.TABLE_NAME+"."+AlgumDBContract.GruposEntry.COLUMN_ID
+                , AlgumDBContract.GruposEntry.TABLE_NAME+"."+AlgumDBContract.GruposEntry.COLUMN_NOME
+                , AlgumDBContract.GruposEntry.TABLE_NAME+"."+AlgumDBContract.GruposEntry.COLUMN_GRUPO_ID
+                , AlgumDBContract.GruposEntry.TABLE_NAME+"."+AlgumDBContract.GruposEntry.COLUMN_TIPO_ID
                 , "(SELECT SUM("+ AlgumDBContract.LancamentoEntry.TABLE_NAME+"."+ AlgumDBContract.LancamentoEntry.COLUMN_VALOR+") "+
                     "FROM "+ AlgumDBContract.LancamentoEntry.TABLE_NAME+
-                    " WHERE "+ AlgumDBContract.LancamentoEntry.TABLE_NAME+"."+AlgumDBContract.LancamentoEntry.COLUMN_GRUPO_ID+"="+ AlgumDBContract.GruposEntry.TABLE_NAME+"."+ AlgumDBContract.GruposEntry.COLUMN_GRUPO_ID+
+                    " WHERE "+ AlgumDBContract.LancamentoEntry.TABLE_NAME+"."+AlgumDBContract.LancamentoEntry.COLUMN_GRUPO_ID+"="+ AlgumDBContract.GruposEntry.TABLE_NAME+"."+ AlgumDBContract.GruposEntry.COLUMN_ID+
                     " AND "+ AlgumDBContract.LancamentoEntry.TABLE_NAME+"."+AlgumDBContract.LancamentoEntry.COLUMN_DATA +" >= "+Long.toString(inicioMes)+
                     " AND "+ AlgumDBContract.LancamentoEntry.TABLE_NAME+"."+AlgumDBContract.LancamentoEntry.COLUMN_DATA +" <= "+Long.toString(finaloMes)+
                     ") AS "+ AlgumDBContract.GruposEntry.COLUMN_GASTO
         };
+
+        String order = AlgumDBContract.GruposEntry.COLUMN_TIPO_ID +" ASC,"+ AlgumDBContract.GruposEntry.COLUMN_NOME + " ASC";
+
         return new CursorLoader(
                 this,
                 gruposUri,
                 projection,
                 selection,
                 selectionArgs,
-                null
+                order
         );
 
     }

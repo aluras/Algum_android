@@ -3,14 +3,6 @@
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:id="@+id/txtNome"
-        android:textColor="@color/colorText"
-        android:paddingTop="5dp" />
-
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="match_parent"
@@ -22,15 +14,11 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            android:id="@+id/txtTipo" />
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:id="@+id/txtNome"
+            android:padding="5dp" />
 
-        <TextView
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            android:id="@+id/txtSaldo"
-            android:gravity="right" />
+
     </LinearLayout>
 
     <LinearLayout

@@ -23,7 +23,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import br.com.algum.algum_android.BuildConfig;
-import br.com.algum.algum_android.LancamentoContasActivity;
+import br.com.algum.algum_android.LancamentoGruposActivity;
 import br.com.algum.algum_android.MainActivity;
 import br.com.algum.algum_android.R;
 import br.com.algum.algum_android.utils.Controle;
@@ -100,16 +100,23 @@ public class AlgumSyncTask extends AsyncTask<String,Void,String> {
     @Override
     protected void onPostExecute(String s) {
         super.onPostExecute(s);
+/*
         if(idrNoSilentSignIn){
             //ContentResolver.addPeriodicSync(newAccount, AUTHORITY, new Bundle(), 60 * 60);
             if(mContext.getClass() == MainActivity.class){
                 StartSyncService(mContext);
-                Intent intent = new Intent(mContext,LancamentoContasActivity.class);
+                Intent intent = new Intent(mContext,LancamentoGruposActivity.class);
                 mContext.startActivity(intent);
             }
         }else{
             AlgumSyncTask task = new AlgumSyncTask(mContext);
             task.execute("");
+        }
+*/
+        if(mContext.getClass() == MainActivity.class){
+            StartSyncService(mContext);
+            Intent intent = new Intent(mContext,LancamentoGruposActivity.class);
+            mContext.startActivity(intent);
         }
     }
 
