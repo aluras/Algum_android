@@ -192,7 +192,7 @@ public class LancamentoValorActivity extends AppCompatActivity
                 getContentResolver().insert(AlgumDBContract.LancamentoEntry.CONTENT_URI, lancamentoValues);
 
                 saldoValue.put(AlgumDBContract.LancamentoEntry.COLUMN_VALOR, nValor);
-                saldoValue.put(AlgumDBContract.ContasEntry.COLUMN_CONTA_ID, idContaOrigem);
+                saldoValue.put(AlgumDBContract.ContasEntry.COLUMN_ID, idContaOrigem);
 
                 getContentResolver().update(AlgumDBContract.ContasEntry.CONTENT_SALDO_URI, saldoValue, null, null);
 

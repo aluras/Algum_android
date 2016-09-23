@@ -50,7 +50,7 @@ public class GruposActivity extends BaseActivity
             Uri gruposUri = AlgumDBContract.GruposEntry.buildGrupoUri(sharedPref.getInt(getString(R.string.idUsuario), 0));
             //Uri gruposUri = AlgumDBContract.GruposEntry.CONTENT_URI;
 
-            String selection = AlgumDBContract.GruposEntry.COLUMN_TIPO_ID + " = " + id;
+            String selection = AlgumDBContract.GruposEntry.COLUMN_TIPO_ID + " = " + id + " AND " + AlgumDBContract.GruposEntry.COLUMN_EXCLUIDO + " = 0 ";
 
             String[] projection =
                     {

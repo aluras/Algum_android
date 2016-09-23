@@ -14,6 +14,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.SimpleCursorAdapter;
@@ -77,6 +78,11 @@ public class ContasEditActivity extends AppCompatActivity
             editText2.setText(cConta.getString(cConta.getColumnIndex(AlgumDBContract.ContasEntry.COLUMN_NOME)));
             editText3.setText(String.format("%.2f", cConta.getFloat(cConta.getColumnIndex(AlgumDBContract.ContasEntry.COLUMN_SALDO))));
             idTipoConta = cConta.getInt(cConta.getColumnIndex(AlgumDBContract.ContasEntry.COLUMN_TIPO_CONTA_ID));
+
+        }else{
+            if(editText2.requestFocus()) {
+                getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
+            }
 
         }
 
@@ -148,6 +154,11 @@ public class ContasEditActivity extends AppCompatActivity
         Float saldoAtual = Float.parseFloat(editText3.getText().toString().replace(',', '.'));
         Cursor obj = (Cursor) spinner.getSelectedItem();
         int idTipoConta = obj.getInt(obj.getColumnIndex(AlgumDBContract.TipoContaEntry.COLUMN_ID));
+
+        if(nome.equals("")){
+            editText2.setError("Digite o nome");
+            return;
+        }
 
 
         ContentValues values = new ContentValues();

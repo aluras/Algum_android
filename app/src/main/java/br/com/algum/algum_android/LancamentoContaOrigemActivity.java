@@ -106,14 +106,14 @@ public class LancamentoContaOrigemActivity extends AppCompatActivity
 
         String[] projection = {AlgumDBContract.ContasEntry.TABLE_NAME+".*"};
 
-        String selection = "";
+        String selection =  AlgumDBContract.ContasEntry.COLUMN_EXCLUIDO + " = 0 ";
 
         switch (idTipoLancamento){
             case 1:
-                selection =  AlgumDBContract.ContasEntry.COLUMN_TIPO_CONTA_ID + " IN (1,3,4,5) ";
+                selection =  selection + "AND " +AlgumDBContract.ContasEntry.COLUMN_TIPO_CONTA_ID + " IN (1,3,4,5) ";
                 break;
             case 2:
-                selection =  AlgumDBContract.ContasEntry.COLUMN_TIPO_CONTA_ID + " IN (1,2,4,5) ";
+                selection =  selection + "AND " +AlgumDBContract.ContasEntry.COLUMN_TIPO_CONTA_ID + " IN (1,2,4,5) ";
                 break;
         }
 

@@ -1,6 +1,9 @@
 package br.com.algum.algum_android.customAdapters;
 
+import android.app.AlertDialog;
+import android.content.ContentValues;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.view.LayoutInflater;
@@ -14,6 +17,7 @@ import br.com.algum.algum_android.ContasEditActivity;
 import br.com.algum.algum_android.ExtratoActivity;
 import br.com.algum.algum_android.R;
 import br.com.algum.algum_android.data.AlgumDBContract;
+import br.com.algum.algum_android.utils.Controle;
 
 /**
  * Created by sn1007071 on 19/08/2016.
@@ -46,7 +50,6 @@ public class ConfigContaAdapter extends CursorAdapter {
         final String txtTipo = cursor.getString(cursor.getColumnIndex(AlgumDBContract.TipoContaEntry.COLUMN_DESCRICAO));
         final Float txtSaldo = cursor.getFloat(cursor.getColumnIndex(AlgumDBContract.ContasEntry.COLUMN_SALDO));
         final int idConta = cursor.getInt(cursor.getColumnIndex(AlgumDBContract.ContasEntry.COLUMN_ID));
-        final int idConta2 = cursor.getInt(cursor.getColumnIndex(AlgumDBContract.ContasEntry.COLUMN_CONTA_ID));
 
         final ContaHolder holder = (ContaHolder) view.getTag();
 
@@ -92,11 +95,41 @@ public class ConfigContaAdapter extends CursorAdapter {
             public void onClick(View view) {
                 Intent intent = new Intent();
                 intent = new Intent(context, ExtratoActivity.class);
-                intent.putExtra("idConta",idConta2);
+                intent.putExtra("idConta",idConta);
                 context.startActivity(intent);
             }
         });
 
+        ImageButton btnDelete = (ImageButton) view.findViewById(R.id.btnDelete);
+
+        btnDelete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                builder.setTitle("Exclusão de Conta");
+                builder.setMessage("Confirma a exclusão da Conta " + txtNome + "?");
+                builder.setPositiveButton(R.string.excluir, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        ContentValues ContaValues = new ContentValues();
+                        ContaValues.put(AlgumDBContract.ContasEntry.COLUMN_EXCLUIDO, 1);
+                        ContaValues.put(AlgumDBContract.ContasEntry.COLUMN_ALTERADO, 1);
+                        String selection = AlgumDBContract.ContasEntry.COLUMN_ID + " = ? ";
+                        String[] selectionArgs = {Integer.toString(idConta)};
+                        context.getContentResolver().update(AlgumDBContract.ContasEntry.CONTENT_URI, ContaValues, selection, selectionArgs);
+
+                        Controle.gravaLog(context, "Conta " + txtNome + " removida", 0);
+
+                    }
+                })
+                        .setNegativeButton(R.string.cancelar, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+
+                            }
+                        }).show();
+            }
+        });
 
 
 

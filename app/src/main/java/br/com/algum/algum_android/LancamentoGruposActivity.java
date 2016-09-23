@@ -142,9 +142,9 @@ public class LancamentoGruposActivity extends BaseActivity
         c.set(Calendar.DAY_OF_MONTH,c.getActualMaximum(Calendar.DAY_OF_MONTH));
         long finaloMes = c.getTime().getTime();
 
-        //Uri gruposUri = AlgumDBContract.GruposEntry.buildGrupoUri(id_usuario);
-        Uri gruposUri = AlgumDBContract.GruposEntry.CONTENT_URI;
-        String selection = AlgumDBContract.GruposEntry.COLUMN_TIPO_ID + " = ?";
+        Uri gruposUri = AlgumDBContract.GruposEntry.buildGrupoUri(id_usuario);
+        //Uri gruposUri = AlgumDBContract.GruposEntry.CONTENT_URI;
+        String selection = AlgumDBContract.GruposEntry.TABLE_NAME+"."+AlgumDBContract.GruposEntry.COLUMN_TIPO_ID + " = ? AND " + AlgumDBContract.GruposEntry.TABLE_NAME+"."+AlgumDBContract.GruposEntry.COLUMN_EXCLUIDO + " = 0 ";
         String[] selectionArgs = {String.valueOf(tipoLancamento)};
         String[] projection = {
                 AlgumDBContract.GruposEntry.TABLE_NAME+"."+AlgumDBContract.GruposEntry.COLUMN_ID
@@ -159,7 +159,7 @@ public class LancamentoGruposActivity extends BaseActivity
                     ") AS "+ AlgumDBContract.GruposEntry.COLUMN_GASTO
         };
 
-        String order = AlgumDBContract.GruposEntry.COLUMN_TIPO_ID +" ASC,"+ AlgumDBContract.GruposEntry.COLUMN_NOME + " ASC";
+        String order = AlgumDBContract.GruposEntry.TABLE_NAME+"."+AlgumDBContract.GruposEntry.COLUMN_TIPO_ID +" ASC,"+ AlgumDBContract.GruposEntry.TABLE_NAME+"."+AlgumDBContract.GruposEntry.COLUMN_NOME + " ASC";
 
         return new CursorLoader(
                 this,

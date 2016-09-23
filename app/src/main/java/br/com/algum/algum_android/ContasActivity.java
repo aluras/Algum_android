@@ -42,7 +42,7 @@ public class ContasActivity extends BaseActivity
         SharedPreferences sharedPref = getSharedPreferences(getString(R.string.userInfo), Context.MODE_PRIVATE);
         Uri contasUri = AlgumDBContract.ContasEntry.buildContaUsuarioUri(sharedPref.getInt(getString(R.string.idUsuario), 0));
 
-        String selection = "";
+        String selection = AlgumDBContract.ContasEntry.COLUMN_EXCLUIDO + " = 0 ";
 
         String[] projection =
                 {

@@ -78,6 +78,10 @@ public class AlgumSyncOperation {
             final String TIPO_CONTA_BASE_URL = mContext.getString(R.string.WSurl) + "tipo_contas";
             TipoContasJsonStr = callService(TIPO_CONTA_BASE_URL);
 
+            if(TipoContasJsonStr.equals("")){
+                return;
+            }
+
             JSONArray tipoContasArray = new JSONArray(TipoContasJsonStr);
 
             for(int i = 0; i < tipoContasArray.length(); i++){
@@ -116,7 +120,9 @@ public class AlgumSyncOperation {
             Log.d(LOG_TAG, "Starting sync Tipo Grupos");
             final String TIPO_GRUPO_BASE_URL = mContext.getString(R.string.WSurl) + "tipo_grupos";
             TipoGruposJsonStr = callService(TIPO_GRUPO_BASE_URL);
-
+            if(TipoGruposJsonStr.equals("")){
+                return;
+            }
             JSONArray tipoGruposArray = new JSONArray(TipoGruposJsonStr);
 
             for(int i = 0; i < tipoGruposArray.length(); i++){
@@ -158,6 +164,10 @@ public class AlgumSyncOperation {
             final String GRUPO_BASE_URL = mContext.getString(R.string.WSurl) + "grupos";
             GruposJsonStr = callService(GRUPO_BASE_URL);
 
+            if(GruposJsonStr.equals("")){
+                return;
+            }
+
             JSONArray gruposArray = new JSONArray(GruposJsonStr);
 
             for(int i = 0; i < gruposArray.length(); i++){
@@ -175,6 +185,7 @@ public class AlgumSyncOperation {
                 gruposValues.put(AlgumDBContract.GruposEntry.COLUMN_GRUPO_ID, grupo.getInt("id"));
                 gruposValues.put(AlgumDBContract.GruposEntry.COLUMN_USUARIO_ID, grupoUsuario.getInt("usuario_id"));
                 gruposValues.put(AlgumDBContract.GruposEntry.COLUMN_TIPO_ID, grupo.getInt("id_tipo_grupo"));
+                gruposValues.put(AlgumDBContract.GruposEntry.COLUMN_EXCLUIDO, grupo.getInt("excluido"));
 
                 if(cursor.getCount() < 1){
                     mContext.getContentResolver().insert(AlgumDBContract.GruposEntry.CONTENT_URI, gruposValues);
@@ -225,6 +236,9 @@ public class AlgumSyncOperation {
 
                 LancamentosJsonStr = callServiceGrava(LANCAMENTO_BASE_URL,params);
 
+                if(LancamentosJsonStr.equals("")){
+                    return;
+                }
                 JSONObject lancamento = new JSONObject(LancamentosJsonStr).getJSONObject("Lancamento");
 
                 String mSelectionClause = AlgumDBContract.LancamentoEntry.COLUMN_ID + " = ? ";
@@ -290,6 +304,9 @@ public class AlgumSyncOperation {
 
             //-- RECEBE OS QUE NÃO ESTÃO LOCAL
             LancamentosJsonStr = callService(LANCAMENTO_BASE_URL);
+            if(LancamentosJsonStr.equals("")){
+                return;
+            }
             JSONArray lancamentoArray = new JSONArray(LancamentosJsonStr);
 
             for(int i = 0; i < lancamentoArray.length(); i++){
@@ -310,9 +327,10 @@ public class AlgumSyncOperation {
                         String[] mSelectionArgsGrupo = {lancamento.getString("grupo_id")};
                         Cursor cursorGrupo = mContext.getContentResolver().query(AlgumDBContract.GruposEntry.CONTENT_URI, null, mSelectionClauseGrupo, mSelectionArgsGrupo, null);
 
+                        String[] projectionConta = {AlgumDBContract.ContasEntry.TABLE_NAME+"."+AlgumDBContract.ContasEntry.COLUMN_ID};
                         String mSelectionClauseConta = AlgumDBContract.ContasEntry.COLUMN_CONTA_ID + " = ? ";
                         String[] mSelectionArgsConta = {lancamento.getString("conta_id")};
-                        Cursor cursorConta = mContext.getContentResolver().query(AlgumDBContract.ContasEntry.buildContaUsuarioUri(usuarioId), null, mSelectionClauseConta, mSelectionArgsConta, null);
+                        Cursor cursorConta = mContext.getContentResolver().query(AlgumDBContract.ContasEntry.buildContaUsuarioUri(usuarioId), projectionConta, mSelectionClauseConta, mSelectionArgsConta, null);
 
                         if(cursorGrupo.getCount() > 0 && cursorConta.getCount() > 0){
                             cursorGrupo.moveToFirst();
@@ -373,6 +391,7 @@ public class AlgumSyncOperation {
                 params = params + "&saldo="+contas.getString(contas.getColumnIndex(AlgumDBContract.ContasEntry.COLUMN_SALDO));
                 params = params + "&tipo_conta_id="+contas.getString(contas.getColumnIndex(AlgumDBContract.ContasEntry.COLUMN_TIPO_CONTA_ID));
                 params = params + "&usuario_id="+contas.getString(contas.getColumnIndex(AlgumDBContract.ContasEntry.COLUMN_USUARIO_ID));
+                params = params + "&excluido="+contas.getString(contas.getColumnIndex(AlgumDBContract.ContasEntry.COLUMN_EXCLUIDO));
 
                 if(contas.getInt(contas.getColumnIndex(AlgumDBContract.ContasEntry.COLUMN_CONTA_ID))> 0){
                     params = params + "&id="+contas.getString(contas.getColumnIndex(AlgumDBContract.ContasEntry.COLUMN_CONTA_ID));
@@ -381,6 +400,9 @@ public class AlgumSyncOperation {
                     ContasJsonStr = callServiceGrava(CONTA_BASE_URL, params);
                 }
 
+                if(ContasJsonStr.equals("")){
+                    return;
+                }
 
                 JSONObject conta = new JSONObject(ContasJsonStr).getJSONObject("Conta");
 
@@ -421,6 +443,7 @@ public class AlgumSyncOperation {
                 String params = "nome="+grupos.getString(grupos.getColumnIndex(AlgumDBContract.GruposEntry.COLUMN_NOME));
                 params = params + "&id_tipo_grupo="+grupos.getString(grupos.getColumnIndex(AlgumDBContract.GruposEntry.COLUMN_TIPO_ID));
                 params = params + "&usuario_id="+grupos.getString(grupos.getColumnIndex(AlgumDBContract.GruposEntry.COLUMN_USUARIO_ID));
+                params = params + "&excluido="+grupos.getString(grupos.getColumnIndex(AlgumDBContract.GruposEntry.COLUMN_EXCLUIDO));
 
                 if(grupos.getInt(grupos.getColumnIndex(AlgumDBContract.GruposEntry.COLUMN_GRUPO_ID))> 0){
                     params = params + "&id="+grupos.getString(grupos.getColumnIndex(AlgumDBContract.GruposEntry.COLUMN_GRUPO_ID));
@@ -428,7 +451,9 @@ public class AlgumSyncOperation {
                 }else{
                     GruposJsonStr = callServiceGrava(GRUPO_BASE_URL, params);
                 }
-
+                if(GruposJsonStr.equals("")){
+                    return;
+                }
 
                 JSONObject grupo = new JSONObject(GruposJsonStr).getJSONObject("Grupo");
 
@@ -464,6 +489,9 @@ public class AlgumSyncOperation {
             //RECEBE AS DO SERVIDOR
             ContasJsonStr = callService(CONTA_BASE_URL);
 
+            if(ContasJsonStr.equals("")){
+                return;
+            }
             JSONArray contasArray = new JSONArray(ContasJsonStr);
 
             for(int i = 0; i < contasArray.length(); i++){
@@ -483,6 +511,7 @@ public class AlgumSyncOperation {
                 contasValues.put(AlgumDBContract.ContasEntry.COLUMN_USUARIO_ID, contaUsuario.getInt("usuario_id"));
                 contasValues.put(AlgumDBContract.ContasEntry.COLUMN_SALDO_INICIAL, conta.getString("saldo_inicial"));
                 contasValues.put(AlgumDBContract.ContasEntry.COLUMN_SALDO, conta.getString("saldo"));
+                contasValues.put(AlgumDBContract.ContasEntry.COLUMN_EXCLUIDO, conta.getInt("excluido"));
 
                 if(cursor.getCount() < 1){
 
@@ -515,7 +544,14 @@ public class AlgumSyncOperation {
         String params = "id="+usuarioId;
         params = params + "&sincronizado="+format.format(new Date(usuarios.getLong(usuarios.getColumnIndex(AlgumDBContract.UsuariosEntry.COLUMN_DATA_SYNC))));
 
-        callServiceGrava(CONTA_BASE_URL + "/" + usuarioId, params);
+        usuarios.close();
+
+        String usuariosJsonStr = callServiceGrava(CONTA_BASE_URL + "/" + usuarioId, params);
+
+        if(usuariosJsonStr.equals("")){
+            return;
+        }
+
 
     }
 
@@ -563,7 +599,7 @@ public class AlgumSyncOperation {
 
         }catch (Exception e){
             //Controle.gravaLog(mContext,e.getMessage(),usuarioId);
-            Controle.gravaLog(mContext, dateTimeFormat.format(new Date()) + " - " + e.toString() + e.getMessage(), usuarioId);
+            Controle.gravaLog(mContext, dateTimeFormat.format(new Date()) + " - " + e.getMessage(), usuarioId);
             return false;
         }
 
@@ -585,8 +621,14 @@ public class AlgumSyncOperation {
             urlConnection.setRequestProperty("Application-Authorization", tok);
             urlConnection.connect();
 
-            // Read the input stream into a String
-            InputStream inputStream = urlConnection.getInputStream();
+            InputStream inputStream;
+
+            if(urlConnection.getResponseCode() != 200){
+                inputStream = urlConnection.getErrorStream();
+            }else{
+                inputStream = urlConnection.getInputStream();
+            }
+
             StringBuffer buffer = new StringBuffer();
             if (inputStream == null) {
                 // Nothing to do.
@@ -605,6 +647,13 @@ public class AlgumSyncOperation {
             if (buffer.length() == 0) {
                 // Stream was empty.  No point in parsing.
                 return "";
+            }
+
+            if(urlConnection.getResponseCode() != 200){
+                JSONObject jsonObject = new JSONObject(buffer.toString());
+                JSONObject objErro = jsonObject.getJSONObject("error");
+                //Controle.gravaLog(mContext,"Erro em: "+objErro.getString("url") + " /n " + objErro.getString("name"),usuarioId);
+                throw new Exception("Erro em: "+objErro.getString("url") + " - " + objErro.getString("name"));
             }
             return buffer.toString();
         }catch (IOException e) {
@@ -649,8 +698,14 @@ public class AlgumSyncOperation {
             writer.flush();
             writer.close();
 
-            // Read the input stream into a String
-            InputStream inputStream = urlConnection.getInputStream();
+            InputStream inputStream;
+
+            if(urlConnection.getResponseCode() != 200){
+                inputStream = urlConnection.getErrorStream();
+            }else{
+                inputStream = urlConnection.getInputStream();
+            }
+
             StringBuffer buffer = new StringBuffer();
             if (inputStream == null) {
                 // Nothing to do.
@@ -669,6 +724,13 @@ public class AlgumSyncOperation {
             if (buffer.length() == 0) {
                 // Stream was empty.  No point in parsing.
                 return "";
+            }
+
+            if(urlConnection.getResponseCode() != 200){
+                JSONObject jsonObject = new JSONObject(buffer.toString());
+                JSONObject objErro = jsonObject.getJSONObject("error");
+                //Controle.gravaLog(mContext,"Erro em: "+objErro.getString("url") + " /n " + objErro.getString("name"),usuarioId);
+                throw new Exception("Erro em: "+objErro.getString("url") + " - " + objErro.getString("name"));
             }
             return buffer.toString();
         }catch (IOException e) {
@@ -707,7 +769,26 @@ public class AlgumSyncOperation {
             urlConnection.setRequestProperty("Application-Authorization", tok);
             urlConnection.setUseCaches(false);
 
-            urlConnection.getResponseCode();
+            if(urlConnection.getResponseCode() != 200){
+                InputStream inputStream;
+                inputStream = urlConnection.getErrorStream();
+
+                StringBuffer buffer = new StringBuffer();
+
+                reader = new BufferedReader(new InputStreamReader(inputStream));
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    // Since it's JSON, adding a newline isn't necessary (it won't affect parsing)
+                    // But it does make debugging a *lot* easier if you print out the completed
+                    // buffer for debugging.
+                    buffer.append(line + "\n");
+                }
+
+                JSONObject jsonObject = new JSONObject(buffer.toString());
+                JSONObject objErro = jsonObject.getJSONObject("error");
+                //Controle.gravaLog(mContext,"Erro em: "+objErro.getString("url") + " /n " + objErro.getString("name"),usuarioId);
+                throw new Exception("Erro em: "+objErro.getString("url") + " - " + objErro.getString("name"));
+            }
 
 
         }catch (IOException e) {

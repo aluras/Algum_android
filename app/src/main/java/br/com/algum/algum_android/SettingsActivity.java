@@ -1,9 +1,9 @@
 package br.com.algum.algum_android;
 
 import android.accounts.Account;
-import android.accounts.AccountManager;
 import android.app.AlertDialog;
 import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -96,6 +96,7 @@ public class SettingsActivity extends AppCompatActivity {
                                             getActivity().getContentResolver().delete(AlgumDBContract.LancamentoEntry.CONTENT_URI, null, null);
                                             getActivity().getContentResolver().delete(AlgumDBContract.ContasEntry.CONTENT_URI, null, null);
                                             getActivity().getContentResolver().delete(AlgumDBContract.GruposEntry.CONTENT_URI, null, null);
+                                            getActivity().getContentResolver().delete(AlgumDBContract.GrupoUsuariosEntry.CONTENT_URI, null, null);
                                             getActivity().getContentResolver().delete(AlgumDBContract.UsuariosEntry.CONTENT_URI, null, null);
                                             getActivity().getSharedPreferences(getString(R.string.userInfo), Context.MODE_PRIVATE).edit().clear().commit();
                                             startActivity(new Intent(mContext, MainActivity.class));
@@ -124,6 +125,33 @@ public class SettingsActivity extends AppCompatActivity {
                      return true;
                 }
             });
+
+            Preference myPrefSyncFull = findPreference(getString(R.string.sync_full));
+            myPrefSyncFull.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+                public boolean onPreferenceClick(Preference pref) {
+                    ContentValues usuarioValues = new ContentValues();
+                    usuarioValues.put(AlgumDBContract.UsuariosEntry.COLUMN_DATA_SYNC, 0L);
+                    SharedPreferences sharedPref = getActivity().getSharedPreferences(getString(R.string.userInfo), Context.MODE_PRIVATE);
+
+                    String mSelectionClause = AlgumDBContract.UsuariosEntry.COLUMN_ID + " = ? ";
+                    String[] mSelectionArgs = {Integer.toString(sharedPref.getInt(mContext.getString(R.string.idUsuario), 0))};
+
+                    mContext.getContentResolver().update(AlgumDBContract.UsuariosEntry.CONTENT_URI, usuarioValues, mSelectionClause, mSelectionArgs);
+
+                    Account newAccount = new Account(
+                            sharedPref.getString(mContext.getString(R.string.emailUsuario), "")
+                            , getActivity().getString(R.string.sync_account_type));
+
+                    Bundle bundle = new Bundle();
+                    bundle.putBoolean(ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
+                    bundle.putBoolean(ContentResolver.SYNC_EXTRAS_MANUAL, true);
+
+                    ContentResolver.requestSync(newAccount,AUTHORITY,bundle);
+                    Controle.showMessage(getActivity(), "Sincronização completa solicitada.");
+                    return true;
+                }
+            });
+
         }
 
         @Override
@@ -147,10 +175,6 @@ public class SettingsActivity extends AppCompatActivity {
                 Account newAccount = new Account(
                         sharedPref.getString(mContext.getString(R.string.emailUsuario), "")
                         , getActivity().getString(R.string.sync_account_type));
-                // Get an instance of the Android account manager
-                AccountManager accountManager =
-                        (AccountManager) getActivity().getSystemService(
-                                Context.ACCOUNT_SERVICE);
 
                 ContentResolver.addPeriodicSync(newAccount, AUTHORITY, new Bundle(),
                         Integer.parseInt(sharedPreferences.getString(s,mContext.getString(R.string.sync_freq_default))) * 60);
@@ -162,9 +186,13 @@ public class SettingsActivity extends AppCompatActivity {
                         sharedPref.getString(mContext.getString(R.string.emailUsuario), "")
                         , getActivity().getString(R.string.sync_account_type));
                 if(sharedPreferences.getBoolean(s,false)){
+                    ContentResolver.setIsSyncable(newAccount,AUTHORITY,1);
+                    ContentResolver.setSyncAutomatically(newAccount,AUTHORITY,true);
                     ContentResolver.addPeriodicSync(newAccount, AUTHORITY, new Bundle(),
                             Integer.parseInt(sharedPreferences.getString(mContext.getString(R.string.sync_freq),mContext.getString(R.string.sync_freq_default))) * 60);
                 }else{
+                    ContentResolver.setIsSyncable(newAccount, AUTHORITY, 0);
+                    ContentResolver.cancelSync(newAccount, AUTHORITY);
                     ContentResolver.removePeriodicSync(newAccount, AUTHORITY, new Bundle());
                 }
                 Controle.gravaLog(this.getActivity(),"Ativação de sincronização para "+Boolean.toString(sharedPreferences.getBoolean(s, false)),0);

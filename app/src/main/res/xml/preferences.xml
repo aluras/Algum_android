@@ -18,6 +18,11 @@
             android:dependency="@string/sync_ativ"
             android:summary="%s"/>
 
+        <Preference
+            android:title="@string/sync_full_title"
+            android:key="@string/sync_full"
+            />
+
 
     </PreferenceCategory>
     <PreferenceCategory

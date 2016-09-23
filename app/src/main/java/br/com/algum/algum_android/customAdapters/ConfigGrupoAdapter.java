@@ -1,6 +1,9 @@
 package br.com.algum.algum_android.customAdapters;
 
+import android.app.AlertDialog;
+import android.content.ContentValues;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
@@ -17,6 +20,7 @@ import br.com.algum.algum_android.GruposActivity;
 import br.com.algum.algum_android.GruposEditActivity;
 import br.com.algum.algum_android.R;
 import br.com.algum.algum_android.data.AlgumDBContract;
+import br.com.algum.algum_android.utils.Controle;
 
 
 /**
@@ -46,7 +50,7 @@ public class ConfigGrupoAdapter extends CursorTreeAdapter {
         Uri gruposUri = AlgumDBContract.GruposEntry.buildGrupoUri(sharedPref.getInt(activity.getString(R.string.idUsuario), 0));
         //Uri gruposUri = AlgumDBContract.GruposEntry.CONTENT_URI;
 
-        String selection = AlgumDBContract.GruposEntry.COLUMN_TIPO_ID + " = " + groupId;
+        String selection = AlgumDBContract.GruposEntry.COLUMN_TIPO_ID + " = " + groupId  + " AND " + AlgumDBContract.GruposEntry.COLUMN_EXCLUIDO + " = 0 ";
 
         String[] projection =
                 {
@@ -131,9 +135,9 @@ public class ConfigGrupoAdapter extends CursorTreeAdapter {
             @Override
             public void onClick(View view) {
                 View vwBtns = view.findViewById(R.id.vwBtns);
-                if(vwBtns.getVisibility() == View.GONE){
+                if (vwBtns.getVisibility() == View.GONE) {
                     vwBtns.setVisibility(View.VISIBLE);
-                }else{
+                } else {
                     vwBtns.setVisibility(View.GONE);
                 }
             }
@@ -151,6 +155,36 @@ public class ConfigGrupoAdapter extends CursorTreeAdapter {
             }
         });
 
+        ImageButton btnDelete = (ImageButton) view.findViewById(R.id.btnDelete);
+
+        btnDelete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                builder.setTitle("Exclusão de Categoria");
+                builder.setMessage("Confirma a exclusão da Categoria " + txtNome + "?");
+                builder.setPositiveButton(R.string.excluir, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        ContentValues GrupoValues = new ContentValues();
+                        GrupoValues.put(AlgumDBContract.GruposEntry.COLUMN_EXCLUIDO, 1);
+                        GrupoValues.put(AlgumDBContract.GruposEntry.COLUMN_ALTERADO, 1);
+                        String selection = AlgumDBContract.GruposEntry.COLUMN_ID + " = ? ";
+                        String[] selectionArgs = {Integer.toString(idGrupo)};
+                        context.getContentResolver().update(AlgumDBContract.GruposEntry.CONTENT_URI, GrupoValues, selection, selectionArgs);
+
+                        Controle.gravaLog(context, "Categoria "+txtNome+" removida", 0);
+
+                    }
+                })
+                        .setNegativeButton(R.string.cancelar, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+
+                            }
+                        }).show();
+            }
+        });
 
         ImageButton btnExtrato = (ImageButton) view.findViewById(R.id.btnExtrato);
 

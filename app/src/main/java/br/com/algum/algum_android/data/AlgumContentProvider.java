@@ -22,11 +22,11 @@ public class AlgumContentProvider extends ContentProvider {
 
     private static final int USUARIOS = 200;
     private static final int USUARIOS_POR_ID = 201;
-    private static final int USUARIOS_LOGOUT = 202;
 
     private static final int GRUPOS = 300;
     private static final int GRUPOS_POR_USUARIO = 301;
     private static final int TIPOS_GRUPOS = 302;
+    private static final int USUARIOS_POR_GRUPO = 303;
 
     private static final int LANCAMENTOS = 400;
     private static final int LANCAMENTOS_POR_USUARIO = 401;
@@ -55,6 +55,7 @@ public class AlgumContentProvider extends ContentProvider {
         matcher.addURI(authority, AlgumDBContract.PATH_GRUPOS, GRUPOS);
         matcher.addURI(authority, AlgumDBContract.PATH_GRUPOS + "/*", GRUPOS_POR_USUARIO);
         matcher.addURI(authority, AlgumDBContract.PATH_TIPO_GRUPO, TIPOS_GRUPOS);
+        matcher.addURI(authority, AlgumDBContract.PATH_GRUPO_USUARIOS, USUARIOS_POR_GRUPO);
 
         matcher.addURI(authority, AlgumDBContract.PATH_LANCAMENTOS, LANCAMENTOS);
         matcher.addURI(authority, AlgumDBContract.PATH_LANCAMENTOS + "/*", LANCAMENTOS_POR_USUARIO);
@@ -202,6 +203,19 @@ public class AlgumContentProvider extends ContentProvider {
 
                 break;
             }
+            case USUARIOS_POR_GRUPO: {
+
+                retCursor = mDbHelper.getReadableDatabase().query(
+                        AlgumDBContract.GrupoUsuariosEntry.TABLE_NAME,
+                        projection,
+                        selection,
+                        selectionArgs,
+                        null,
+                        null,sortOrder
+                );
+
+                break;
+            }
             case LANCAMENTOS: {
                 retCursor = mDbHelper.getReadableDatabase().query(
                         AlgumDBContract.LancamentoEntry.TABLE_NAME,
@@ -308,6 +322,14 @@ public class AlgumContentProvider extends ContentProvider {
                     throw new android.database.SQLException("Failed to insert row into " + uri);
                 break;
             }
+            case USUARIOS_POR_GRUPO:{
+                long _id = mDbHelper.getWritableDatabase().insert(AlgumDBContract.GrupoUsuariosEntry.TABLE_NAME, null, values);
+                if ( _id > 0 )
+                    returnUri = null;
+                else
+                    throw new android.database.SQLException("Failed to insert row into " + uri);
+                break;
+            }
             case LANCAMENTOS:{
                 long _id = mDbHelper.getWritableDatabase().insert(AlgumDBContract.LancamentoEntry.TABLE_NAME, null, values);
                 if ( _id > 0 )
@@ -351,6 +373,10 @@ public class AlgumContentProvider extends ContentProvider {
                 _id = mDbHelper.getWritableDatabase().delete(AlgumDBContract.GruposEntry.TABLE_NAME, selection, selectionArgs);
                 break;
             }
+            case USUARIOS_POR_GRUPO: {
+                _id = mDbHelper.getWritableDatabase().delete(AlgumDBContract.GrupoUsuariosEntry.TABLE_NAME, selection, selectionArgs);
+                break;
+            }
             case USUARIOS: {
                 _id = mDbHelper.getWritableDatabase().delete(AlgumDBContract.UsuariosEntry.TABLE_NAME, selection, selectionArgs);
                 break;
@@ -385,7 +411,7 @@ public class AlgumContentProvider extends ContentProvider {
 
                 String strUpdate = "update "+ AlgumDBContract.ContasEntry.TABLE_NAME
                         +" set "+ AlgumDBContract.ContasEntry.COLUMN_SALDO+" = "+ AlgumDBContract.ContasEntry.COLUMN_SALDO+"+("+values.getAsString(AlgumDBContract.LancamentoEntry.COLUMN_VALOR)+")"
-                        +" where "+ AlgumDBContract.ContasEntry.COLUMN_CONTA_ID+" = "+ values.getAsString(AlgumDBContract.ContasEntry.COLUMN_CONTA_ID);
+                        +" where "+ AlgumDBContract.ContasEntry.COLUMN_ID+" = "+ values.getAsString(AlgumDBContract.ContasEntry.COLUMN_ID);
                 mDbHelper.getWritableDatabase().execSQL(strUpdate);
                 break;
             }
@@ -406,7 +432,8 @@ public class AlgumContentProvider extends ContentProvider {
                 //if (_id == 0)
                 //    throw new android.database.SQLException("Failed to update row into " + uri);
                 break;
-            }            case USUARIOS: {
+            }
+            case USUARIOS: {
                 _id = mDbHelper.getWritableDatabase().update(AlgumDBContract.UsuariosEntry.TABLE_NAME, values, selection, selectionArgs);
                 //if (_id == 0)
                 //    throw new android.database.SQLException("Failed to update row into " + uri);

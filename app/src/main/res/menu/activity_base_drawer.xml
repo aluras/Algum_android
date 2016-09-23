@@ -6,6 +6,9 @@
             android:id="@+id/nav_lancamento"
              android:title="Lancamento" />
         <item
+            android:id="@+id/nav_graficos"
+            android:title="Gráficos" />
+        <item
             android:id="@+id/nav_extrato"
             android:title="Extrato" />
         <item

@@ -56,25 +56,25 @@ public abstract class BaseActivity extends AppCompatActivity
                 .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
                 .build();
 
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
         SharedPreferences sharedPref = getSharedPreferences(getString(R.string.userInfo), Context.MODE_PRIVATE);
 
         if (sharedPref.contains(getString(R.string.emailUsuario))){
             email = sharedPref.getString(getString(R.string.emailUsuario), "");
             id_usuario = sharedPref.getInt(getString(R.string.idUsuario), 0);
-
-            TextView txtEmail = (TextView) v.findViewById(R.id.txtEmail);
-            txtEmail.setText(email);
-
         }else{
             Intent intent = new Intent();
             intent = new Intent(this, MainActivity.class);
             startActivity(intent);
         }
+
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        TextView txtEmail = (TextView) v.findViewById(R.id.txtEmail);
+        txtEmail.setText(email);
     }
 
     protected void onCreateDrawer() {
@@ -156,6 +156,8 @@ public abstract class BaseActivity extends AppCompatActivity
 
         if (id == R.id.nav_lancamento) {
             intent = new Intent(this, LancamentoGruposActivity.class);
+        }else if (id == R.id.nav_graficos){
+            intent = new Intent(this, GraficosActivity.class);
         }else if (id == R.id.nav_extrato){
             intent = new Intent(this, ExtratoActivity.class);
         }else if (id == R.id.nav_contas){

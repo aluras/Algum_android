@@ -9,15 +9,13 @@ import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
+import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.OptionalPendingResult;
-import com.google.android.gms.common.api.ResultCallback;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -54,10 +52,6 @@ public class AlgumSyncTask extends AsyncTask<String,Void,String> {
 
         Controle.gravaLog(mContext, dateTimeFormat.format(new Date()) + "SyncTask iniciada", sharedPref.getInt("idUsuario", 0));
 
-        Bundle bundle = new Bundle();
-        bundle.putBoolean(ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
-        bundle.putBoolean(ContentResolver.SYNC_EXTRAS_MANUAL, true);
-
         usuarioEmail = sharedPref.getString(mContext.getString(R.string.emailUsuario), "");
 
         if (!sharedPref.contains(mContext.getString(R.string.idUsuario))){
@@ -74,24 +68,27 @@ public class AlgumSyncTask extends AsyncTask<String,Void,String> {
                 .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
                 .build();
 
-        mGoogleApiClient.connect();
+        try {
+            ConnectionResult result = mGoogleApiClient.blockingConnect();
+            if (result.isSuccess()) {
 
-        OptionalPendingResult<GoogleSignInResult> opr = Auth.GoogleSignInApi.silentSignIn(mGoogleApiClient);
+                GoogleSignInResult googleSignInResult =
+                        Auth.GoogleSignInApi.silentSignIn(mGoogleApiClient).await();
 
-        if (opr.isDone()) {
+                AlgumSyncOperation operations = new AlgumSyncOperation(mContext,googleSignInResult);
 
-            GoogleSignInResult result = opr.get();
-            AlgumSyncOperation operations = new AlgumSyncOperation(mContext,result);
-            idrNoSilentSignIn = true;
-            operations.performSync();
-
-        } else {
-            opr.setResultCallback(new ResultCallback<GoogleSignInResult>() {
-                @Override
-                public void onResult(@NonNull GoogleSignInResult googleSignInResult) {
+                if(!operations.performSync()) {
                     idrNoSilentSignIn = false;
+                }else{
+                    idrNoSilentSignIn = true;
                 }
-            });
+
+                Controle.gravaLog(mContext, dateTimeFormat.format(new Date()) + " SyncTask - Concluida", sharedPref.getInt("idUsuario", 0));
+            }else{
+                Controle.gravaLog(mContext, dateTimeFormat.format(new Date()) + " SyncTask - não conectado Google signin: "+result.getErrorMessage(), sharedPref.getInt("idUsuario", 0));
+            }
+        } finally {
+            mGoogleApiClient.disconnect();
         }
 
         return null;

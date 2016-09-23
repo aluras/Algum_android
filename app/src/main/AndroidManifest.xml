@@ -77,15 +77,22 @@
             android:label="@string/title_activity_grupos"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".GruposEditActivity"
+        <activity
+            android:name=".GruposEditActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:label="@string/title_activity_grupos"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".LancamentoContaDestinoActivity"
+        <activity
+            android:name=".LancamentoContaDestinoActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:label="@string/title_activity_main"
             android:parentActivityName=".LancamentoGruposActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".GraficosActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:label="@string/title_activity_graficos"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
 

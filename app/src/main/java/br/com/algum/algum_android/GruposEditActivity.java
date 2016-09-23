@@ -13,6 +13,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.SimpleCursorAdapter;
@@ -72,6 +73,10 @@ public class GruposEditActivity extends AppCompatActivity
             editText2.setText(cGrupo.getString(cGrupo.getColumnIndex(AlgumDBContract.GruposEntry.COLUMN_NOME)));
             idTipoGrupo = cGrupo.getInt(cGrupo.getColumnIndex(AlgumDBContract.GruposEntry.COLUMN_TIPO_ID));
 
+        }else{
+            if(editText2.requestFocus()) {
+                getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
+            }
         }
 
         button.setOnClickListener(new View.OnClickListener() {
@@ -126,9 +131,13 @@ public class GruposEditActivity extends AppCompatActivity
         Cursor obj = (Cursor) spinner.getSelectedItem();
         int idTipoGrupo = obj.getInt(obj.getColumnIndex(AlgumDBContract.TipoGrupoEntry.COLUMN_ID));
 
+        if(nome.equals("")){
+            editText2.setError("Digite o nome");
+            return;
+        }
 
         ContentValues values = new ContentValues();
-        values.put(AlgumDBContract.GruposEntry.COLUMN_NOME,nome);
+        values.put(AlgumDBContract.GruposEntry.COLUMN_NOME, nome);
         values.put(AlgumDBContract.GruposEntry.COLUMN_TIPO_ID,idTipoGrupo);
         values.put(AlgumDBContract.GruposEntry.COLUMN_ALTERADO, 1);
 

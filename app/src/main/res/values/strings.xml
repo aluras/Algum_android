@@ -40,6 +40,7 @@
     <string name="title_activity_planejamento">Planejamento</string>
     <string name="title_activity_extrato">Extrato</string>
     <string name="title_activity_situacao">Situação</string>
+    <string name="title_activity_graficos">Gráficos</string>
 
     <!-- Sign-in status messages -->
     <string name="signed_in_fmt">Entrou como: %s</string>
@@ -91,6 +92,9 @@
         <item>"360"</item>
         <item>"720"</item>
     </array>
+
+    <string name="sync_full_title">Efetuar sincronização completa</string>
+    <string name="sync_full">sync_full</string>
 
     <string name="user_title">Dados de usuário</string>
     <string name="user_remove">user_remove</string>
