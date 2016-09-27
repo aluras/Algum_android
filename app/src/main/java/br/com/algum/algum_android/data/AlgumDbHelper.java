@@ -41,7 +41,7 @@ public class AlgumDbHelper extends SQLiteOpenHelper {
                 AlgumDBContract.ContasEntry.COLUMN_NOME + " TEXT NOT NULL, " +
                 AlgumDBContract.ContasEntry.COLUMN_SALDO_INICIAL + " DECIMAL NOT NULL, " +
                 AlgumDBContract.ContasEntry.COLUMN_SALDO + " DECIMAL NOT NULL," +
-                AlgumDBContract.ContasEntry.COLUMN_EXCLUIDO + " INTEGER NOT NULL," +
+                AlgumDBContract.ContasEntry.COLUMN_EXCLUIDO + " INTEGER NOT NULL DEFAULT 0," +
                 AlgumDBContract.ContasEntry.COLUMN_ALTERADO + " INT NOT NULL DEFAULT 0)";
 
         db.execSQL(SQL_CREATE_CONTA_TABLE);
@@ -49,6 +49,7 @@ public class AlgumDbHelper extends SQLiteOpenHelper {
         final String SQL_CREATE_USUARIO_TABLE = "CREATE TABLE " + AlgumDBContract.UsuariosEntry.TABLE_NAME + " (" +
                 AlgumDBContract.UsuariosEntry.COLUMN_ID + " INTEGER PRIMARY KEY," +
                 AlgumDBContract.UsuariosEntry.COLUMN_EMAIL + " TEXT NOT NULL," +
+                AlgumDBContract.UsuariosEntry.COLUMN_NOME + " TEXT NOT NULL," +
                 AlgumDBContract.UsuariosEntry.COLUMN_DATA_SYNC + " INT)";
 
         db.execSQL(SQL_CREATE_USUARIO_TABLE);
@@ -59,7 +60,7 @@ public class AlgumDbHelper extends SQLiteOpenHelper {
                 AlgumDBContract.GruposEntry.COLUMN_TIPO_ID + " INTEGER NOT NULL," +
                 AlgumDBContract.GruposEntry.COLUMN_USUARIO_ID + " INTEGER NOT NULL," +
                 AlgumDBContract.GruposEntry.COLUMN_NOME + " TEXT NOT NULL," +
-                AlgumDBContract.GruposEntry.COLUMN_EXCLUIDO + " INTEGER NOT NULL," +
+                AlgumDBContract.GruposEntry.COLUMN_EXCLUIDO + " INTEGER NOT NULL DEFAULT 0," +
                 AlgumDBContract.GruposEntry.COLUMN_ALTERADO + " INT NOT NULL DEFAULT 0)";
 
         db.execSQL(SQL_CREATE_GRUPO_TABLE);
@@ -82,7 +83,7 @@ public class AlgumDbHelper extends SQLiteOpenHelper {
                 AlgumDBContract.LancamentoEntry.COLUMN_GRUPO_ID + " INTEGER NOT NULL," +
                 AlgumDBContract.LancamentoEntry.COLUMN_CONTA_ID + " INTEGER NOT NULL,"+
                 AlgumDBContract.LancamentoEntry.COLUMN_USUARIO_ID + " INTEGER NOT NULL,"+
-                AlgumDBContract.LancamentoEntry.COLUMN_EXCLUIDO + " INTEGER NOT NULL," +
+                AlgumDBContract.LancamentoEntry.COLUMN_EXCLUIDO + " INTEGER NOT NULL DEFAULT 0," +
                 AlgumDBContract.LancamentoEntry.COLUMN_ALTERADO + " INT NOT NULL DEFAULT 0)";
 
         db.execSQL(SQL_CREATE_LANCAMENTO_TABLE);

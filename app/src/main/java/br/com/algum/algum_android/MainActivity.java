@@ -311,6 +311,7 @@ public class MainActivity extends AppCompatActivity implements
                         ContentValues usuarioValues = new ContentValues();
                         usuarioValues.put(AlgumDBContract.UsuariosEntry.COLUMN_ID, usuarioJson.getJSONObject("Usuario").getInt("id"));
                         usuarioValues.put(AlgumDBContract.UsuariosEntry.COLUMN_EMAIL, usuarioJson.getJSONObject("Usuario").getString("email"));
+                        usuarioValues.put(AlgumDBContract.UsuariosEntry.COLUMN_NOME, usuarioJson.getJSONObject("Usuario").getString("nome"));
                         usuarioValues.put(AlgumDBContract.UsuariosEntry.COLUMN_DATA_SYNC, 0L);
 
                         getContentResolver().insert(AlgumDBContract.UsuariosEntry.CONTENT_URI, usuarioValues);

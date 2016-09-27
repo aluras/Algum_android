@@ -174,7 +174,6 @@ public class AlgumSyncOperation {
 
                 JSONObject grupoJson = gruposArray.getJSONObject(i);
                 JSONObject grupo = grupoJson.getJSONObject("Grupo");
-                JSONObject grupoUsuario = grupoJson.getJSONObject("GrupoUsuario");
 
                 String mSelectionClause = AlgumDBContract.GruposEntry.COLUMN_GRUPO_ID + " = ? ";
                 String[] mSelectionArgs = {grupo.getString("id")};
@@ -183,7 +182,7 @@ public class AlgumSyncOperation {
                 ContentValues gruposValues = new ContentValues();
                 gruposValues.put(AlgumDBContract.GruposEntry.COLUMN_NOME, grupo.getString("nome"));
                 gruposValues.put(AlgumDBContract.GruposEntry.COLUMN_GRUPO_ID, grupo.getInt("id"));
-                gruposValues.put(AlgumDBContract.GruposEntry.COLUMN_USUARIO_ID, grupoUsuario.getInt("usuario_id"));
+                gruposValues.put(AlgumDBContract.GruposEntry.COLUMN_USUARIO_ID, grupo.getInt("usuario_id"));
                 gruposValues.put(AlgumDBContract.GruposEntry.COLUMN_TIPO_ID, grupo.getInt("id_tipo_grupo"));
                 gruposValues.put(AlgumDBContract.GruposEntry.COLUMN_EXCLUIDO, grupo.getInt("excluido"));
 
@@ -363,7 +362,7 @@ public class AlgumSyncOperation {
                 cursor.close();
             }
         }catch (JSONException e) {
-            Controle.gravaLog(mContext,dateTimeFormat.format(new Date()) + " - " + e.toString() + e.getMessage(),usuarioId);
+            //Controle.gravaLog(mContext,dateTimeFormat.format(new Date()) + " - " + e.toString() + e.getMessage(),usuarioId);
             Log.e(LOG_TAG, "Error ", e);
             throw new Exception(e);
         }catch (ParseException e) {
@@ -442,7 +441,6 @@ public class AlgumSyncOperation {
             while(grupos.isAfterLast() == false){
                 String params = "nome="+grupos.getString(grupos.getColumnIndex(AlgumDBContract.GruposEntry.COLUMN_NOME));
                 params = params + "&id_tipo_grupo="+grupos.getString(grupos.getColumnIndex(AlgumDBContract.GruposEntry.COLUMN_TIPO_ID));
-                params = params + "&usuario_id="+grupos.getString(grupos.getColumnIndex(AlgumDBContract.GruposEntry.COLUMN_USUARIO_ID));
                 params = params + "&excluido="+grupos.getString(grupos.getColumnIndex(AlgumDBContract.GruposEntry.COLUMN_EXCLUIDO));
 
                 if(grupos.getInt(grupos.getColumnIndex(AlgumDBContract.GruposEntry.COLUMN_GRUPO_ID))> 0){
