@@ -1,8 +1,6 @@
 package br.com.algum.algum_android;
 
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -39,18 +37,13 @@ public class ContasActivity extends BaseActivity
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        SharedPreferences sharedPref = getSharedPreferences(getString(R.string.userInfo), Context.MODE_PRIVATE);
-        Uri contasUri = AlgumDBContract.ContasEntry.buildContaUsuarioUri(sharedPref.getInt(getString(R.string.idUsuario), 0));
+        Uri contasUri = AlgumDBContract.ContasUsuarioEntry.buildContaUsuariosUri(id_usuario);
 
-        String selection = AlgumDBContract.ContasEntry.COLUMN_EXCLUIDO + " = 0 ";
+        String selection = AlgumDBContract.ContasUsuarioEntry.TABLE_NAME+"."+AlgumDBContract.ContasUsuarioEntry.COLUMN_EXCLUIDO + " = 0 ";
 
         String[] projection =
                 {
-                        AlgumDBContract.ContasEntry.TABLE_NAME+"."+ AlgumDBContract.ContasEntry.COLUMN_ID
-                        ,AlgumDBContract.ContasEntry.TABLE_NAME+"."+ AlgumDBContract.ContasEntry.COLUMN_CONTA_ID
-                        , AlgumDBContract.ContasEntry.TABLE_NAME+"."+ AlgumDBContract.ContasEntry.COLUMN_NOME
-                        , AlgumDBContract.ContasEntry.TABLE_NAME+"."+ AlgumDBContract.ContasEntry.COLUMN_SALDO
-                        , AlgumDBContract.TipoContaEntry.TABLE_NAME+"."+ AlgumDBContract.TipoContaEntry.COLUMN_DESCRICAO
+                        AlgumDBContract.ContasEntry.TABLE_NAME+".*"
                 };
 
         return new CursorLoader(

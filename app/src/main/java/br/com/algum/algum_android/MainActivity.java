@@ -39,6 +39,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 import br.com.algum.algum_android.data.AlgumDBContract;
+import br.com.algum.algum_android.sync.AlgumSyncOperation;
 import br.com.algum.algum_android.sync.AlgumSyncTask;
 
 
@@ -315,6 +316,8 @@ public class MainActivity extends AppCompatActivity implements
                         usuarioValues.put(AlgumDBContract.UsuariosEntry.COLUMN_DATA_SYNC, 0L);
 
                         getContentResolver().insert(AlgumDBContract.UsuariosEntry.CONTENT_URI, usuarioValues);
+
+                        AlgumSyncOperation.atualizaDados(mContext,strRetorno);
 
                         PreferenceManager.setDefaultValues(mContext, R.xml.preferences, false);
 

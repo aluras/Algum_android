@@ -59,9 +59,9 @@ public class AlgumSyncOperation {
             GoogleSignInAccount acct = googleSignInResult.getSignInAccount();
             tok = acct.getIdToken();
         } else {
-            SharedPreferences.Editor editor = sharedPref.edit();
-            editor.remove(mContext.getString(R.string.emailUsuario));
-            editor.commit();
+            //SharedPreferences.Editor editor = sharedPref.edit();
+            //editor.remove(mContext.getString(R.string.emailUsuario));
+            //editor.commit();
             return;
         }
     }
@@ -182,9 +182,7 @@ public class AlgumSyncOperation {
                 ContentValues gruposValues = new ContentValues();
                 gruposValues.put(AlgumDBContract.GruposEntry.COLUMN_NOME, grupo.getString("nome"));
                 gruposValues.put(AlgumDBContract.GruposEntry.COLUMN_GRUPO_ID, grupo.getInt("id"));
-                gruposValues.put(AlgumDBContract.GruposEntry.COLUMN_USUARIO_ID, grupo.getInt("usuario_id"));
                 gruposValues.put(AlgumDBContract.GruposEntry.COLUMN_TIPO_ID, grupo.getInt("id_tipo_grupo"));
-                gruposValues.put(AlgumDBContract.GruposEntry.COLUMN_EXCLUIDO, grupo.getInt("excluido"));
 
                 if(cursor.getCount() < 1){
                     mContext.getContentResolver().insert(AlgumDBContract.GruposEntry.CONTENT_URI, gruposValues);
@@ -381,7 +379,7 @@ public class AlgumSyncOperation {
         try {
             // -- ENVIA OS NOVOS
             String[] projectionContasAlteradas = {AlgumDBContract.ContasEntry.TABLE_NAME+".*"};
-            String selectionContasAlteradas = AlgumDBContract.ContasEntry.COLUMN_ALTERADO + " = 1 ";
+            String selectionContasAlteradas = AlgumDBContract.ContasEntry.TABLE_NAME+"."+AlgumDBContract.ContasEntry.COLUMN_ALTERADO + " = 1 ";
             Cursor contas = mContext.getContentResolver().query(AlgumDBContract.ContasEntry.buildContaUsuarioUri(usuarioId),projectionContasAlteradas,selectionContasAlteradas,null,null);
 
             contas.moveToFirst();
@@ -434,14 +432,15 @@ public class AlgumSyncOperation {
         try {
             // -- ENVIA OS NOVOS
             String[] projectionGruposAlteradas = {AlgumDBContract.GruposEntry.TABLE_NAME+".*"};
-            String selectionGruposAlteradas = AlgumDBContract.GruposEntry.COLUMN_ALTERADO + " = 1 ";
+            //String selectionGruposAlteradas = AlgumDBContract.GruposEntry.COLUMN_ALTERADO + " = 1 ";
+            String selectionGruposAlteradas = "";
             Cursor grupos = mContext.getContentResolver().query(AlgumDBContract.GruposEntry.buildGrupoUri(usuarioId),projectionGruposAlteradas,selectionGruposAlteradas,null,null);
 
             grupos.moveToFirst();
             while(grupos.isAfterLast() == false){
                 String params = "nome="+grupos.getString(grupos.getColumnIndex(AlgumDBContract.GruposEntry.COLUMN_NOME));
                 params = params + "&id_tipo_grupo="+grupos.getString(grupos.getColumnIndex(AlgumDBContract.GruposEntry.COLUMN_TIPO_ID));
-                params = params + "&excluido="+grupos.getString(grupos.getColumnIndex(AlgumDBContract.GruposEntry.COLUMN_EXCLUIDO));
+                //params = params + "&excluido="+grupos.getString(grupos.getColumnIndex(AlgumDBContract.GruposEntry.COLUMN_EXCLUIDO));
 
                 if(grupos.getInt(grupos.getColumnIndex(AlgumDBContract.GruposEntry.COLUMN_GRUPO_ID))> 0){
                     params = params + "&id="+grupos.getString(grupos.getColumnIndex(AlgumDBContract.GruposEntry.COLUMN_GRUPO_ID));
@@ -460,7 +459,7 @@ public class AlgumSyncOperation {
 
                 ContentValues values = new ContentValues();
                 values.put(AlgumDBContract.GruposEntry.COLUMN_GRUPO_ID, grupo.getInt("id"));
-                values.put(AlgumDBContract.GruposEntry.COLUMN_ALTERADO, 0);
+                //values.put(AlgumDBContract.GruposEntry.COLUMN_ALTERADO, 0);
 
                 mContext.getContentResolver().update(AlgumDBContract.GruposEntry.CONTENT_URI,values,mSelectionClause,mSelectionArgs);
 
@@ -496,28 +495,60 @@ public class AlgumSyncOperation {
 
                 JSONObject contaJson = contasArray.getJSONObject(i);
                 JSONObject conta = contaJson.getJSONObject("Conta");
-                JSONObject contaUsuario = contaJson.getJSONObject("ContaUsuario");
+                JSONArray contaUsuarioArray = contaJson.getJSONArray("ContaUsuario");
+                JSONObject usu = contaJson.getJSONObject("Usuario");
 
-                String mSelectionClause = AlgumDBContract.ContasEntry.COLUMN_CONTA_ID + " = ? ";
+                String[] projection = {AlgumDBContract.ContasEntry.TABLE_NAME+".*"};
+                String mSelectionClause = AlgumDBContract.ContasEntry.TABLE_NAME+ "."+ AlgumDBContract.ContasEntry.COLUMN_CONTA_ID + " = ? ";
                 String[] mSelectionArgs = {conta.getString("id")};
-                Cursor cursor = mContext.getContentResolver().query(AlgumDBContract.ContasEntry.buildContaUsuarioUri(usuarioId), null, mSelectionClause, mSelectionArgs, null);
+                Cursor cursor = mContext.getContentResolver().query(AlgumDBContract.ContasEntry.buildContaUsuarioUri(usuarioId), projection, mSelectionClause, mSelectionArgs, null);
 
                 ContentValues contasValues = new ContentValues();
                 contasValues.put(AlgumDBContract.ContasEntry.COLUMN_NOME, conta.getString("nome"));
                 contasValues.put(AlgumDBContract.ContasEntry.COLUMN_CONTA_ID, conta.getInt("id"));
                 contasValues.put(AlgumDBContract.ContasEntry.COLUMN_TIPO_CONTA_ID, conta.getInt("tipo_conta_id"));
-                contasValues.put(AlgumDBContract.ContasEntry.COLUMN_USUARIO_ID, contaUsuario.getInt("usuario_id"));
+                contasValues.put(AlgumDBContract.ContasEntry.COLUMN_USUARIO_ID, conta.getInt("usuario_id"));
+                contasValues.put(AlgumDBContract.ContasEntry.COLUMN_USUARIO_EMAIL, usu.getString("email"));
+                contasValues.put(AlgumDBContract.ContasEntry.COLUMN_USUARIO_NOME, usu.getString("nome"));
                 contasValues.put(AlgumDBContract.ContasEntry.COLUMN_SALDO_INICIAL, conta.getString("saldo_inicial"));
                 contasValues.put(AlgumDBContract.ContasEntry.COLUMN_SALDO, conta.getString("saldo"));
                 contasValues.put(AlgumDBContract.ContasEntry.COLUMN_EXCLUIDO, conta.getInt("excluido"));
 
-                if(cursor.getCount() < 1){
+                int contaId = 0;
 
-                    mContext.getContentResolver().insert(AlgumDBContract.ContasEntry.CONTENT_URI, contasValues);
+                if(cursor.getCount() < 1){
+                    Uri uri = mContext.getContentResolver().insert(AlgumDBContract.ContasEntry.CONTENT_URI, contasValues);
+                    contaId = Integer.parseInt(uri.getLastPathSegment());
                 }else{
                     mContext.getContentResolver().update(AlgumDBContract.ContasEntry.CONTENT_URI, contasValues, mSelectionClause,mSelectionArgs);
+                    cursor.moveToFirst();
+                    contaId = cursor.getInt(cursor.getColumnIndex(AlgumDBContract.ContasEntry.COLUMN_ID));
                 }
                 cursor.close();
+
+                for(int j = 0; j < contaUsuarioArray.length(); j++){
+                    JSONObject contaUsuario = contaUsuarioArray.getJSONObject(j);
+                    JSONObject usuario = contaUsuario.getJSONObject("Usuario");
+
+                    ContentValues contasUsuarioValues = new ContentValues();
+                    contasUsuarioValues.put(AlgumDBContract.ContasUsuarioEntry.COLUMN_CONTA_USUARIO_ID, contaUsuario.getInt("id"));
+                    contasUsuarioValues.put(AlgumDBContract.ContasUsuarioEntry.COLUMN_CONTA_ID, contaId);
+                    contasUsuarioValues.put(AlgumDBContract.ContasUsuarioEntry.COLUMN_USUARIO_ID, contaUsuario.getInt("usuario_id"));
+                    contasUsuarioValues.put(AlgumDBContract.ContasUsuarioEntry.COLUMN_USUARIO_EMAIL, usuario.getString("email"));
+                    contasUsuarioValues.put(AlgumDBContract.ContasUsuarioEntry.COLUMN_USUARIO_NOME, usuario.getString("nome"));
+                    contasUsuarioValues.put(AlgumDBContract.ContasUsuarioEntry.COLUMN_EXCLUIDO, contaUsuario.getInt("excluido"));
+
+                    String mSelectionClauseCU = AlgumDBContract.ContasUsuarioEntry.TABLE_NAME+ "."+ AlgumDBContract.ContasUsuarioEntry.COLUMN_CONTA_USUARIO_ID + " = ? ";
+                    String[] mSelectionArgsCU = {contaUsuario.getString("id")};
+                    Cursor cursorCU = mContext.getContentResolver().query(AlgumDBContract.ContasUsuarioEntry.CONTENT_URI, null, mSelectionClauseCU, mSelectionArgsCU, null);
+
+                    if(cursorCU.getCount() < 1) {
+                        mContext.getContentResolver().insert(AlgumDBContract.ContasUsuarioEntry.CONTENT_URI, contasUsuarioValues);
+                    }else{
+                        mContext.getContentResolver().update(AlgumDBContract.ContasUsuarioEntry.CONTENT_URI, contasUsuarioValues, mSelectionClauseCU,mSelectionArgsCU);
+                    }
+                    cursorCU.close();
+                }
             }
 
         }catch (JSONException e) {
@@ -574,6 +605,12 @@ public class AlgumSyncOperation {
         try {
             Log.d(LOG_TAG, "Starting sync");
 
+            String dados = dadosEnvio(mContext);
+
+            final String SERVICO_BASE_URL = mContext.getString(R.string.WSurl) + "usuarios";
+
+            callServiceGrava(SERVICO_BASE_URL,dados);
+            /*
             atualizaUsuario();
             addContas();
             addGrupos();
@@ -585,7 +622,7 @@ public class AlgumSyncOperation {
             syncContas();
             syncLancamentos();
             atualizaDataSync();
-
+*/
             Log.d(LOG_TAG, "Finishing sync");
 
             SharedPreferences sharedPref = mContext.getSharedPreferences(mContext.getString(R.string.userInfo), Context.MODE_PRIVATE);
@@ -806,4 +843,224 @@ public class AlgumSyncOperation {
             }
         }
     }
+
+    public static void atualizaDados(Context context, String JSONresponse){
+        try {
+            JSONObject objDados = new JSONObject(JSONresponse);
+            JSONArray arrayGrupos = objDados.getJSONArray("GrupoUsuario");
+            JSONArray arrayContas = objDados.getJSONArray("ContaUsuario");
+            JSONArray arrayTipoGrupo = objDados.getJSONArray("TipoGrupo");
+            JSONArray arrayTipoConta = objDados.getJSONArray("TipoConta");
+            JSONObject usuarioObj = objDados.getJSONObject("Usuario");
+
+            int idUsuario = usuarioObj.getInt("id");
+            String emailUsuario = usuarioObj.getString("email");
+            String nomeUsuario = usuarioObj.getString("nome");
+
+            //GRUPOS
+            for(int i = 0; i < arrayGrupos.length(); i++){
+
+                JSONObject grupoUsuarioJson = arrayGrupos.getJSONObject(i);
+                JSONObject grupo = grupoUsuarioJson.getJSONObject("Grupo");
+
+                String mSelectionClause = AlgumDBContract.GruposEntry.COLUMN_GRUPO_ID + " = ? ";
+                String[] mSelectionArgs = {grupo.getString("id")};
+                Cursor cursor = context.getContentResolver().query(AlgumDBContract.GruposEntry.CONTENT_URI, null, mSelectionClause, mSelectionArgs, null);
+
+                ContentValues gruposValues = new ContentValues();
+                gruposValues.put(AlgumDBContract.GruposEntry.COLUMN_NOME, grupo.getString("nome"));
+                gruposValues.put(AlgumDBContract.GruposEntry.COLUMN_GRUPO_ID, grupo.getInt("id"));
+                gruposValues.put(AlgumDBContract.GruposEntry.COLUMN_TIPO_ID, grupo.getInt("id_tipo_grupo"));
+
+                int idGrupo = 0;
+
+                if(cursor.getCount() < 1){
+                    Uri uri = context.getContentResolver().insert(AlgumDBContract.GruposEntry.CONTENT_URI, gruposValues);
+                    idGrupo = Integer.parseInt(uri.getLastPathSegment());
+                }else{
+                    idGrupo = context.getContentResolver().update(AlgumDBContract.GruposEntry.CONTENT_URI, gruposValues, mSelectionClause, mSelectionArgs);
+                }
+                cursor.close();
+
+                String[] projection = {AlgumDBContract.GrupoUsuariosEntry.TABLE_NAME+".*"};
+                String mSelectionClauseUsuario = AlgumDBContract.GrupoUsuariosEntry.TABLE_NAME + "." + AlgumDBContract.GrupoUsuariosEntry.COLUMN_GRUPO_ID + " = ? ";
+                String[] mSelectionArgsUsuario = {String.valueOf(idGrupo)};
+                Uri uriGrupoUsuario = AlgumDBContract.GrupoUsuariosEntry.buildGrupoUsuariosUri(idUsuario);
+                Cursor cursorGU = context.getContentResolver().query(uriGrupoUsuario, projection, mSelectionClauseUsuario, mSelectionArgsUsuario, null);
+
+                ContentValues gruposUsuarioValues = new ContentValues();
+                gruposUsuarioValues.put(AlgumDBContract.GrupoUsuariosEntry.COLUMN_USUARIO_ID, idUsuario);
+                gruposUsuarioValues.put(AlgumDBContract.GrupoUsuariosEntry.COLUMN_GRUPO_ID, idGrupo);
+                gruposUsuarioValues.put(AlgumDBContract.GrupoUsuariosEntry.COLUMN_EMAIL, emailUsuario);
+
+                if(cursorGU.getCount() < 1){
+                    context.getContentResolver().insert(uriGrupoUsuario, gruposUsuarioValues);
+                }else{
+                    context.getContentResolver().update(uriGrupoUsuario, gruposUsuarioValues, mSelectionClause, mSelectionArgs);
+                }
+                cursorGU.close();
+            }
+
+            //CONTAS
+            for(int i = 0; i < arrayContas.length(); i++){
+
+                JSONObject contaUsuarioJson = arrayContas.getJSONObject(i);
+                JSONObject conta = contaUsuarioJson.getJSONObject("Conta");
+
+                String mSelectionClause = AlgumDBContract.ContasEntry.COLUMN_CONTA_ID + " = ? ";
+                String[] mSelectionArgs = {conta.getString("id")};
+                Cursor cursor = context.getContentResolver().query(AlgumDBContract.ContasEntry.CONTENT_URI, null, mSelectionClause, mSelectionArgs, null);
+
+                ContentValues contasValues = new ContentValues();
+                contasValues.put(AlgumDBContract.ContasEntry.COLUMN_CONTA_ID, conta.getInt("id"));
+                contasValues.put(AlgumDBContract.ContasEntry.COLUMN_SALDO_INICIAL, conta.getString("saldo_inicial"));
+                contasValues.put(AlgumDBContract.ContasEntry.COLUMN_SALDO, conta.getString("saldo"));
+                contasValues.put(AlgumDBContract.ContasEntry.COLUMN_TIPO_CONTA_ID, conta.getInt("tipo_conta_id"));
+                contasValues.put(AlgumDBContract.ContasEntry.COLUMN_USUARIO_ID, conta.getInt("usuario_id"));
+                contasValues.put(AlgumDBContract.ContasEntry.COLUMN_NOME, conta.getString("nome"));
+                contasValues.put(AlgumDBContract.ContasEntry.COLUMN_USUARIO_EMAIL, emailUsuario);
+                contasValues.put(AlgumDBContract.ContasEntry.COLUMN_USUARIO_NOME, nomeUsuario);
+
+                int idConta = 0;
+
+                if(cursor.getCount() < 1){
+                    Uri uri = context.getContentResolver().insert(AlgumDBContract.ContasEntry.CONTENT_URI, contasValues);
+                    idConta = Integer.parseInt(uri.getLastPathSegment());
+                }else{
+                    idConta = context.getContentResolver().update(AlgumDBContract.ContasEntry.CONTENT_URI, contasValues, mSelectionClause, mSelectionArgs);
+                }
+                cursor.close();
+
+                String[] projection = {AlgumDBContract.ContasUsuarioEntry.TABLE_NAME+".*"};
+                String mSelectionClauseUsuario = AlgumDBContract.ContasUsuarioEntry.TABLE_NAME + "." + AlgumDBContract.ContasUsuarioEntry.COLUMN_CONTA_ID + " = ? ";
+                String[] mSelectionArgsUsuario = {String.valueOf(idConta)};
+                Uri uriContaUsuario = AlgumDBContract.ContasUsuarioEntry.buildContaUsuariosUri(idUsuario);
+                Cursor cursorCU = context.getContentResolver().query(uriContaUsuario, projection, mSelectionClauseUsuario, mSelectionArgsUsuario, null);
+
+                ContentValues contaUsuarioValues = new ContentValues();
+                contaUsuarioValues.put(AlgumDBContract.ContasUsuarioEntry.COLUMN_USUARIO_ID, idUsuario);
+                contaUsuarioValues.put(AlgumDBContract.ContasUsuarioEntry.COLUMN_CONTA_ID, idConta);
+                contaUsuarioValues.put(AlgumDBContract.ContasUsuarioEntry.COLUMN_ACEITA, contaUsuarioJson.getInt("aceita"));
+                contaUsuarioValues.put(AlgumDBContract.ContasUsuarioEntry.COLUMN_USUARIO_NOME, nomeUsuario);
+                contaUsuarioValues.put(AlgumDBContract.ContasUsuarioEntry.COLUMN_CONTA_USUARIO_ID, contaUsuarioJson.getInt("id"));
+                contaUsuarioValues.put(AlgumDBContract.ContasUsuarioEntry.COLUMN_USUARIO_EMAIL, emailUsuario);
+
+                if(cursorCU.getCount() < 1){
+                    context.getContentResolver().insert(uriContaUsuario, contaUsuarioValues);
+                }else{
+                    context.getContentResolver().update(uriContaUsuario, contaUsuarioValues, mSelectionClause, mSelectionArgs);
+                }
+                cursorCU.close();
+            }
+
+            //TIPO GRUPOS
+            for(int i = 0; i < arrayTipoGrupo.length(); i++){
+
+                JSONObject tipoGrupo = arrayTipoGrupo.getJSONObject(i).getJSONObject("TipoGrupo");
+
+                String mSelectionClause = AlgumDBContract.TipoGrupoEntry.COLUMN_ID + " = ? ";
+                String[] mSelectionArgs = {tipoGrupo.getString("id")};
+                Cursor cursor = context.getContentResolver().query(AlgumDBContract.TipoGrupoEntry.CONTENT_URI, null, mSelectionClause, mSelectionArgs, null);
+
+                ContentValues tipoGrupoValues = new ContentValues();
+                tipoGrupoValues.put(AlgumDBContract.TipoGrupoEntry.COLUMN_ID, tipoGrupo.getInt("id"));
+                tipoGrupoValues.put(AlgumDBContract.TipoGrupoEntry.COLUMN_DESCRICAO, tipoGrupo.getString("nome"));
+
+                if(cursor.getCount() < 1){
+                    context.getContentResolver().insert(AlgumDBContract.TipoGrupoEntry.CONTENT_URI, tipoGrupoValues);
+                }else{
+                    context.getContentResolver().update(AlgumDBContract.TipoGrupoEntry.CONTENT_URI, tipoGrupoValues, mSelectionClause, mSelectionArgs);
+                }
+                cursor.close();
+
+            }
+
+            //TIPO CONTA
+            for(int i = 0; i < arrayTipoConta.length(); i++){
+
+                JSONObject tipoConta = arrayTipoConta.getJSONObject(i).getJSONObject("TipoConta");
+
+                String mSelectionClause = AlgumDBContract.TipoContaEntry.COLUMN_ID + " = ? ";
+                String[] mSelectionArgs = {tipoConta.getString("id")};
+                Cursor cursor = context.getContentResolver().query(AlgumDBContract.TipoContaEntry.CONTENT_URI, null, mSelectionClause, mSelectionArgs, null);
+
+                ContentValues tipoContaValues = new ContentValues();
+                tipoContaValues.put(AlgumDBContract.TipoContaEntry.COLUMN_ID, tipoConta.getInt("id"));
+                tipoContaValues.put(AlgumDBContract.TipoContaEntry.COLUMN_DESCRICAO, tipoConta.getString("descricao"));
+
+                if(cursor.getCount() < 1){
+                    context.getContentResolver().insert(AlgumDBContract.TipoContaEntry.CONTENT_URI, tipoContaValues);
+                }else{
+                    context.getContentResolver().update(AlgumDBContract.TipoContaEntry.CONTENT_URI, tipoContaValues, mSelectionClause, mSelectionArgs);
+                }
+                cursor.close();
+
+            }
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static String dadosEnvio (Context context){
+        JSONObject objRetorno = new JSONObject();
+
+        try{
+            //LANCAMENTOS
+            String selection = AlgumDBContract.LancamentoEntry.COLUMN_LANCAMENTO_ID + " IS NULL ";
+            String sortOrder = AlgumDBContract.LancamentoEntry.COLUMN_DATA;
+            Cursor lancamentos = context.getContentResolver().query(AlgumDBContract.LancamentoEntry.CONTENT_URI,null,selection,null,sortOrder);
+            int grupo_id = 0;
+            int conta_id = 0;
+
+            JSONArray arrayLancamentos = new JSONArray();
+            lancamentos.moveToFirst();
+            while(lancamentos.isAfterLast() == false){
+                JSONObject lancamento = new JSONObject();
+                SimpleDateFormat dateFformat = new SimpleDateFormat("dd/MM/yyyy");
+
+                Uri uriGrupo = AlgumDBContract.GruposEntry.CONTENT_URI;
+                String[] projectionGrupo = {AlgumDBContract.GruposEntry.TABLE_NAME+".*"};
+                String selectionGrupo = AlgumDBContract.GruposEntry.TABLE_NAME+"."+ AlgumDBContract.GruposEntry.COLUMN_ID + " = ? ";
+                String[] selectionGrupoArgs = {lancamentos.getString(lancamentos.getColumnIndex(AlgumDBContract.LancamentoEntry.COLUMN_GRUPO_ID))};
+                Cursor cursorGrupo = context.getContentResolver().query(uriGrupo,projectionGrupo,selectionGrupo,selectionGrupoArgs,null);
+                if(cursorGrupo.getCount()>0){
+                    cursorGrupo.moveToFirst();
+                    grupo_id = cursorGrupo.getInt(cursorGrupo.getColumnIndex(AlgumDBContract.GruposEntry.COLUMN_GRUPO_ID));
+                }
+                cursorGrupo.close();
+
+                Uri uriConta = AlgumDBContract.ContasEntry.CONTENT_URI;
+                String[] projectionConta = {AlgumDBContract.ContasEntry.TABLE_NAME+".*"};
+                String selectionConta = AlgumDBContract.ContasEntry.TABLE_NAME+"."+ AlgumDBContract.ContasEntry.COLUMN_ID + " = ? ";
+                String[] selectionContaArgs = {lancamentos.getString(lancamentos.getColumnIndex(AlgumDBContract.LancamentoEntry.COLUMN_CONTA_ID))};
+                Cursor cursorConta = context.getContentResolver().query(uriConta,projectionConta,selectionConta,selectionContaArgs,null);
+                if(cursorConta.getCount()>0){
+                    cursorConta.moveToFirst();
+                    conta_id = cursorConta.getInt(cursorConta.getColumnIndex(AlgumDBContract.ContasEntry.COLUMN_CONTA_ID));
+                }
+                cursorConta.close();
+
+                lancamento.put("data", dateFformat.format(new Date(lancamentos.getLong(lancamentos.getColumnIndex(AlgumDBContract.LancamentoEntry.COLUMN_DATA)))));
+                lancamento.put("valor", lancamentos.getString(lancamentos.getColumnIndex(AlgumDBContract.LancamentoEntry.COLUMN_VALOR)));
+                lancamento.put("grupo_id",grupo_id);
+                lancamento.put("conta_id",conta_id);
+                lancamento.put("usuario_id",lancamentos.getString(lancamentos.getColumnIndex(AlgumDBContract.LancamentoEntry.COLUMN_USUARIO_ID)));
+                lancamento.put("lancamento_id",lancamentos.getString(lancamentos.getColumnIndex(AlgumDBContract.LancamentoEntry.COLUMN_ID)));
+
+                arrayLancamentos.put(lancamento);
+
+                lancamentos.moveToNext();
+            }
+            lancamentos.close();
+            objRetorno.put("Lancamentos",arrayLancamentos);
+
+        }catch (JSONException e) {
+
+        }
+
+        return objRetorno.toString();
+    }
+
+
 }

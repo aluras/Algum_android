@@ -36,37 +36,52 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="right"
-        android:visibility="gone"
-        android:id="@+id/vwBtns">
+        android:orientation="horizontal"
+        android:id="@+id/vwBtns"
+        android:visibility="gone">
 
-        <ImageButton
+        <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/btnEdit"
-            android:backgroundTintMode="screen"
-            android:src="@drawable/ic_mode_edit_black_24dp"/>
+            android:id="@+id/txtTitular"
+            android:textAppearance="?android:attr/textAppearanceSmall"/>
 
-        <ImageButton
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/btnShare"
-            android:backgroundTintMode="screen"
-            android:src="@drawable/ic_supervisor_account_black_24dp"/>
 
-        <ImageButton
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/btnExtrato"
-            android:backgroundTintMode="screen"
-            android:src="@drawable/ic_list_black_24dp"/>
+            android:gravity="right">
 
-        <ImageButton
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/btnDelete"
-            android:backgroundTintMode="screen"
-            android:src="@drawable/ic_delete_black_24dp"/>
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/btnEdit"
+                android:backgroundTintMode="screen"
+                android:src="@drawable/ic_mode_edit_black_24dp"/>
+
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/btnShare"
+                android:backgroundTintMode="screen"
+                android:src="@drawable/ic_supervisor_account_black_24dp"/>
+
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/btnExtrato"
+                android:backgroundTintMode="screen"
+                android:src="@drawable/ic_list_black_24dp"/>
+
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/btnDelete"
+                android:backgroundTintMode="screen"
+                android:src="@drawable/ic_delete_black_24dp"/>
+
+        </LinearLayout>
 
     </LinearLayout>
+
 </LinearLayout>

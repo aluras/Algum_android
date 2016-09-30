@@ -45,22 +45,18 @@ public class ConfigGrupoAdapter extends CursorTreeAdapter {
         int groupId = cursor.getInt(cursor
                 .getColumnIndex(AlgumDBContract.TipoGrupoEntry.COLUMN_ID));
 
-        //activity.getSupportLoaderManager().initLoader(groupId, null, activity);
         SharedPreferences sharedPref = activity.getSharedPreferences(activity.getString(R.string.userInfo), Context.MODE_PRIVATE);
-        Uri gruposUri = AlgumDBContract.GruposEntry.buildGrupoUri(sharedPref.getInt(activity.getString(R.string.idUsuario), 0));
-        //Uri gruposUri = AlgumDBContract.GruposEntry.CONTENT_URI;
+        Uri gruposUri = AlgumDBContract.GrupoUsuariosEntry.buildGrupoUsuariosUri(sharedPref.getInt(activity.getString(R.string.idUsuario), 0));
 
-        String selection = AlgumDBContract.GruposEntry.COLUMN_TIPO_ID + " = " + groupId  + " AND " + AlgumDBContract.GruposEntry.COLUMN_EXCLUIDO + " = 0 ";
+        String selection = AlgumDBContract.GruposEntry.COLUMN_TIPO_ID + " = " + groupId  + " AND " + AlgumDBContract.GrupoUsuariosEntry.TABLE_NAME+ "." + AlgumDBContract.GrupoUsuariosEntry.COLUMN_EXCLUIDO + " = 0 ";
+        //String selection = "";
 
         String[] projection =
                 {
-                        AlgumDBContract.GruposEntry.TABLE_NAME+"."+ AlgumDBContract.GruposEntry.COLUMN_ID
-                        ,AlgumDBContract.GruposEntry.TABLE_NAME+"."+ AlgumDBContract.GruposEntry.COLUMN_GRUPO_ID
-                        , AlgumDBContract.GruposEntry.TABLE_NAME+"."+ AlgumDBContract.GruposEntry.COLUMN_NOME
-                        , AlgumDBContract.TipoGrupoEntry.TABLE_NAME+"."+ AlgumDBContract.TipoGrupoEntry.COLUMN_DESCRICAO
+                        AlgumDBContract.GruposEntry.TABLE_NAME+".*"
                 };
 
-        String order = AlgumDBContract.GruposEntry.COLUMN_TIPO_ID +" ASC,"+ AlgumDBContract.GruposEntry.COLUMN_NOME + " ASC";
+        String order = AlgumDBContract.GruposEntry.TABLE_NAME+"."+AlgumDBContract.GruposEntry.COLUMN_NOME + " ASC";
 
         Cursor c1 = activity.getContentResolver().query(
                 gruposUri,
@@ -72,19 +68,6 @@ public class ConfigGrupoAdapter extends CursorTreeAdapter {
 
         return c1;
 
-/*
-        Loader loader = activity.getSupportLoaderManager().getLoader(groupId);
-
-        if (loader != null && !loader.isReset()) {
-            activity.getSupportLoaderManager().restartLoader(groupId, null,
-                    activity);
-        } else {
-            activity.getSupportLoaderManager().initLoader(groupId, null,
-                    activity);
-        }
-
-        return null;
-*/
     }
 
     @Override
@@ -167,8 +150,8 @@ public class ConfigGrupoAdapter extends CursorTreeAdapter {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         ContentValues GrupoValues = new ContentValues();
-                        GrupoValues.put(AlgumDBContract.GruposEntry.COLUMN_EXCLUIDO, 1);
-                        GrupoValues.put(AlgumDBContract.GruposEntry.COLUMN_ALTERADO, 1);
+                        //GrupoValues.put(AlgumDBContract.GruposEntry.COLUMN_EXCLUIDO, 1);
+                        //GrupoValues.put(AlgumDBContract.GruposEntry.COLUMN_ALTERADO, 1);
                         String selection = AlgumDBContract.GruposEntry.COLUMN_ID + " = ? ";
                         String[] selectionArgs = {Integer.toString(idGrupo)};
                         context.getContentResolver().update(AlgumDBContract.GruposEntry.CONTENT_URI, GrupoValues, selection, selectionArgs);

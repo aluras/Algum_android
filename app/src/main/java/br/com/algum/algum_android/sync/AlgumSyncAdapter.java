@@ -78,10 +78,12 @@ public class AlgumSyncAdapter extends AbstractThreadedSyncAdapter {
 
                 AlgumSyncOperation operations = new AlgumSyncOperation(getContext(),googleSignInResult);
 
+
                 if(!operations.performSync()) {
                     syncResult.stats.numAuthExceptions++;
                     syncResult.fullSyncRequested = true;
                 }
+
 
                 SharedPreferences s = PreferenceManager.getDefaultSharedPreferences(getContext());
                 syncResult.delayUntil = Integer.parseInt(s.getString(getContext().getString(R.string.sync_freq),getContext().getString(R.string.sync_freq_default))) *60;

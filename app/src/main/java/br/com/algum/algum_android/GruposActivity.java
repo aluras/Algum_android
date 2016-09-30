@@ -1,8 +1,6 @@
 package br.com.algum.algum_android;
 
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -43,24 +41,17 @@ public class GruposActivity extends BaseActivity
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         CursorLoader c1;
 
-//        HashMap<Integer, Integer> groupMap = mAdapter.getGroupMap();
-
         if(id <123456) {
-            SharedPreferences sharedPref = getSharedPreferences(getString(R.string.userInfo), Context.MODE_PRIVATE);
-            Uri gruposUri = AlgumDBContract.GruposEntry.buildGrupoUri(sharedPref.getInt(getString(R.string.idUsuario), 0));
-            //Uri gruposUri = AlgumDBContract.GruposEntry.CONTENT_URI;
+            Uri gruposUri = AlgumDBContract.GrupoUsuariosEntry.buildGrupoUsuariosUri(id_usuario);
 
-            String selection = AlgumDBContract.GruposEntry.COLUMN_TIPO_ID + " = " + id + " AND " + AlgumDBContract.GruposEntry.COLUMN_EXCLUIDO + " = 0 ";
+            String selection = "";
 
             String[] projection =
                     {
-                            AlgumDBContract.GruposEntry.TABLE_NAME+"."+ AlgumDBContract.GruposEntry.COLUMN_ID
-                            ,AlgumDBContract.GruposEntry.TABLE_NAME+"."+ AlgumDBContract.GruposEntry.COLUMN_GRUPO_ID
-                            , AlgumDBContract.GruposEntry.TABLE_NAME+"."+ AlgumDBContract.GruposEntry.COLUMN_NOME
-                            , AlgumDBContract.TipoGrupoEntry.TABLE_NAME+"."+ AlgumDBContract.TipoGrupoEntry.COLUMN_DESCRICAO
+                            AlgumDBContract.GruposEntry.TABLE_NAME+".*"
                     };
 
-            String order = AlgumDBContract.GruposEntry.COLUMN_TIPO_ID +" ASC,"+ AlgumDBContract.GruposEntry.COLUMN_NOME + " ASC";
+            String order = AlgumDBContract.GruposEntry.COLUMN_NOME + " ASC";
 
             c1 = new CursorLoader(
                     this,

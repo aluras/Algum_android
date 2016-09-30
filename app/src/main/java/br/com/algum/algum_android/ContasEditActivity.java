@@ -173,8 +173,13 @@ public class ContasEditActivity extends AppCompatActivity
             getContentResolver().update(AlgumDBContract.ContasEntry.CONTENT_URI, values, mSelectionClause,mSelectionArgs);
         }else{
             values.put(AlgumDBContract.ContasEntry.COLUMN_SALDO_INICIAL,saldoAtual);
-            values.put(AlgumDBContract.ContasEntry.COLUMN_USUARIO_ID,idUsuario);
-            getContentResolver().insert(AlgumDBContract.ContasEntry.CONTENT_URI, values);
+            values.put(AlgumDBContract.ContasEntry.COLUMN_USUARIO_ID, idUsuario);
+            Uri uri = getContentResolver().insert(AlgumDBContract.ContasEntry.CONTENT_URI, values);
+
+            ContentValues valuesCU = new ContentValues();
+            valuesCU.put(AlgumDBContract.ContasUsuarioEntry.COLUMN_USUARIO_ID,idUsuario);
+            valuesCU.put(AlgumDBContract.ContasUsuarioEntry.COLUMN_CONTA_ID,uri.getLastPathSegment());
+            getContentResolver().insert(AlgumDBContract.ContasUsuarioEntry.CONTENT_URI, valuesCU);
         }
 
         Controle.showMessage(this, "Conta registrada.");

@@ -19,6 +19,7 @@ public class AlgumContentProvider extends ContentProvider {
     private static final int CONTAS_POR_USUARIO = 101;
     private static final int TIPOS_CONTAS = 102;
     private static final int SALDO_CONTA = 103;
+    private static final int USUARIO_CONTA = 104;
 
     private static final int USUARIOS = 200;
     private static final int USUARIOS_POR_ID = 201;
@@ -26,7 +27,7 @@ public class AlgumContentProvider extends ContentProvider {
     private static final int GRUPOS = 300;
     private static final int GRUPOS_POR_USUARIO = 301;
     private static final int TIPOS_GRUPOS = 302;
-    private static final int USUARIOS_POR_GRUPO = 303;
+    private static final int GRUPO_POR_ID = 303;
 
     private static final int LANCAMENTOS = 400;
     private static final int LANCAMENTOS_POR_USUARIO = 401;
@@ -45,7 +46,8 @@ public class AlgumContentProvider extends ContentProvider {
 
         // For each type of URI you want to add, create a corresponding code.
         matcher.addURI(authority, AlgumDBContract.PATH_CONTAS, CONTAS);
-        matcher.addURI(authority, AlgumDBContract.PATH_CONTAS + "/*", CONTAS_POR_USUARIO);
+        matcher.addURI(authority, AlgumDBContract.PATH_CONTAS_USUARIOS, USUARIO_CONTA);
+        matcher.addURI(authority, AlgumDBContract.PATH_CONTAS_USUARIOS + "/*", CONTAS_POR_USUARIO);
         matcher.addURI(authority, AlgumDBContract.PATH_TIPO_CONTA, TIPOS_CONTAS);
         matcher.addURI(authority, AlgumDBContract.PATH_SALDO_CONTA, SALDO_CONTA);
 
@@ -53,9 +55,9 @@ public class AlgumContentProvider extends ContentProvider {
         matcher.addURI(authority, AlgumDBContract.PATH_USUARIOS + "/*", USUARIOS_POR_ID);
 
         matcher.addURI(authority, AlgumDBContract.PATH_GRUPOS, GRUPOS);
-        matcher.addURI(authority, AlgumDBContract.PATH_GRUPOS + "/*", GRUPOS_POR_USUARIO);
+        matcher.addURI(authority, AlgumDBContract.PATH_GRUPOS + "/*", GRUPO_POR_ID);
+        matcher.addURI(authority, AlgumDBContract.PATH_GRUPO_USUARIOS + "/*", GRUPOS_POR_USUARIO);
         matcher.addURI(authority, AlgumDBContract.PATH_TIPO_GRUPO, TIPOS_GRUPOS);
-        matcher.addURI(authority, AlgumDBContract.PATH_GRUPO_USUARIOS, USUARIOS_POR_GRUPO);
 
         matcher.addURI(authority, AlgumDBContract.PATH_LANCAMENTOS, LANCAMENTOS);
         matcher.addURI(authority, AlgumDBContract.PATH_LANCAMENTOS + "/*", LANCAMENTOS_POR_USUARIO);
@@ -82,35 +84,17 @@ public class AlgumContentProvider extends ContentProvider {
                 if (selection != null && !selection.trim().isEmpty()){
                     selection = selection + " AND ";
                 }
-                selection = selection + AlgumDBContract.ContasEntry.TABLE_NAME + "." + AlgumDBContract.ContasEntry.COLUMN_USUARIO_ID + " = " + uri.getLastPathSegment();
+                selection = selection + AlgumDBContract.ContasUsuarioEntry.TABLE_NAME + "." + AlgumDBContract.ContasUsuarioEntry.COLUMN_USUARIO_ID + " = " + uri.getLastPathSegment();
 
                 _QB.setTables(AlgumDBContract.ContasEntry.TABLE_NAME +
-                        " INNER JOIN " + AlgumDBContract.TipoContaEntry.TABLE_NAME + " ON " +
-                        AlgumDBContract.TipoContaEntry.TABLE_NAME + "." + AlgumDBContract.TipoContaEntry.COLUMN_ID + " = " +
-                        AlgumDBContract.ContasEntry.TABLE_NAME + "." + AlgumDBContract.ContasEntry.COLUMN_TIPO_CONTA_ID);
+                        " INNER JOIN " + AlgumDBContract.ContasUsuarioEntry.TABLE_NAME + " ON " +
+                        AlgumDBContract.ContasUsuarioEntry.TABLE_NAME + "." + AlgumDBContract.ContasUsuarioEntry.COLUMN_CONTA_ID + " = " +
+                        AlgumDBContract.ContasEntry.TABLE_NAME + "." + AlgumDBContract.ContasEntry.COLUMN_ID);
 
-                String _OrderBy = AlgumDBContract.ContasEntry.TABLE_NAME + "." + AlgumDBContract.ContasEntry.COLUMN_NOME + " ASC ";
 
-                retCursor = _QB.query(mDbHelper.getReadableDatabase(),projection,selection,selectionArgs,null,null,_OrderBy);
+                retCursor = _QB.query(mDbHelper.getReadableDatabase(),projection,selection,selectionArgs,null,null,sortOrder);
 
                 break;
-
-/*
-                if (selection != null && !selection.trim().isEmpty()){
-                    selection = selection + " AND ";
-                }
-                selection = selection + AlgumDBContract.ContasEntry.COLUMN_USUARIO_ID + " = " + uri.getLastPathSegment();
-
-                retCursor = mDbHelper.getReadableDatabase().query(
-                        AlgumDBContract.ContasEntry.TABLE_NAME,
-                        projection,
-                        selection,
-                        selectionArgs,
-                        null,
-                        null,sortOrder
-                );
-                break;
-*/
             }
             case CONTAS: {
                 retCursor = mDbHelper.getReadableDatabase().query(
@@ -175,6 +159,24 @@ public class AlgumContentProvider extends ContentProvider {
 
                 break;
             }
+            case GRUPO_POR_ID: {
+
+                if (selection != null && !selection.trim().isEmpty()){
+                    selection = selection + " AND ";
+                }
+                selection = selection + AlgumDBContract.GruposEntry.COLUMN_ID + " = " + uri.getLastPathSegment();
+
+                retCursor = mDbHelper.getReadableDatabase().query(
+                        AlgumDBContract.GruposEntry.TABLE_NAME,
+                        projection,
+                        selection,
+                        selectionArgs,
+                        null,
+                        null,
+                        sortOrder
+                );
+                break;
+            }
             case TIPOS_GRUPOS: {
                 retCursor = mDbHelper.getReadableDatabase().query(
                         AlgumDBContract.TipoGrupoEntry.TABLE_NAME,
@@ -187,32 +189,24 @@ public class AlgumContentProvider extends ContentProvider {
                 break;
             }
             case GRUPOS_POR_USUARIO: {
+
                 SQLiteQueryBuilder _QB = new SQLiteQueryBuilder();
 
-                if (selection != null && !selection.trim().isEmpty()) {
+                if(projection == null || projection.length == 0){
+                    projection = new String[] {AlgumDBContract.GruposEntry.TABLE_NAME+".*"};
+                }
+
+                if (selection != null && !selection.trim().isEmpty()){
                     selection = selection + " AND ";
                 }
-                selection = selection + AlgumDBContract.GruposEntry.TABLE_NAME + "." + AlgumDBContract.GruposEntry.COLUMN_USUARIO_ID + " = " + uri.getLastPathSegment();
+                selection = selection + AlgumDBContract.GrupoUsuariosEntry.TABLE_NAME + "." + AlgumDBContract.GrupoUsuariosEntry.COLUMN_USUARIO_ID + " = " + uri.getLastPathSegment();
 
                 _QB.setTables(AlgumDBContract.GruposEntry.TABLE_NAME +
-                        " INNER JOIN " + AlgumDBContract.TipoGrupoEntry.TABLE_NAME + " ON " +
-                        AlgumDBContract.TipoGrupoEntry.TABLE_NAME + "." + AlgumDBContract.TipoGrupoEntry.COLUMN_ID + " = " +
-                        AlgumDBContract.GruposEntry.TABLE_NAME + "." + AlgumDBContract.GruposEntry.COLUMN_TIPO_ID);
+                        " INNER JOIN " + AlgumDBContract.GrupoUsuariosEntry.TABLE_NAME + " ON " +
+                        AlgumDBContract.GrupoUsuariosEntry.TABLE_NAME + "." + AlgumDBContract.GrupoUsuariosEntry.COLUMN_GRUPO_ID + " = " +
+                        AlgumDBContract.GruposEntry.TABLE_NAME + "." + AlgumDBContract.GruposEntry.COLUMN_ID);
 
-                retCursor = _QB.query(mDbHelper.getReadableDatabase(), projection, selection, selectionArgs, null, null, sortOrder);
-
-                break;
-            }
-            case USUARIOS_POR_GRUPO: {
-
-                retCursor = mDbHelper.getReadableDatabase().query(
-                        AlgumDBContract.GrupoUsuariosEntry.TABLE_NAME,
-                        projection,
-                        selection,
-                        selectionArgs,
-                        null,
-                        null,sortOrder
-                );
+                retCursor = _QB.query(mDbHelper.getReadableDatabase(),projection,selection,selectionArgs,null,null,sortOrder);
 
                 break;
             }
@@ -290,6 +284,14 @@ public class AlgumContentProvider extends ContentProvider {
                     throw new android.database.SQLException("Failed to insert row into " + uri);
                 break;
             }
+            case CONTAS_POR_USUARIO:{
+                long _id = mDbHelper.getWritableDatabase().insert(AlgumDBContract.ContasUsuarioEntry.TABLE_NAME, null, values);
+                if ( _id > 0 )
+                    returnUri = null;
+                else
+                    throw new android.database.SQLException("Failed to insert row into " + uri);
+                break;
+            }
             case TIPOS_CONTAS:{
                 long _id = mDbHelper.getWritableDatabase().insert(AlgumDBContract.TipoContaEntry.TABLE_NAME, null, values);
                 if ( _id > 0 )
@@ -314,16 +316,16 @@ public class AlgumContentProvider extends ContentProvider {
                     throw new android.database.SQLException("Failed to insert row into " + uri);
                 break;
             }
-            case TIPOS_GRUPOS:{
-                long _id = mDbHelper.getWritableDatabase().insert(AlgumDBContract.TipoGrupoEntry.TABLE_NAME, null, values);
+            case GRUPOS_POR_USUARIO:{
+                long _id = mDbHelper.getWritableDatabase().insert(AlgumDBContract.GrupoUsuariosEntry.TABLE_NAME, null, values);
                 if ( _id > 0 )
-                    returnUri = null;
+                    returnUri = AlgumDBContract.GrupoUsuariosEntry.CONTENT_URI;
                 else
                     throw new android.database.SQLException("Failed to insert row into " + uri);
                 break;
             }
-            case USUARIOS_POR_GRUPO:{
-                long _id = mDbHelper.getWritableDatabase().insert(AlgumDBContract.GrupoUsuariosEntry.TABLE_NAME, null, values);
+            case TIPOS_GRUPOS:{
+                long _id = mDbHelper.getWritableDatabase().insert(AlgumDBContract.TipoGrupoEntry.TABLE_NAME, null, values);
                 if ( _id > 0 )
                     returnUri = null;
                 else
@@ -365,16 +367,16 @@ public class AlgumContentProvider extends ContentProvider {
                 _id = mDbHelper.getWritableDatabase().delete(AlgumDBContract.ContasEntry.TABLE_NAME, selection, selectionArgs);
                 break;
             }
+            case CONTAS_POR_USUARIO: {
+                _id = mDbHelper.getWritableDatabase().delete(AlgumDBContract.ContasUsuarioEntry.TABLE_NAME, selection, selectionArgs);
+                break;
+            }
             case TIPOS_CONTAS: {
                 _id = mDbHelper.getWritableDatabase().delete(AlgumDBContract.TipoContaEntry.TABLE_NAME, selection, selectionArgs);
                 break;
             }
             case GRUPOS: {
                 _id = mDbHelper.getWritableDatabase().delete(AlgumDBContract.GruposEntry.TABLE_NAME, selection, selectionArgs);
-                break;
-            }
-            case USUARIOS_POR_GRUPO: {
-                _id = mDbHelper.getWritableDatabase().delete(AlgumDBContract.GrupoUsuariosEntry.TABLE_NAME, selection, selectionArgs);
                 break;
             }
             case USUARIOS: {
@@ -407,6 +409,12 @@ public class AlgumContentProvider extends ContentProvider {
                 //    throw new android.database.SQLException("Failed to update row into " + uri);
                 break;
             }
+            case CONTAS_POR_USUARIO: {
+                _id = mDbHelper.getWritableDatabase().update(AlgumDBContract.ContasUsuarioEntry.TABLE_NAME, values, selection, selectionArgs);
+                if (_id == 0)
+                    throw new android.database.SQLException("Failed to update row into " + uri);
+                break;
+            }
             case SALDO_CONTA: {
 
                 String strUpdate = "update "+ AlgumDBContract.ContasEntry.TABLE_NAME
@@ -423,6 +431,12 @@ public class AlgumContentProvider extends ContentProvider {
             }
             case GRUPOS: {
                 _id = mDbHelper.getWritableDatabase().update(AlgumDBContract.GruposEntry.TABLE_NAME, values, selection, selectionArgs);
+                //if (_id == 0)
+                //    throw new android.database.SQLException("Failed to update row into " + uri);
+                break;
+            }
+            case GRUPOS_POR_USUARIO: {
+                _id = mDbHelper.getWritableDatabase().update(AlgumDBContract.GrupoUsuariosEntry.TABLE_NAME, values, selection, selectionArgs);
                 //if (_id == 0)
                 //    throw new android.database.SQLException("Failed to update row into " + uri);
                 break;

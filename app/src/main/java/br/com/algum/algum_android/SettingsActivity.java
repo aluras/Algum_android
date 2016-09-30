@@ -95,6 +95,7 @@ public class SettingsActivity extends AppCompatActivity {
                                         public void onResult(Status status) {
                                             getActivity().getContentResolver().delete(AlgumDBContract.LancamentoEntry.CONTENT_URI, null, null);
                                             getActivity().getContentResolver().delete(AlgumDBContract.ContasEntry.CONTENT_URI, null, null);
+                                            getActivity().getContentResolver().delete(AlgumDBContract.ContasUsuarioEntry.CONTENT_URI, null, null);
                                             getActivity().getContentResolver().delete(AlgumDBContract.GruposEntry.CONTENT_URI, null, null);
                                             getActivity().getContentResolver().delete(AlgumDBContract.GrupoUsuariosEntry.CONTENT_URI, null, null);
                                             getActivity().getContentResolver().delete(AlgumDBContract.UsuariosEntry.CONTENT_URI, null, null);

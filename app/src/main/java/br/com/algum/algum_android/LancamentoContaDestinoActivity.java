@@ -106,11 +106,11 @@ public class LancamentoContaDestinoActivity extends AppCompatActivity
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
 
         SharedPreferences sharedPref = getSharedPreferences(getString(R.string.userInfo), Context.MODE_PRIVATE);
-        Uri contasUri = AlgumDBContract.ContasEntry.buildContaUsuarioUri(sharedPref.getInt(getString(R.string.idUsuario), 0));
+        Uri contasUri = AlgumDBContract.ContasUsuarioEntry.buildContaUsuariosUri(sharedPref.getInt(getString(R.string.idUsuario), 0));
 
         String[] projection = {AlgumDBContract.ContasEntry.TABLE_NAME+".*"};
 
-        String selection =  AlgumDBContract.ContasEntry.COLUMN_EXCLUIDO + " = 0 ";
+        String selection =  AlgumDBContract.ContasEntry.TABLE_NAME+"."+ AlgumDBContract.ContasEntry.COLUMN_EXCLUIDO + " = 0 ";
 
         switch (idTipoLancamento){
             case 1:

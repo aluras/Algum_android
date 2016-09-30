@@ -139,14 +139,14 @@ public class GruposEditActivity extends AppCompatActivity
         ContentValues values = new ContentValues();
         values.put(AlgumDBContract.GruposEntry.COLUMN_NOME, nome);
         values.put(AlgumDBContract.GruposEntry.COLUMN_TIPO_ID,idTipoGrupo);
-        values.put(AlgumDBContract.GruposEntry.COLUMN_ALTERADO, 1);
+        //values.put(AlgumDBContract.GruposEntry.COLUMN_ALTERADO, 1);
 
         if(idGrupo > 0){
             String mSelectionClause = AlgumDBContract.GruposEntry.COLUMN_ID + " = ? ";
             String[] mSelectionArgs = {Integer.toString(idGrupo)};
             getContentResolver().update(AlgumDBContract.GruposEntry.CONTENT_URI, values, mSelectionClause,mSelectionArgs);
         }else{
-            values.put(AlgumDBContract.GruposEntry.COLUMN_USUARIO_ID,idUsuario);
+            //values.put(AlgumDBContract.GruposEntry.COLUMN_USUARIO_ID,idUsuario);
             getContentResolver().insert(AlgumDBContract.GruposEntry.CONTENT_URI, values);
         }
 

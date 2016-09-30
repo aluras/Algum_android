@@ -48,7 +48,6 @@ public class LancamentoValorActivity extends AppCompatActivity
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
-        //super.onCreateDrawer();
 
         Intent intent = getIntent();
 

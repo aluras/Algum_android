@@ -38,6 +38,8 @@ public class AlgumDbHelper extends SQLiteOpenHelper {
                 AlgumDBContract.ContasEntry.COLUMN_CONTA_ID + " INTEGER NULL," +
                 AlgumDBContract.ContasEntry.COLUMN_TIPO_CONTA_ID + " INTEGER NOT NULL," +
                 AlgumDBContract.ContasEntry.COLUMN_USUARIO_ID + " INTEGER NOT NULL, " +
+                AlgumDBContract.ContasEntry.COLUMN_USUARIO_EMAIL + " TEXT NULL," +
+                AlgumDBContract.ContasEntry.COLUMN_USUARIO_NOME + " TEXT NULL," +
                 AlgumDBContract.ContasEntry.COLUMN_NOME + " TEXT NOT NULL, " +
                 AlgumDBContract.ContasEntry.COLUMN_SALDO_INICIAL + " DECIMAL NOT NULL, " +
                 AlgumDBContract.ContasEntry.COLUMN_SALDO + " DECIMAL NOT NULL," +
@@ -45,6 +47,19 @@ public class AlgumDbHelper extends SQLiteOpenHelper {
                 AlgumDBContract.ContasEntry.COLUMN_ALTERADO + " INT NOT NULL DEFAULT 0)";
 
         db.execSQL(SQL_CREATE_CONTA_TABLE);
+
+        final String SQL_CREATE_CONTA_USUARIO_TABLE = "CREATE TABLE " + AlgumDBContract.ContasUsuarioEntry.TABLE_NAME + " (" +
+                AlgumDBContract.ContasUsuarioEntry.COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
+                AlgumDBContract.ContasUsuarioEntry.COLUMN_CONTA_USUARIO_ID + " INT NULL," +
+                AlgumDBContract.ContasUsuarioEntry.COLUMN_CONTA_ID + " INT NOT NULL," +
+                AlgumDBContract.ContasUsuarioEntry.COLUMN_USUARIO_ID + " INT NULL," +
+                AlgumDBContract.ContasUsuarioEntry.COLUMN_USUARIO_EMAIL + " TEXT NULL," +
+                AlgumDBContract.ContasUsuarioEntry.COLUMN_USUARIO_NOME + " TEXT NULL," +
+                AlgumDBContract.ContasUsuarioEntry.COLUMN_EXCLUIDO + " INTEGER NOT NULL DEFAULT 0," +
+                AlgumDBContract.ContasUsuarioEntry.COLUMN_ALTERADO + " INTEGER NOT NULL DEFAULT 0," +
+                AlgumDBContract.ContasUsuarioEntry.COLUMN_ACEITA + " INT NOT NULL DEFAULT 0)";
+
+        db.execSQL(SQL_CREATE_CONTA_USUARIO_TABLE);
 
         final String SQL_CREATE_USUARIO_TABLE = "CREATE TABLE " + AlgumDBContract.UsuariosEntry.TABLE_NAME + " (" +
                 AlgumDBContract.UsuariosEntry.COLUMN_ID + " INTEGER PRIMARY KEY," +
@@ -58,19 +73,17 @@ public class AlgumDbHelper extends SQLiteOpenHelper {
                 AlgumDBContract.GruposEntry.COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
                 AlgumDBContract.GruposEntry.COLUMN_GRUPO_ID + " INTEGER NULL," +
                 AlgumDBContract.GruposEntry.COLUMN_TIPO_ID + " INTEGER NOT NULL," +
-                AlgumDBContract.GruposEntry.COLUMN_USUARIO_ID + " INTEGER NOT NULL," +
-                AlgumDBContract.GruposEntry.COLUMN_NOME + " TEXT NOT NULL," +
-                AlgumDBContract.GruposEntry.COLUMN_EXCLUIDO + " INTEGER NOT NULL DEFAULT 0," +
-                AlgumDBContract.GruposEntry.COLUMN_ALTERADO + " INT NOT NULL DEFAULT 0)";
+                AlgumDBContract.GruposEntry.COLUMN_NOME + " TEXT NOT NULL)";
 
         db.execSQL(SQL_CREATE_GRUPO_TABLE);
 
         final String SQL_CREATE_GRUPO_USUARIO_TABLE = "CREATE TABLE " + AlgumDBContract.GrupoUsuariosEntry.TABLE_NAME + " (" +
                 AlgumDBContract.GrupoUsuariosEntry.COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
-                AlgumDBContract.GrupoUsuariosEntry.COLUMN_GRUPO_ID + " INTEGER NULL," +
+                AlgumDBContract.GrupoUsuariosEntry.COLUMN_GRUPO_ID + " INTEGER NOT NULL," +
+                AlgumDBContract.GrupoUsuariosEntry.COLUMN_USUARIO_ID + " INTEGER NULL," +
                 AlgumDBContract.GrupoUsuariosEntry.COLUMN_EMAIL + " TEXT NOT NULL," +
-                AlgumDBContract.GrupoUsuariosEntry.COLUMN_EXCLUIDO + " INTEGER NOT NULL," +
-                AlgumDBContract.GrupoUsuariosEntry.COLUMN_ALTERADO + " INT NOT NULL DEFAULT 0)";
+                AlgumDBContract.GrupoUsuariosEntry.COLUMN_EXCLUIDO + " INTEGER NOT NULL DEFAULT 0," +
+                AlgumDBContract.GrupoUsuariosEntry.COLUMN_ALTERADO + " INTEGER NOT NULL DEFAULT 0)";
 
         db.execSQL(SQL_CREATE_GRUPO_USUARIO_TABLE);
 

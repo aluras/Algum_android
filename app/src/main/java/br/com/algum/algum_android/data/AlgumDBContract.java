@@ -20,6 +20,7 @@ public class AlgumDBContract {
     public static final Uri BASE_CONTENT_URI = Uri.parse("content://" + CONTENT_AUTHORITY);
 
     public static final String PATH_CONTAS = "contas";
+    public static final String PATH_CONTAS_USUARIOS = "contasUsuarios";
     public static final String PATH_TIPO_CONTA = "tipoConta";
     public static final String PATH_SALDO_CONTA = "saldoConta";
     public static final String PATH_USUARIOS = "usuarios";
@@ -72,6 +73,8 @@ public class AlgumDBContract {
         public static final String COLUMN_CONTA_ID = "conta_id";
         public static final String COLUMN_TIPO_CONTA_ID = "tipo_conta_id";
         public static final String COLUMN_USUARIO_ID = "usuario_id";
+        public static final String COLUMN_USUARIO_EMAIL = "usuario_email";
+        public static final String COLUMN_USUARIO_NOME = "usuario_nome";
         public static final String COLUMN_NOME = "nome";
         public static final String COLUMN_SALDO_INICIAL = "saldo_inicial";
         public static final String COLUMN_SALDO = "saldo";
@@ -81,6 +84,35 @@ public class AlgumDBContract {
         public static Uri buildContaUsuarioUri(long id) {
             return ContentUris.withAppendedId(CONTENT_URI, id);
         }
+
+    }
+
+    public static final class ContasUsuarioEntry implements BaseColumns {
+
+        public static final Uri CONTENT_URI =
+                BASE_CONTENT_URI.buildUpon().appendPath(PATH_CONTAS_USUARIOS).build();
+
+        public static final String CONTENT_TYPE =
+                "vnd.android.cursor.dir/" + CONTENT_AUTHORITY + "/" + PATH_CONTAS_USUARIOS;
+        public static final String CONTENT_ITEM_TYPE =
+                "vnd.android.cursor.item/" + CONTENT_AUTHORITY + "/" + PATH_CONTAS_USUARIOS;
+
+        public static final String TABLE_NAME = "contasCompartilhamento";
+
+        public static final String COLUMN_ID = "_id";
+        public static final String COLUMN_CONTA_USUARIO_ID = "conta_usuario_id";
+        public static final String COLUMN_CONTA_ID = "conta_id";
+        public static final String COLUMN_USUARIO_ID = "usuario_id";
+        public static final String COLUMN_USUARIO_EMAIL = "usuario_email";
+        public static final String COLUMN_USUARIO_NOME = "usuario_nome";
+        public static final String COLUMN_EXCLUIDO = "excluido";
+        public static final String COLUMN_ALTERADO = "alterado";
+        public static final String COLUMN_ACEITA = "aceita";
+
+        public static Uri buildContaUsuariosUri(long id) {
+            return ContentUris.withAppendedId(CONTENT_URI, id);
+        }
+
 
     }
 
@@ -154,9 +186,6 @@ public class AlgumDBContract {
         public static final String COLUMN_GRUPO_ID = "grupo_id";
         public static final String COLUMN_NOME = "nome";
         public static final String COLUMN_TIPO_ID = "tipo_id";
-        public static final String COLUMN_USUARIO_ID = "usuario_id";
-        public static final String COLUMN_EXCLUIDO = "excluido";
-        public static final String COLUMN_ALTERADO = "alterado";
         public static final String COLUMN_GASTO = "gasto";
 
         public static Uri buildGrupoUri(long id) {
@@ -177,9 +206,14 @@ public class AlgumDBContract {
 
         public static final String COLUMN_ID = "_id";
         public static final String COLUMN_GRUPO_ID = "grupo_id";
+        public static final String COLUMN_USUARIO_ID = "usuario_id";
         public static final String COLUMN_EMAIL = "email";
         public static final String COLUMN_EXCLUIDO = "excluido";
         public static final String COLUMN_ALTERADO = "alterado";
+
+        public static Uri buildGrupoUsuariosUri(long id) {
+            return ContentUris.withAppendedId(CONTENT_URI, id);
+        }
 
     }
 
